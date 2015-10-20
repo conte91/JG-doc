@@ -1,0 +1,23 @@
+\chapter{Object detection and pose estimation}
+In this chapter a pipeline similar to the one introduced in
+\cite{linemod-pipeline} is presented, which is used to detect and estimate
+the pose of the objects to be recognized. First a template matching approach is
+used to detect the objects, then matches are progressively excluded (false
+positives detection) based on hue values; finally valid matches are
+progressively refined by physically moving a precision depth camera and
+performing depth-based alignment of the match and the real object.
+
+\section{Linemod template matching}
+%TODO
+
+\section{False positive rejection based on hue values}
+The first step of pose matching is made by purpose to be overly tolerant in
+template matching. This is because the used objects are quite small and simple
+in shape - which can reduce the number of features to match - and at the first
+step are seen from far away ( more than 1 meter ) in order to maximize the
+field of view without increasing the needed number of cameras. The counterpart
+for being sure to match \emph{at least} something is having a huge number of
+  false positives, which must be recognized and excluded before starting the
+  alignment.
+
+
