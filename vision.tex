@@ -21,3 +21,26 @@ for being sure to match \emph{at least} something is having a huge number of
   alignment.
 
 
+To do this, after performing each match together with a rough pose estimation,
+the object is rendered again into its estimated position, and the portion of
+source image corresponding to the render is taken. The two images are then
+compared on a per-pixel basis, considering only the pixels that lie on the
+depth mask created during rendering. 
+
+Before comparing, the two images are converted to the HSV colour space, and
+comparation is done based on the hue values. This allows to only consider the
+actual colour of the model and match, and discard all information about
+surface behaviour with respect to light, together with variations in the images
+depending on different lightning conditions.
+
+HSV colour space has singularities on the hue dimension when the chosen pixel is
+either black or white; in this case, in effect, the hue of the pixel is
+undefined due to the low saturation or low luminosity (\emph{value}). To fix
+this, white and black pixels are turned to be zero-saturated, zero-valued
+pixels with fixed hue, corresponding to yellow (for white) and blue (for
+black). When matching, these are treated as special values and two pixels are
+said to match either if their actual hue match (which
+happens in case of strong lightning changes) or if their modified hue match
+(which happes if both the model and the scene appear to be actually white or
+black).
+
