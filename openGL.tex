@@ -1,0 +1,51 @@
+\section{Offline training of objects using 3D meshes and OpenGL}
+In order to efficiently train the object database for each model, it is needed
+to create a big set of templates, which is able to cover the whole set of view
+points. Training can be both performed with either \emph{online} methods (i.e.
+phisically looking at the object from different viewpoints with the chosen
+camera) or \emph{offline} ones, which build the dataset starting from known
+object informations such as pre-extracted colour features or shape informations.
+
+In this section we present the proposed method for template database
+creation, which is an implementation of the method used by modern template
+matching algorithms such as \cite{TODO} and \cite{TODO}, and
+has the advantage of being quite fast, fully automated for any dataset size,
+and highly scalable (different dataset from different vendors can be merged
+together or distributed with no effort at all).
+
+\subsection{Offline training advantages}
+It has been suggested in \cite{TODO} that fully-automated, offline training method can
+outperform online training methods used as a de-facto standard
+in previous years \cite{TODO}. Main advantages of offline training methods like
+the proposed one, with respect
+to online ones, include:
+
+\begin{itemize}
+\item{Offline training does not require human intervention. Human-based
+training is error prone, and cannot yield to good results if not done by an
+\emph{expert} person. In an industrial or research scenario, this implies
+employing a skilled human resource in a non-productive task, which has obvious
+consequences in terms of costs (at least if the process is repeated
+for a big group of objects) and team productivity (the charged person will be
+actually involved full-time in a task which is well below is actual
+capabilities);
+\item{Accurate training is a time-consuming task and physical objects must be available. In an
+industrial scenario, this can mean a longer time-to-market or delayed custom products deli-
+very. On the other hand, offline training does not require a phisical copy of the object: for
+example, the proposed approach only needs a CAD model of the object, which in modern
+scenarios is available well before the final product; this means that training can be done at
+early project phases, before the objects used for testing the project actually
+arrive;}
+\item{If offline training is accurate enough, it can bring much more precise results than online
+one. For example, pose information associated with each template are exact when generated
+offline, while and subject to human error;}
+\item{Large objects can be modelled without the need of physical movement around them. As
+algorithms such as \cite{linemod-pipeline} will probably evolve their already good realtime capabilities, they will
+be able to be applied to environments such as cities, in which the trackable objects are too
+big to be modeled online at low cost.}
+
+\subsection{CAD modeling of objects}
+The idea behind the training procedure is to exploit CAD models of the object
+to recognize in order to generate realistic renders of it and use the latter
+for feature extraction and database training. In this way, a physical camera is
+ simulated and full coverage which 
