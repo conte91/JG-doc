@@ -3,5 +3,101 @@ In order to obtain good renderings for training and recognition purposes, it is
 important to use the same model of camera described in sec.
 \ref{sec:camera_modelling}.
 
-\subsection{OpenGL reference system}
-Open
+In this chapter, this modelling is described. First, a brief
+introduction on the correct usage of homogeneous coordinates (sec.
+\ref{homogeneous-coordinates}) and OpenGL reference systems (sec.
+\ref{opengl-reference-systems}) is done. After this, the OpenGL rendering
+process is described (sec. \ref{opengl-rendering-process}), and finally the
+implementation of objects' rendering for the purpose of this project is
+described keeping all of the previous into account (sec. \ref{renderer3d}).
+
+\subsection{Homogeneous coordinates} \label{homogeneous-coordinates}
+Homogeneous coordinates were introduced by the famous mathematician August Ferdinand Möbius in
+\cite{homogeneous-coordinates}; they are a common way to represent points in
+\emph{projective geometry} by using an additional scale value, usually called
+$w$, in represented
+vectors, which can be seen as an inverted scale factor for the whole vector. In
+practice this means that the association between homogeneous coordinates $H$ and
+cartesian coordinates $C$ is:
+
+\begin{equation}
+H=\left(\begin{array}{c}wx\\wy\\wz\\w\end{array}\right) \Leftrightarrow
+C=\left(\begin{array}{c}x\\y\\z\end{array}\right)
+\end{equation}
+
+Although this generates redundancy, as there will always be more freedom degrees
+then constraints when mapping from coordinates to points (2D points are
+represented with 3 values, 3D points with 4, and so on), this notation can
+simplify a lot the computing effort for usual geometric operations -- for
+example, scaling a set of points only requires to change their $w$ value.
+Also, when performing matrix operations, this geometry has the good property to
+be \emph{scale-invariant} for vectors, which means that coordinates are
+multiplied by a constant value they keep representing the same point.
+
+The last interesting property of homogeneous coordinates for the purposes of
+this thesis is their capability to easily distinguish points from directions;
+in fact, a directional vector can be represented as a point at the infinity,
+and, differentely from cartesian coordinate systems, homogeneous coordinates
+easily represent them as directional vectors by setting their $w$ coordinate to
+$0$.
+
+Also, \emph{all} affine transformations, if operating on homogeneous
+coordinates, can be representing as $4\times 4$ matrices including rotation
+matrix $R$, translation vector $T$, and scale properties $s$:
+
+\begin{equation}
+A=\begin{pmatrix}
+R & T \\
+0 & s
+\end{pmatrix}
+\end{equation}
+
+By representing directional vectors as points at the infinity, they will have
+the good property of never being scaled nor translated by these transformation,
+which is desirable e.g. for unit direction vectors.
+
+OpenGL, together with applications like OpenCV and algebraic libraries like
+Eigen\footnote{eigen.org}, use homogeneous coordinates for almost all of their
+work. During this project, homogeneous coordinates have been used extensively
+thanks to the Eigen library, in order to have a well-defined system (Affine
+transformations) to define the reference systems of interest, and in order to
+compute transformations between objects. Homogeneous coordinates are converted
+to native formats (e.g. COMAU robots' euler axis representation) only in the
+final backend of the applications, so that data representation is unique and
+coherent in the whole scope of the project.
+
+\subsection{OpenGL reference systems} \label{opengl-reference-systems}
+Opposing to a lot of 3D manipulation systems, such as COMAU's robotic arms or
+CAD applications, which use different coordinate systems for different logical
+aspects of their work, typically requiring at least a \emph{local} and a
+\emph{global} coordinate system, OpenGL only works with a single 
+coordinate system (\emph{clip coordinates}) when drawing (rendering) objects,
+in which camera's frame is fixed at the origin and aligned with global axes,
+with Z-axis pointing forward\footnote{This actually brings out a left-handed
+coordinate system, which must be taken into account when interfacing OpenGL
+with external world like it has been done in this project.},
+which is then transformed into another unique coordinate system (\emph{window
+coordinates}) after drawing in order to map 3D points to 2D points into the
+render (camera) buffer. A third buffer (\emph{Z-depth buffer}) keeps
+informations about the depth of drawn points into the visible scene and is
+registered with the rendering buffer. As described in \cite{opengl-book}, in order to give the
+programmer full access capabilities to the rendering engine's internals, 
+multiple reference systems appear to the user only on the
+OpenGL API's abstraction layer, in which different functions \emph{appear} to
+work on different coordinate systems, but instead limit themselves to act
+differently on the latter. Thus, with the target of emulating a physical
+camera in mind, the programmer can act on the most suitable components of the
+rendering process as needed, without caring about what is the right coordinate
+system to transform. 
+
+\subsection{Details about OpenGL rendering process} \label{opengl-rendering-process}
+Here follows a description of the full process performed by OpenGL in order to
+render a 3D mesh, from scene generation to actual mapping of 3D points into a
+2D buffer. A complete and detailed description can be found in
+\cite{opengl-book}, completed of actual API examples which are omitted here
+for brevity.
+
+First of all, OpenGL applications were born 
+
+\subsection{Implementation of objects' rendering} \label{renderer3d}
+\paragraph{The GLUT toolkit}

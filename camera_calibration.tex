@@ -67,11 +67,12 @@ Also, as we are assuming to work with a registered RGBD image, $z$ coordinate is
 directly measured from the depth sensor and is reported on a per-pixel basis
 without the need of further processing.
 
-If we use \emph{homogeneous coordinates} % TODO nota
+If we use \emph{homogeneous coordinates} as described in sec.
+\ref{homogeneous-coordinates}
 to describe both 3D and 2D points, we get
 
 \begin{equation} \label{eqn:intrinsics}
-z_c \left(\begin{array}{c}u\\v\\1\end{array}\right)
+\left(\begin{array}{c}u\\v\\z_c\end{array}\right)
   =
   \left(\begin{array}{cccc}
       f_x & 0 & u_0 \\
