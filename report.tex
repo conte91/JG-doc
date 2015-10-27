@@ -1,11 +1,17 @@
+\usepackage{amsmath}
 \usepackage[
 backend=biber,
 style=numeric, %TODO ask 
 ]{biblatex}
 \addbibresource{bibliography.bib}
+\newcommand{\vmiddle}[1]{\begin{tabular}{@{}c@{}} {#1} \end{tabular}}
 \begin{document}
-\input{vision}
+\english
+\chapter{Object modelling and training for detection purposes}
 \input{camera_calibration}
-\input{openGL.tex}
+\input{openGL}
+\input{training}
+\chapter{Object detection and pose estimation}
+\input{vision}
 \printbibliography
 \end{document}
