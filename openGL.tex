@@ -1,17 +1,71 @@
 \section{OpenGL rendering process} \label{sec:opengl-rendering}
 In order to obtain good renderings for training and recognition purposes, it is
-important to use the same model of camera described in sec.
-\ref{sec:camera_modelling}.
+important to create photo realistic, virtual snapshots of the objects in
+diffent poses. It is also important to use the same model of camera described in sec.
+\ref{sec:camera_modelling} in the most uniform manner as possible.
 
 In this chapter, this modelling is described. First, a brief
-introduction on the correct usage of homogeneous coordinates (sec.
-\ref{homogeneous-coordinates}) and OpenGL reference systems (sec.
-\ref{opengl-reference-systems}) is done. After this, the OpenGL rendering
+introduction to OpenGL (sec. \ref{opengl-intro}) and to the correct usage of homogeneous coordinates (sec.
+\ref{homogeneous-coordinates}) is done, followed by a description of OpenGL reference systems (sec.
+\ref{opengl-reference-systems}). After this, the OpenGL rendering
 process is described (sec. \ref{opengl-rendering-process}), and finally the
 implementation of objects' rendering for the purpose of this project is
 described keeping all of the previous into account (sec. \ref{renderer3d}).
 
-\subsection{Homogeneous coordinates} \label{homogeneous-coordinates}
+\subsection{OpenGL graphics library} \label{sec:opengl-intro}
+OpenGL\footnote{www.opengl.org} is a free (GPL) software interface to graphics hardware \cite{opengl-book}. This
+library allows a programmer to build incredibly complex, interactive 3D graphics
+applications (a lot of modern PC games are an example) without the need of
+directly interfacing the graphics hardware, which in most of cases has an
+extremely complicated architecture and variegated set of features. Instead, a
+set of standard 3D graphics functions (\emph{API}) for the C programming
+language is exposed to the developer, and the hassle of linking these
+functions to the hardware is left to the manufacturer, who will provide its own
+optimized implementation of the library together with the hardware.
+
+Being industrial-level free software, this library has become very popular, and
+well-working implementations exist for most of the modern graphics hardware
+available nowadays. Being highly portable (stripped-down versions of OpenGL
+called \emph{OpenGL-ES} exist for embedded systems and systems with limited
+resources in general, such as Android mobile phones); in this sense, OpenGL is
+a perfect fit for image processing systems requiring a 3D rendering feedback to
+work, like this, in order to be easily ported and implemented in real-world
+applications.
+
+As a 3D graphics engine, and considering that it targets a wide range of devices, OpenGL only manages simple primitives' rendering, such
+as points', lines' and polygons'. It does \emph{not}, thus, implement
+high level tasks like window management or user input, which may be not even
+available on the system the application's running onto.
+
+However, a set of various complementary libraries exist, which can be used in
+synergy with OpenGL to provide such functionalities. The ones used during the
+course of this project are:
+
+\begin{itemize}
+  \item{\emph{The OpenGL Utility Toolkit
+(\emph{GLUT})}\footnote{https://www.opengl.org/resources/libraries/glut/} a
+nonfree library, written by Mark Kilgard to support its OpenGL guide
+\cite{opengl-book}, tightly bundled to OpenGL and
+almost always shipped together with it, which helps the programmer in all the
+aforementioned tasks. In particular, it provides a cross-platform abstraction
+for window creation and management, and for user event handling; it also
+provides the programmer with high-level shape creation routines. A free
+implementation and extension called
+\emph{FreeGLUT}\footnote{http://freeglut.sourceforge.net/} exists and is used
+worldwide as a replacement for GLUT, as the last version (3.7) of the latter dates
+back to
+1997;\footnote{http://www.ibiblio.org/pub/packages/development/graphics/glut/}}
+
+\item{
+\emph{Open Asset Import Library (\emph{Assimp})}, which is a support library which
+can be used to import various mesh formats into a uniform, object-oriented (C++)
+data structure. It is useful to generate at runtime a vertex list and rendering
+data for objects
+generated from external data, such as the objects' models used into this project
+for object recognition purposes.
+}
+\end{itemize}
+\subsection{Homogeneous coordinates} \label{sec:homogeneous-coordinates}
 Homogeneous coordinates were introduced by the famous mathematician August Ferdinand Möbius in
 \cite{homogeneous-coordinates}; they are a common way to represent points in
 \emph{projective geometry} by using an additional scale value, usually called
@@ -19,6 +73,7 @@ $w$, in represented
 vectors, which can be seen as an inverted scale factor for the whole vector. In
 practice this means that the association between homogeneous coordinates $H$ and
 cartesian coordinates $C$ is:
+
 
 \begin{equation}
 H=\left(\begin{array}{c}wx\\wy\\wz\\w\end{array}\right) \Leftrightarrow
@@ -73,11 +128,11 @@ aspects of their work, typically requiring at least a \emph{local} and a
 \emph{global} coordinate system, OpenGL only works with a single 
 coordinate system (\emph{clip coordinates}) when drawing (rendering) objects,
 in which camera's frame is fixed at the origin and aligned with global axes,
-with Z-axis pointing forward\footnote{This actually brings out a left-handed
+with Z-axis pointing backward\footnote{This actually brings out a left-handed
 coordinate system, which must be taken into account when interfacing OpenGL
 with external world like it has been done in this project.},
-which is then transformed into another unique coordinate system (\emph{window
-coordinates}) after drawing in order to map 3D points to 2D points into the
+which is then transformed into another unique coordinate system
+(\emph{Normalized device coordinates}) after drawing in order to map 3D points to 2D points into the
 render (camera) buffer. A third buffer (\emph{Z-depth buffer}) keeps
 informations about the depth of drawn points into the visible scene and is
 registered with the rendering buffer. As described in \cite{opengl-book}, in order to give the
@@ -90,14 +145,230 @@ camera in mind, the programmer can act on the most suitable components of the
 rendering process as needed, without caring about what is the right coordinate
 system to transform. 
 
-\subsection{Details about OpenGL rendering process} \label{opengl-rendering-process}
+\subsection{Details about OpenGL rendering process} \label{sec:opengl-rendering-process}
 Here follows a description of the full process performed by OpenGL in order to
 render a 3D mesh, from scene generation to actual mapping of 3D points into a
 2D buffer. A complete and detailed description can be found in
 \cite{opengl-book}, completed of actual API examples which are omitted here
 for brevity.
 
-First of all, OpenGL applications were born 
+OpenGL library implements a state machine: sequential calls to library
+functions modify internal state variables (e.g. colour information) , allowing the renderer to be
+instructed about how to add elements in the scene and how to transform them to
+get the final renderer. Thus, single, independent objects can draw themselves
+into the scene and manage each one a single part of the scene (e.g. camera and
+fog): current scene's state is actually a global accessible datum. While this
+has the obvious advantage of full and deep freedom of implementation, it also
+brings the drawback of needing to be careful for how each of the elements
+modifies the global state when it finishes operating. In general, it is thus
+important to define with extreme precision what each object is supposed to do
+and never implement complex operations in a single block, rather splitting them
+into single, well-defined tasks.
 
-\subsection{Implementation of objects' rendering} \label{renderer3d}
-\paragraph{The GLUT toolkit}
+In this project the simpler -- although deprecated in newest (3.0) versions and
+substituted by shaders --
+rendering procedure using OpenGL's \emph{fixed pipeline} has been used; this
+procedure assimilates the rendering process to an assembly line, in which every
+element of the scene undergoes a predefined sequence of processing steps before
+being merged with others to form the final render. In particular, geometric data
+like lines or polygons are moved into the scene , cut based on their $z$ coordinate, and
+finally mapped to 2D screen coordinates through the \emph{projection matrix}.
+Mapped points are then bound to 2D data like bitmaps and 2D points in a
+process called \emph{rasterization}; finally, every token can be modified by
+\emph{per-fragment operations}, like texture appliances and alpha (transparency)
+computation.
+
+The first operation done by the renderer is taking the list of vertices
+which have to be drawn from the global state. Vertices can be added to the
+scene by use of \emph{display list} (cached sets of 3D vertices created using
+basic drawing functions) or explicitely drawn during a single rendering
+iteration. Drawing primitives different from vertices, which were inserted into a
+display list via drawing functions, are numerically computed and transformed to
+vertices sets too.
+
+From vertices informations OpenGL extrapolates geometric primitives'
+data, like surfaces, edges, texture coordinates.
+Each primitive is then moved into the scene through an affine transformation
+described by the \emph{Modelview matrix}. This $4 \times 4$ matrix multiplies
+each primitive on the left to produce its coordinate in the first of two
+coordinate systems described in sec. \ref{sec:opengl-reference-systems}, called
+\emph{clip coordinates}. This is the global, 3D reference system and is the one in
+which the actual 3D drawing is done: first, $z$ coordinate is used to determine
+which parts of which object will actually be visible. Points are not considered
+if their $z$ coordinate makes them covered by another object. At this point the
+whole scene is clipped (hence the name), using two planes, \emph{near} and
+\emph{far} clipping planes. Objects are kept if they lie in between this planes,
+i.e. if and only if $near<z<far$ as shown in fig. \ref{fig:clipping-planes}.
+This is to minimize the number of objects to process, by removing objects that
+are actually too far away or too near to be rendered accurately. These values
+must be chosen in the most restrictive way as possible: this is because $z$
+coordinate is mapped to its output buffer (depth buffer) with a low-range
+(usually, $12\unit{b}$) value, taking the values of $near$ and $far$ as a
+reference for minimum and maximum value. So, having a too wide range in near and
+far planes results in heavy loss of depth information due to discretization of
+depth values.
+
+\begin{figure}[htbp] \label{fig:clipping-planes}
+\centering
+\includegraphics[width=4in]{./Graphics/clipping_planes}
+\caption{Near and far clipping planes are used to minimize the number of
+primitives to process, as well as reference points for depth computation.}
+\end{figure}
+
+Raw colouring information in applied at this stage and primitives are finally
+mapped into screen by a second $4\times 4$ matrix, the \emph{perspective
+matrix}. At the end of this process objects are said to be in \emph{normalized
+device coordinates \emph{NDC}}. In NDC, the cube spawning the
+$\left(-1,1\right)$ range in each direction is projected orthographically on the
+output image buffer (considering $x$ and $y$ coordinates), with each corner
+corrisponding to an angle of the window (called \emph{Viewport}) -- top, bottom,
+right, left-- and depth buffer
+(mapping the $(-1,1)$ $z$ coordinate to the range $\left( near , far \right)$ as described
+before).
+
+Finally, texture information in form of \emph{texels} (texture elements) is applied to primitives if needed and other
+processing such as fog calculation is done. The image is completely rendered at
+this point and can be accessed via direct reading from raw data buffers.
+
+\subsection{Antialiasing of polygons and textures} \label{sec:antialiasing}
+%TODO antialiasing of textures
+
+Texture multisampling is also implemented with this method and provides a good
+result. However, for textures the situation is different as also another factor
+case must be considered: as the object reduces
+its dimension, texture internal data will be dropped during the mapping from 3D
+to 2D coordinate, because it actually is applied on a per-2D-pixel basis during the
+last stage of rendering (after rasterization has been done), as depicted in sec.
+\ref{sec:opengl-rendering}. This process downsamples heavily the texture -- even if
+polygon multisampling is enabled -- as no interpolation is done when scaling
+down the texture for appliance.
+
+To solve this issue, OpenGL allows the programmer to specify a set of textures
+of different size for the same object. Element of this set, which can be easily
+generated automatically starting from the biggest texture, are called
+\emph{mipmaps}. At the 2D texturing stage, OpenGL will choose the correct image
+to map points to, and $(u,v)$ coordinates on it, based on a \emph{strategy}
+which can be defined at runtime. Simpler strategies assume for example to always
+take the first texture which is bigger or smaller than the primitive to cover,
+while more complex ones allow to refine the result at expense of a bigger
+computing time, by linearly interpolating between these two textures to produce
+a middle texture component.
+
+As said in sec. \ref{sec:opengl-intro}, OpenGL tends to be extrimely frugal in the
+number of implemented features: the only supported method for adding mipmaps to
+a texture is manually adding a serie of differently sized images to the texture
+data. As it is quite easy to generate this data automatically and with good
+quality, however, the GLUT library exports useful functions to automatically
+build the set of textures of increasing size and adding them to the texture.
+A native extension for OpenGL allows to generate mipmaps when and only when
+needed, at the cost of random loss of GPU cycles into the program; this extension is,
+however, only present in newest versions of OpenGL and is not supported by some
+graphic hardwares (e.g. Intel HD4000). The programmer must explicitely check for
+its presence, and only when the extension is found by OpenGL he can safely
+assume that no manual (or semi-automatic) mipmap generation is needed.
+
+Texture mipmaps allow a 3D rendering application to reduce at its minimum the
+number of discarded of data due to texture downsampling: instead, they allow to
+produce high-quality, low-sized images when initializing the system (i.e. when
+the program can afford to lose time to produce this data using complex filters
+such as cubic interpolation). The visual result of texture mipmapping is
+qualitative relevant and can be observed, together with the effect of
+multisample on geometry, in fig. \ref{fig:multisampling-on}.
+
+\begin{figure}[htbp] \label{fig:multisampling-on}.
+\centering
+%\includegraphics[width=2.5in]{./Graphics/pinhole_camera}
+\caption{Rendering with antialiasing and mipmapping off (left) and on (right)
+can improve a lot the quality of the result.}
+\end{figure}
+
+\section{Implementation of objects' rendering} \label{sec:renderer3d}
+With the details explained in sec. \ref{sec:opengl-rendering} in mind, a mesh renderer has been implemented, capable of
+reading objects' meshes from files as needed together with the full model of
+camera with which training has to be done and rendering them in the required
+pose, also extrapolating useful informations from the render which can be used
+for training. All the interface of the renderer with the external world is done
+using the conventions of the whole project: cameras are modelled using OpenCV's
+standard reference systems and calibration matrices described into sec.
+\ref{sec:camera_modelling}, while object poses are described as affine
+transformations acting on homogeneous coordinates as in sec.
+\ref{sec:homogeneous-coordinates}. At time of objects' creation, the Assimp library
+is used to convert the mesh file, in whichever format it is, into Assimp's
+unified structure, which for simplicity's sake can be simplified to a tree of
+nodes, each representing a face, a texture to be applied to children, or
+an affine transformation to be applied to children. When the renderer is created
+it configures itself using GLUT to open a window and create the RGB and depth
+framebuffers in which to render. Renderer's initialization is a one-time
+operation, and is performed statically by the first object using GLUT. During
+this phase, renderer also initializes the needed parameters for multisampling as
+described in sec. \ref{sec:antialiasing}.
+
+Three main features have been implemented, which can be used as an access point
+to the renderer : the first one can set the
+camera model by reading it from the project's camera data structure; the second
+one can set the reference position of objects into camera's space (in this project's
+conventions, i.e. in OpenCV not in OpenGL one); the third function can render a
+mesh and extract RGB and depth buffers to OpenCV matrices for later use. This
+last feature also extracts object's bounding box information and rendering mask,
+which will be used for training and recognition filtering in sec.
+\label{sec:vision}.
+
+\subsection{OpenGL camera modelling}
+The goal of the first set of functions of the renderer is to interface OpenGL's
+projection system with the global camera models used into the project; in
+OpenGL camera's parameters are not defined and only a single matrix is used to
+transform 3D coordinates in camera frame to 2D points onto the image. Keeping in
+mind the definitions of intrinsic parameters of the camera, as described in sec.
+\ref{sec:intrinsics}, this is accomplished into three steps.
+
+First, the intrinsic matrix of the camera is extracted from the
+      camera's model, and from it the relevant camera parameters are read.
+
+From this data, the projection matrix 
+\begin{equation}
+  M_{\text{int}}=\begin{pmatrix}
+      f_x & 0 & -c_x & 0\\
+      0 & f_y & -c_y & 0\\
+      0 & 0 & (N+F) & NF \\
+      0 & 0 & 0 & -1 
+  \end{pmatrix}
+\end{equation}
+
+is built. This matrix is similar to the camera intrinsic matrix, but with two
+main differences: first and most important, it operates on 3D points (in clip
+coordinates) producing
+other 3D points. If applied to a point, $x$ and $y$ coordinates in output are the same as they would be
+if mapped using intrinsic matrix, but $z$ coordinate is mapped to the $near-far$
+range. Second, the Z axis points forward in our convention, backward in OpenGL.
+Thus the matrix is built so that the Z coordinate will be inverted while
+preserving X and Y.
+
+After this, clip coordinates have been transformed in what would are OpenCV's
+camera coordinates, plus $z$. In order to port them into OpenGL's NDC, another
+transformation is needed, which simply scales the view range (\emph{view
+frustrum}) to linearly fit the NDC:
+
+\begin{eqnarray}
+  L = x_{\text{left}} & = & 0 \nonumber \\
+  R = x_{\text{right}} & = & W_{\text{cam}} \nonumber \\
+  B = y_{\text{bottom}} & = & H_{\text{cam}} \nonumber \\
+  T = y_{\text{top}} & = & 0 \nonumber \\
+  M_{\text{fit}} & = & 
+  \begin{pmatrix}
+    \frac{2}{R-L} & 0 & 0 & -\frac{R+L}{R-L} \\
+    0 & \frac{2}{T-B} & 0 & -\frac{T+B}{T-B} \\
+    0 & 0 & -\frac{2}{F-N} & -\frac{F+N}{F-N} \\
+    0 & 0 & 0 & 1
+  \end{pmatrix}
+\end{eqnarray}
+
+The two matrices are multiplied to get the final projection matrix, which is
+passed to OpenGL as the matrix which maps clip coordinates to NDC:
+
+\begin{equation}
+  M_{\texttt{proj}}=M_{\text{fit}}M_{\text{int}}
+\end{equation}
+
+Also, OpenGL is instructed to which pixels and depth ranges correponds to the
+NDC by setting its \emph{viewport}, \emph{near} and \emph{far} values.
+
