@@ -35,7 +35,7 @@ considerations have been done:
     object for the high-level strategy to pick first;}
   \item{on the other hand, a grasp which puts the
       gripper at risk of hitting the borders of the object's container -- being them
-      the edges of a bin or the floor -- shall have score $d=\inf$. Trying to pick the
+      the edges of a bin or the floor -- shall have score $d=\infty$. Trying to pick the
       object with this grasp could cause physical damage to the robot, the floor or
     even humans, thus the high-level strategy should discard it completely;}
   \item{if a grasp puts the gripper in contact with other objects of a scene, its
@@ -51,7 +51,7 @@ considerations have been done:
   \item{the intersection volume, especially is considered to grow linearly, is not
       enough for evaluating the score: first, the score must grow consistently if the
       object is not touched only by the border but by a consistent part of the
-      gripper, and finally saturate to $d=\inf$ if the intersection volume
+      gripper, and finally saturate to $d=+\infty$ if the intersection volume
       reaches an acceptability threshold $V_{\text{max}}$. Also, as touching an object will result in moving it, grasp score
       should keep into account the actual difficulty of moving the intersected
       object. For example, bouncing with a closed, rigid box would probably not damage it
@@ -61,7 +61,55 @@ considerations have been done:
 \end{itemize}
 
 
-TODO
+With these considerations in mind, a suitable, global score function $s(V_{\text{int}})$
+can be found. The score function must obey certain properties which can be
+extracted from the above:
+
+\begin{itemize}
+  \item{The function must be monotonic and always positive;}
+  \item{it must be linear when x is low enough, in order to evaluate
+    lightly touches adequately;}
+  \item{it must be continue in the whole domain: this does not come
+      from the previous properties, but is needed in order to compute it without
+    the need of caring about floating point's approximations;}
+  \item{it must have a parameter $\alpha>0$ defining how much
+    intersection volume globally affects hardness of grasp;}
+  \item{it must have another parameter $K>=1$ defining how much the hardness is
+    increased rapidly after reaching the brushing threshold $V_{easy}$;}
+  \item{when the intersection volume is greater than the brushing threshold, the
+      function
+    must never grow less quickly than when the volume is in the brushing
+    region, i.e. $\text{max}\left( \left\{ \frac{ds(x)}{dx} | 0 \leq
+    x \leq V_{\text{easy}} \right\} \right) \leq \text{min}\left( \left\{
+  \frac{ds(x)}{dx} | x > V_{\text{easy}}\right\} \right)$.}
+\end{itemize}
+
+The chosen function, which satisfies all of the above properties, is
+
+\begin{equation}
+  s(V_{int})=\left\{
+    \begin{array}{lcr}
+      \alpha V_{\text{int}} & \text{when} & 0 \leq V_{\text{int}} \leq V_{\text{easy}}, \\
+      \alpha
+      \left[1-K\left(\frac{V_{\text{max}}-V_{\text{easy}}}{V_{\text{int}}-V_{\text{max}}}\right)\right]
+      & \text{when} &  V_{\text{easy}} < V_{\text{int}} < V_{\text{max}}, \\
+      +\infty & \text{when} & V_{\text{int}} \geq V_{\text{max}}.
+    \end{array}
+  \right.
+\end{equation}
+
+It is shown in appendix \ref{app:score_function} that $s(V_{int})$ satisfies all
+of the above properties for any $K>=1$, and is thus suitable as a score
+function. Some examples of this function varying the two parameters $\alpha$ and
+$K$ are shown in fig. \ref{fig:score_function}.
+
+\begin{figure}[htbp] \label{fig:score_function}
+  \centering
+  \includegraphics[height=3in]{./Graphics/score_alpha}
+  \includegraphics[height=3in]{./Graphics/score_k}
+  \caption{Resulting score function for different values of $\alpha$ (top) and
+  $K$ (bottom)}
+\end{figure}
 
 \subsection{Object representation as elementary shapes} \label{sec:shapes}
 A good representation of objects is essential in order to compute efficiently
@@ -137,9 +185,9 @@ A line segment $L$ intersects the same cuboid if, by projecting it on one axis a
 all the three projections belong to the projection of the cube:
 
 \begin{equation}
-  L \in C \Leftrightarrow \left(L\cdot \vec{X} \in C \cdot \vec{X}\right) \wedge
-  \left(L\cdot \vec{Y} \in C \cdot \vec{Y}\right) \wedge \left(L\cdot \vec{Z}
-    \in C \cdot \vec{Z}\right)
+  L \in C \Leftrightarrow \left(L_x \in C_x\right) \wedge
+  \left(L_y \in C_y\right) \wedge \left(L_z
+    \in C_z\right)
 \end{equation}
 
 \paragraph{A \emph{sphere}} is a shape representing a sphere of fixed radius,
@@ -174,6 +222,41 @@ height:
   \left(A^{-1}P\right)_z > 0 \wedge \left(A^{-1}P\right)_z<H
 \end{equation}
 
+A line segment $L$ in the cylinder's reference system belongs to the same cylinder if its projection on the $XY$
+plane belongs to the base circle and its projection over the $Z$ axis belongs to
+the cilinder's height segment:
+
+\begin{equation}
+  L \in C \Leftrightarrow
+  \left(L_{x,y} \in C_{x,y} \right)
+  \wedge
+  \left(L_{z} \in [0,H] \right)
+\end{equation}
+
+\paragraph{A \emph{compound}} is the composition of any number of shapes, called
+\emph{children}. Children can be compounds too. This shape has no dimension
+information, but only a reference system to which all the children's reference
+systems are applied before any evaluation. For example, in order to transform a
+point to a children's reference system for intersections' evaluation, the point
+is first transformed using the compound's reference system, then it is
+transformed again using the child's reference system. In this way, assembly-like
+shapes can be formed.
+
+A point, or any other primitive, $P$ belongs to a compound $C$ with children $c_i$ if it belongs to
+\emph{at least} one of them:
+
+\begin{equation}
+  P \in C \Leftrightarrow \exists i : P \in c_i
+\end{equation}
+
+Using this four composing blocks, it is easy to form every object. Also, every
+object can be evaluated for intersection with at least a point, which is the
+base for the volumes' evaluation system described into sec.
+\ref{sec:grasp_computing}; some objects can also be intersected more efficiently by
+exploiting other special case features as line evaluation. Also, it has been
+shown how the easy structure of each primitive, together with the use of
+compounds, makes it easy to add further extensions to this system and immediately
+make use of them.
 
 \section{Efficient volume computation of objects' intersections} \label{sec:grasp_computing}
 After defining the score function $d(V_{\text{int}})$, the only remaining
