@@ -5,5 +5,9 @@
 !toptesi.cls
 !*.sty
 !Makefile
-!Graphics/
-!Results/
+!Graphics
+!Results
+!Graphics/*
+!Results/*
+*-converted-to.pdf
+*.fcstd1
