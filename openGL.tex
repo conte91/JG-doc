@@ -5,12 +5,12 @@ diffent poses. It is also important to use the same model of camera described in
 \ref{sec:camera_modelling} in the most uniform manner as possible.
 
 In this chapter, this modelling is described. First, a brief
-introduction to OpenGL (sec. \ref{opengl-intro}) and to the correct usage of homogeneous coordinates (sec.
-\ref{homogeneous-coordinates}) is done, followed by a description of OpenGL reference systems (sec.
-\ref{opengl-reference-systems}). After this, the OpenGL rendering
-process is described (sec. \ref{opengl-rendering-process}), and finally the
+introduction to OpenGL (sec. \ref{sec:opengl-intro}) and to the correct usage of homogeneous coordinates (sec.
+\ref{sec:homogeneous-coordinates}) is done, followed by a description of OpenGL reference systems (sec.
+\ref{sec:opengl-reference-systems}). After this, the OpenGL rendering
+process is described (sec. \ref{sec:opengl-rendering-process}), and finally the
 implementation of objects' rendering for the purpose of this project is
-described keeping all of the previous into account (sec. \ref{renderer3d}).
+described keeping all of the previous into account (sec. \ref{sec:renderer3d}).
 
 \subsection{OpenGL graphics library} \label{sec:opengl-intro}
 OpenGL\footnote{www.opengl.org} is a free (GPL) software interface to graphics hardware \cite{opengl-book}. This
@@ -43,27 +43,27 @@ course of this project are:
 
 \begin{itemize}
   \item{\emph{The OpenGL Utility Toolkit
-(\emph{GLUT})}\footnote{https://www.opengl.org/resources/libraries/glut/} a
-nonfree library, written by Mark Kilgard to support its OpenGL guide
-\cite{opengl-book}, tightly bundled to OpenGL and
-almost always shipped together with it, which helps the programmer in all the
-aforementioned tasks. In particular, it provides a cross-platform abstraction
-for window creation and management, and for user event handling; it also
-provides the programmer with high-level shape creation routines. A free
-implementation and extension called
-\emph{FreeGLUT}\footnote{http://freeglut.sourceforge.net/} exists and is used
-worldwide as a replacement for GLUT, as the last version (3.7) of the latter dates
-back to
-1997;\footnote{http://www.ibiblio.org/pub/packages/development/graphics/glut/}}
+      (\emph{GLUT})}\footnote{https://www.opengl.org/resources/libraries/glut/} a
+      nonfree library, written by Mark Kilgard to support its OpenGL guide
+      \cite{opengl-book}, tightly bundled to OpenGL and
+      almost always shipped together with it, which helps the programmer in all the
+      aforementioned tasks. In particular, it provides a cross-platform abstraction
+      for window creation and management, and for user event handling; it also
+      provides the programmer with high-level shape creation routines. A free
+      implementation and extension called
+      \emph{FreeGLUT}\footnote{http://freeglut.sourceforge.net/} exists and is used
+      worldwide as a replacement for GLUT, as the last version (3.7) of the latter dates
+      back to
+    1997;\footnote{http://www.ibiblio.org/pub/packages/development/graphics/glut/}}
 
-\item{
-\emph{Open Asset Import Library (\emph{Assimp})}, which is a support library which
-can be used to import various mesh formats into a uniform, object-oriented (C++)
-data structure. It is useful to generate at runtime a vertex list and rendering
-data for objects
-generated from external data, such as the objects' models used into this project
-for object recognition purposes.
-}
+  \item{
+      \emph{Open Asset Import Library (\emph{Assimp})}, which is a support library which
+      can be used to import various mesh formats into a uniform, object-oriented (C++)
+      data structure. It is useful to generate at runtime a vertex list and rendering
+      data for objects
+      generated from external data, such as the objects' models used into this project
+      for object recognition purposes.
+    }
 \end{itemize}
 \subsection{Homogeneous coordinates} \label{sec:homogeneous-coordinates}
 Homogeneous coordinates were introduced by the famous mathematician August Ferdinand Möbius in
@@ -101,10 +101,10 @@ coordinates, can be representing as $4\times 4$ matrices including rotation
 matrix $R$, translation vector $T$, and scale properties $s$:
 
 \begin{equation}
-A=\begin{pmatrix}
-R & T \\
-0 & s
-\end{pmatrix}
+  A=\begin{pmatrix}
+    R & T \\
+    0 & s
+  \end{pmatrix}
 \end{equation}
 
 By representing directional vectors as points at the infinity, they will have
@@ -129,12 +129,12 @@ aspects of their work, typically requiring at least a \emph{local} and a
 coordinate system (\emph{clip coordinates}) when drawing (rendering) objects,
 in which camera's frame is fixed at the origin and aligned with global axes,
 with Z-axis pointing backward\footnote{This actually brings out a left-handed
-coordinate system, which must be taken into account when interfacing OpenGL
+  coordinate system, which must be taken into account when interfacing OpenGL
 with external world like it has been done in this project.},
 which is then transformed into another unique coordinate system
 (\emph{Normalized device coordinates}) after drawing in order to map 3D points to 2D points into the
 render (camera) buffer. A third buffer (\emph{Z-depth buffer}) keeps
-informations about the depth of drawn points into the visible scene and is
+informations about the depth of drown points into the visible scene and is
 registered with the rendering buffer. As described in \cite{opengl-book}, in order to give the
 programmer full access capabilities to the rendering engine's internals, 
 multiple reference systems appear to the user only on the
@@ -179,9 +179,9 @@ process called \emph{rasterization}; finally, every token can be modified by
 computation.
 
 The first operation done by the renderer is taking the list of vertices
-which have to be drawn from the global state. Vertices can be added to the
+which have to be drown from the global state. Vertices can be added to the
 scene by use of \emph{display list} (cached sets of 3D vertices created using
-basic drawing functions) or explicitely drawn during a single rendering
+basic drawing functions) or explicitely drown during a single rendering
 iteration. Drawing primitives different from vertices, which were inserted into a
 display list via drawing functions, are numerically computed and transformed to
 vertices sets too.
@@ -209,10 +209,10 @@ far planes results in heavy loss of depth information due to discretization of
 depth values.
 
 \begin{figure}[htbp] \label{fig:clipping-planes}
-\centering
-\includegraphics[width=4in]{./Graphics/clipping_planes}
-\caption{Near and far clipping planes are used to minimize the number of
-primitives to process, as well as reference points for depth computation.}
+  \centering
+  \includegraphics[width=4in]{./Graphics/clipping_planes}
+  \caption{Near and far clipping planes are used to minimize the number of
+  primitives to process, as well as reference points for depth computation.}
 \end{figure}
 
 Raw colouring information in applied at this stage and primitives are finally
@@ -231,11 +231,80 @@ processing such as fog calculation is done. The image is completely rendered at
 this point and can be accessed via direct reading from raw data buffers.
 
 \subsection{Antialiasing of polygons and textures} \label{sec:antialiasing}
+\label{sec:FBO}
 %TODO antialiasing of textures
+During the last phase of rendering, OpenGL's pipeline silently associate each
+pixel primitive, with its matching texture and depth information, with a single
+colour (RGB) and depth value (alpha). If only the geometric information relative
+to the center of the pixels is considered (as done by default), this will cause
+high rendering quality degradation: this is because contours of objects and
+textures will be neatly mapped on a per-pixel basis, and so their lines --
+especially if almost vertical or almost horizontal -- will appear more as a
+polyline than a single, straight line. This effect is shown in fig.
+\ref{fig:polyline}. To solve this issue, a set of techniques for what is called
+\emph{antialiasing} are implemented. If implemented correctly, antialiasing of
+polygons' edges and texture data can improve image quality by blending the
+boundaries between adjacent polygons, thus providing a more photorealistic
+render.
+
+\begin{figure}[htbp] \label{fig:polyline}
+  \centering
+  \includegraphics[width=2.5in]{./Graphics/antialiasing}
+  \caption{A 1-pixel line generates rough boundaries on when rendering on a
+  per-pixel basis. Multisample antialiasing can solve the problem by
+approximating the line as a 4-pixel rectangle and averaging each multisampled
+pixel with its neighbours.}
+\end{figure}
+
+Old versions of OpenGL provided a set of features called \emph{smoothing}, which
+emulated transparency (alpha) value on pixels on the border in order to blend
+them with neighbour pixels. Newer versions have deprecated this techniques in
+place of \emph{Multisampling}. By using multisampling, each pixel primitive --
+as the one obtained after the rasterization process -- is actually splitted in
+four or more parts into a special, offscreen buffer, and the image is treated as
+it was a render with higher resolution, except for coordinate systems which will
+be left untouched -- so that the entire process is transparent to the
+programmer. After rendering, the offscreen buffer is copied to the result buffer
+and is said to be \emph{resolved}: in this stage, each pixel is formed by
+averaging the content of the four micro-pixels which compose it. Multisampled
+has been preferred over smoothing because, although requiring a lot of memory
+for storing the high-resolution image -- which is not a problem with modern
+graphics hardware as it was when smoothing was born --  it provides both faster
+performance and better quality, as explained in \cite{opengl-book}.
+
+The special buffer for offscreen rendering is implemented in OpenGL through the
+means of a \emph{Framebuffer object (\emph{FBO})}.
+Framebuffer objects are special drawing buffers, introduced with OpenGL 3.0,
+which emulate a real framebuffer (i.e. the are of a video memory which
+the software will draw onto), keeping the allocated memory area totally
+independent from the actual video memory of the rendering window. Apart from
+their physical location, they look totally equivalent to a normal rendering
+window, and just like it they have a set of buffers to which the application can
+draw, the main ones being the color and depth buffer. These can be generated and
+swapped at runtime by assigning new buffers to the \emph{attachment point} of a
+framebuffer.
+
+Apart from multiple uses which are irrelevant for this project (like dynamically
+updating a texture by offscreen rendering onto it), the main scope of FBOs is
+their multisample capabilities. In fact, it is sufficient to plug
+multisample-capable buffers (which can be generated using OpenGL's allocation
+functions) to the colour and depth attachment points of an FBO and select the
+latter as the default rendering buffer to have the application draw all of its
+raster data there, thus keeping multisample into account. 
+
+When the final render has to be read, however, it is not sufficient to read the
+raw drawing buffer from the FBO, as it has a totally different internal
+structure in order to keep track of the needed geometric transformations needed
+not to change the geometry's position despite of multisampling. A special
+function, called \emph{blitting}, can be used to copy the multisampled data to
+another framebuffer, allocated with raw RGB pixels and thus capable of being
+read with the expected result. When blitting is applied to the multisampled
+framebuffer, it is automatically resolved to pixels; in this way, the resolved
+buffer can be copied byte-per-byte into the raw FBO.
 
 Texture multisampling is also implemented with this method and provides a good
 result. However, for textures the situation is different as also another factor
-case must be considered: as the object reduces
+must be considered: as the object reduces
 its dimension, texture internal data will be dropped during the mapping from 3D
 to 2D coordinate, because it actually is applied on a per-2D-pixel basis during the
 last stage of rendering (after rasterization has been done), as depicted in sec.
@@ -276,10 +345,11 @@ qualitative relevant and can be observed, together with the effect of
 multisample on geometry, in fig. \ref{fig:multisampling-on}.
 
 \begin{figure}[htbp] \label{fig:multisampling-on}.
-\centering
-%\includegraphics[width=2.5in]{./Graphics/pinhole_camera}
-\caption{Rendering with antialiasing and mipmapping off (left) and on (right)
-can improve a lot the quality of the result.}
+  \centering
+  \includegraphics[width=2.5in]{./Results/antialiasing}
+  \caption{Rendering with antialiasing and mipmapping on (left)
+  can improve a lot the quality of the result with respect to the same options
+turned off (right).}
 \end{figure}
 
 \section{Implementation of objects' rendering} \label{sec:renderer3d}
@@ -322,15 +392,15 @@ mind the definitions of intrinsic parameters of the camera, as described in sec.
 \ref{sec:intrinsics}, this is accomplished into three steps.
 
 First, the intrinsic matrix of the camera is extracted from the
-      camera's model, and from it the relevant camera parameters are read.
+camera's model, and from it the relevant camera parameters are read.
 
 From this data, the projection matrix 
 \begin{equation}
   M_{\text{int}}=\begin{pmatrix}
-      f_x & 0 & -c_x & 0\\
-      0 & f_y & -c_y & 0\\
-      0 & 0 & (N+F) & NF \\
-      0 & 0 & 0 & -1 
+    f_x & 0 & -c_x & 0\\
+    0 & f_y & -c_y & 0\\
+    0 & 0 & (N+F) & NF \\
+    0 & 0 & 0 & -1 
   \end{pmatrix}
 \end{equation}
 
@@ -372,3 +442,151 @@ passed to OpenGL as the matrix which maps clip coordinates to NDC:
 Also, OpenGL is instructed to which pixels and depth ranges correponds to the
 NDC by setting its \emph{viewport}, \emph{near} and \emph{far} values.
 
+At the end of this process, OpenGL will thus map automatically points in global
+3D space with points in camera frame.
+
+\subsection{Object movement into global space}
+Into the project's convention, each object has got its own local coordinate
+system, and the mesh is built with all its verteces into this system,with all
+its verteces into this system,  as explained into sec. \ref{sec:cad-mesh}. Every
+object is then stored into its mesh file as if it was centered into the global
+origin. Assimp library is used to read this mesh file and produce a set of faces
+together with their vertices' coordinates. From the external world, however, the global
+renderer can display a mesh into a specified pose in the global coordinate
+system obeying the specifications of the project. This system is different from
+OpenGL's one, which only knows camera (clip) coordinates. In order to move
+the object from the global system to the right position in OpenGL reference
+system the \emph{Modelview} matrix is used: this will be automatically applied
+to OpenGL when drawing each primitive, and will modify its coordinates
+accordignly. In order to take into account the difference between the global
+coordinate system and OpenGL's clipping coordinates, a $\pi$ rotation along the
+$X$ axis is applied
+to the Modelview matrix \emph{before} the actual pose, which as usual is
+already represented as a $4 \times 4$ affine transformation matrix:
+
+\begin{equation} \label{eqn:modelview}
+  M_{\text{modelview}} = 
+  \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & -1 & 0 & 0 \\
+    0 & 0 & -1 & 0 \\
+    0 & 0 & 0 & 1 
+  \end{pmatrix} M_{\text{pose}}
+\end{equation}
+
+Another convenience function is presented to the user, which can emulate
+camera's movement around the object: in this case, the object's pose is first
+computed as the inverse of camera pose ($M_{pose}=M_{cam}^{-1}$), and it is
+finally applied as in eqn. \ref{eqn:modelview}.
+
+\subsection{Object rendering and image processing} \label{sec:meshdraw}
+When all the rendering parameters has been set accordingly to the desired scene
+parameters and emulated camera model, the renderer can be asked for to finally
+get the rendered image of a mesh object. When done, it is actually the mesh that
+renders itself into the OpenGL's framebuffer. As the mesh knows its internal
+data as a tree structure, a recursive rendering algorithm is applied. Starting
+from the mesh's root node:
+
+\begin{itemize}
+  \item{If the node contains a transformation, this has to be applied to the
+      current node and all his children. Thus, the transformation matrix data is
+      extracted from the node and it multiplies the current Modelview matrix.
+      The old value of the Modelview matrix is saved in a stack using OpenGL's
+      builtin facilities, in order to be restored when this node will end its
+    drawing;}
+  \item{If the node contains one or more meshes (here, indicating a set of
+      faces sharing a common texture), these are drown into the scene: first the
+      appropriate texture is loaded, then each face is drown considering its
+      number of vertices $N_v$: either as a point (if $N_v=1$), or as a line (if
+    $N_v=2$), or as a polygon (if $N_v \geq 3$);}
+  \item{If a texture must be applied to the previously drown face, or the face
+      has solid colour, it is applied at this stage. In the case of a 2D
+    texture, UV mapping information is mapped to the vertices of the face;}
+  \item{If the node has children, these are drown recursively. When the children
+      start drawing themselves, the Modelview matrix will correspond to the
+      stacked transformation of their parents: in this way, they will be able to
+    specify their vertices' data in their local coordinate system;}
+  \item{Finally, the previously stored Modelview matrix is popped from the stack
+      in order to restore the initial state for the following nodes. The
+      control is returned to the caller, be it its parent or the
+    original caller of the drawing algorithm.}
+\end{itemize}
+
+When the algorithm exits, thus, the mesh will be drown on OpenGL's FBO %TODO
+%capitoletto su FBO 
+with both colour and depth informations and the render is ready to be read from the
+caller's process. Also, the final state of OpenGL's render is equal to the
+starting one, which allows to draw more than one mesh singularly without
+setting the parameters for each.
+
+\subsection{Framebuffer's data acquisition}
+As all data has to be rendered off-window, OpenGL's \emph{framebuffer objects
+(\emph{FBO})} have been used as explained in sec. \ref{sec:FBO}. Two main FBOs
+are generated and replaced each time the camera model changes its dimensions:
+
+\begin{itemize}
+  \item{The \emph{Multisampled FBO} is the FBO that the application will
+      actually use when drawing. At the time of its creation, two buffers are
+      created, both of which with multisample capabilities of $4\times$. The two
+      buffers are then bound to the attachment points of the FBO, one for colour
+    and one for depth information;}
+  \item{The \emph{Resolve FBO} is the FBO on which the previous FBO will resolve
+      itself by means of blitting: it has two buffers like the previous one, but
+      these are raw, non-multisampled buffers. These are actually internally
+      represented as a C matrix and can thus be read sequentially.
+      When the user wants to read the render's result, the multisampled FBO is bound
+      as the FBO from which data have to be read, and the resolve FBO is bound
+      as the FBO on which data have to be drown. The blitting function will copy
+      the viewport area of the render and automatically resolve the
+      multisampling. The resolve FBO is finally bound as the default FBO. The
+      caller process can then read raw data from the default FBO and get
+    back the multisampled render result in RGB format.}
+\end{itemize}
+
+When an application wants to drive something into the rendering, it first binds
+the drawing buffer to the multisampled FBO, then calls its drawing algorithm as
+explained in sec. \ref{sec:meshdraw}. Finally, it resolves the FBO as above and
+reads the pixels' data from it. In order to comply with the global, internal
+specifications of the project, this data is transformed into a \texttt{cv::Mat}
+object; no data copying is needed because OpenCV's matrices' internal format is
+the same as raw C buffers and camera frames have been set accordingly to both
+specifications to have the result fit.
+
+\subsection{Render postprocessing}
+At the end of the rendering process, the renderer performs a simple serie of
+operations which will be needed in the later training and recognizing process:
+
+\begin{itemize}
+  \item{
+    First, the real depth values are reconstructed from the 12-bit value
+    provided by OpenGL. These will be useful for normal feature estimation by
+  the training algorithm;}
+  \item{then, an object mask is generated for the render. This is intended to inform
+the caller on which pixels on the image correspond to the actual object and
+which are simply background. In order to find it, each depth value is checked to
+be comprehended in the $near,far$ range which was set into OpenGL: if it isn't,
+this means that the pixel was not generated by the render (it is 0 or NaN, i.e.
+the depth buffer's clearing value);}
+  \item{next, the object's bounding box is extracted from the mask. Assuming it
+to be a rectangle, the bounding box can be computed by considering the minimum
+and maximum $(u)$ and $v$ values in which the mask is not null:
+\[
+  \begin{array}{c}
+    m_u=min\left(\left\{u | \exists i, mask_{(u,i)}\neq 0\right\}\right),
+    m_v=min\left(\left\{v | \exists i, mask_{(i,v)}\neq 0\right\}\right) \\
+    M_u=max\left(\left\{u | \exists i, mask_{(u,i)}\neq 0\right\}\right),
+    M_v=max\left(\left\{v | \exists i, mask_{(i,v)}\neq 0\right\}\right) \\
+    \Downarrow \\
+    \text{rect}=\left\{\text{rectangle of width } M_u-m_u \text{ and height } M_v-m_v
+    \text{ starting from } (m_u,m_v)\right\}
+  \end{array}
+\]
+}
+\item{finally, the RGB image is cropped to the rectangle found in the previous
+    step. This will allow faster feature computation, possibility to easily save
+    frames, low memory bandwidth usage (which is not negligible as the rendering
+  process will be done thousands of times).}
+\end{itemize}
+
+The renderer returns all of this information to the caller, who will be able to
+use it for image processing.
