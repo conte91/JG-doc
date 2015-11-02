@@ -11,7 +11,7 @@ possible set of movements (which we will refer to as a \emph{grasp} from now on)
 a \emph{score} representing the difficulty of picking
 for that particular grasp. The chosen algorithm assigns to each grasp a
 probabilistic score, based on the intersection volume between an emulated
-gripper and the scene.
+gripper and the scene, from which the object to grasp has been removed.
 
 In this section, first it is described the score concept (sec.
 \ref{sec:grasp_score}), then the chosen way of modelling the gripper (and robot) and
@@ -261,4 +261,160 @@ make use of them.
 \section{Efficient volume computation of objects' intersections} \label{sec:grasp_computing}
 After defining the score function $d(V_{\text{int}})$, the only remaining
 obstacle for computing the best possible grasping strategy is the actual
-computation of shapes' intersections. 
+computation of shapes' intersections. In order to complete this task the problem
+has been splitted on many levels: a trivial, resource-consuming -- but always
+working -- algorithm to use whenever the actual volume must be computed and
+there is no known better way to do it, a serie of heuristic algorithms to use if
+the same problem can be brought to a closed-form, more efficient solution for
+the shapes kept in consideration (e.g. for sphere-sphere intersection), and
+another serie of heuristic considerations which can avoid the actual volume
+computation if the problem is meaningless (e.g. when the chosen objects are
+known to not intersect at all). 
+
+\subsection{Point approximation of shapes on different levels of precision}
+The basic algorithm is based on splitting one of the two shapes to intersect into a serie of cubes of
+fixed dimension.
+Cubes are then represented with their center only, and only this information is
+used to compute the shapes' intersections' volume: for each cube, if the center
+of the cube belongs to the other shape, the whole cube is considered to belong
+to the latter. The final intersection volume is brought by the sum of the
+volumes, actually approximating via Riemann's series the real value of the
+intersection, as if it was
+analitically computed by an integral. More in detail, each shape knows how to
+approximate both its surface and its volume at different levels; both these
+representations are returned by the shape as a serie of points, or \emph{point
+cloud}, which is the same representation used for visualization purposes 
+% TODO as described in blablabla
+. While the surface's points represent real points onto the surface of the
+object, the volume's points are the center of the approximating cubes described
+before. Each shape also knows how to analitically compute its total surface and
+volume, which is a trivial geometric task for each primitive.
+
+For each representation, the \emph{level} $l$ of approximation is a representation
+of how good the approximation is; it is not well-defined in order to make it
+easier for the shapes to compute their representations, however three
+constraints are needed for the algorithm to work properly:
+
+\begin{itemize}
+  \item{The first constraint on the  concept of level
+      (which is what makes the concept itself meaningful) is that the number of points
+      $N_p$
+      computed for a particular level (which is what the computational complexity of
+      all of the algorithms used for intersections' computation depends linearly on)
+      is roughly, i.e. asimptotically, proportional to the square of the level in the
+      case of surface approximation, and to the cube of the level in the case of
+      volume approximation. In simpler, though less precise, terms, this means that
+      the level value affects the sampling distance $d$ that the shape will apply in each
+      of its dimensions when computing itself; this can be used by the algorithms to
+      control the precision/speed tradeoff which comes naturally from the
+      approximation of each intergral term with Riemann's series:
+
+      \begin{eqnarray}
+        N_{p,\text{surface}}(l)& = & O(l^2) \\
+        N_{p,\text{volume}}(l) & = & O(l^3) \label{volume-l-3}\\
+        d & \propto & \frac{1}{l}
+      \end{eqnarray}
+    ;}
+  \item{also, because of how the volumes are treated in the integration
+      algorithm, another constraint of the approximation functions is that, for
+      volume approximation, at any level \emph{no points} of the approximation
+      must lie outside the shape itself, nor on its surface. This allows the
+      integration algorithm to assume that at least a neighbourhood of the point
+    $V_{\epsilon}$ will actually be contained into the shape;}
+  \item{a third, desirable property of the approximation functions is for the
+      points to be as equally sampled as possible; although this constraint can be
+      relaxed (it is not important that the points are \emph{exactly} equally
+      spaced when approximating), it is important
+      that asimptotically the density of points $\frac{p}{V}$ generated by the approximation
+      is the same in every neighbourhood of the shape's volume and surface, so
+      that the approximation error becomes negligible if enough points are
+      generated:
+      \begin{equation} \label{eqn:points_with_constant_density}
+        \lim_{l \rightarrow \infty} \nabla \frac{p(l)}{V} = 0, \forall V
+        \in S
+    \end{equation}.
+  }
+\end{itemize}
+
+Some levels of approximation of different surfaces can be seen in fig. \ref{fig:approximate_shapes}.
+
+\begin{figure}[htbp] \label{fig:approximate_shapes}
+  \centering
+  \begin{tabular}{c|c|c}
+    \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/sphere_vol}}&
+    \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/cube_vol}}&
+    \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/compound_vol}} \\
+    \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/sphere_surf}}&
+    \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/cube_surf}}&
+    \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/compound_surf}}
+  \end{tabular}
+  \caption{Surface (top) and volume (bottom) approximation of a cube (left), a sphere (center) and a compound
+  (right) for different values of $l$, depicted in red, green, and blue.}
+\end{figure}
+
+\subsection{Volume computation via central points} \label{volume-via-points}
+After getting the approximation of the shape as a set of points, the
+intersection volume is trivial to compute: as each shape knows how to check
+whether a points is contained into it, it is sufficient to count the number of
+points which it contain, and then assume that each point corresponds to the same
+fraction of the shape's volume: $V_{\text{cube}}=\frac{V_{\text{shape}}}{N_p}$.
+This assumption will be valid for sure, i.e. the computed sum will converge to
+the actual intersection value if $l$ is high enough, thanks to the third
+property of the approximation function stated in eqn.
+\ref{eqn:points_with_constant_density}.
+
+The total intersection volume $V_{\text{int}}$ computed with approximation level
+$l$ will then be
+\begin{equation}
+  V_{\text{int}}(l)=V_{\text{shape}} \frac{N_{\text{in}}}{N_p(l)}
+\end{equation}
+
+\subsection{Optimized volume computations for particular cases}
+The method presented in sec. \ref{volume-via-points} is universally valid,
+being able to be applied for every combination of shapes. However, this is
+clearly not efficient if applied to large datasets; also, the computational
+complexity increases cubically with the level of approximation as stated in
+eqn. \ref{volume-l-3}. Thus, when performing intersections for shapes for which
+a closed form solution is known, this is preferred. In this project the case of
+sphere-sphere intersection has been implemented as an example, but other cases
+can be easily added due to the polimorphic structure of the algorithm.
+
+The volume of the intersection of two spheres $S_1$ and $S_2$ can be reduced to three cases which only
+depend on the distance $d$ between the centres of the spheres and their radii
+$R$ and $r$, with $R\geq r$:
+
+\begin{equation}
+  V_{int}\left(S_1,S_2\right)=\left\{\begin{array}{lcr}
+      0 & \mbox{if} & d\geq R+r, \\
+      \frac{\pi \left(R+r-d\right) ^2 \left(
+      d^2 + 2dr - 3r^2 + 2dR + 6rR-3R ^2 \right) }{12d}
+      & \mbox{if} & R-r<d<R+r, \\
+      \frac{4}{3}\pi r^3 & \mbox{if} & d \leq R-r.
+  \end{array}\right.
+\end{equation}
+
+\subsection{Computation skipping via surface intersections}
+Another consideration can improve a lot the execution speed of the algorithm:
+due to the real-life nature of the application scenario, the gripper will
+actually seldom hit more than one object at a time. Thus, if the algorithm is
+able to detect if two objects actually intersect \emph{before} computing their
+volume, the resulting speedup will be important.
+
+A sufficient and necessary condition for two shapes $S_1$ and $S_2$ to intersect is that, fixing
+one of the two, at least one point of the surface $B$ of the other must be contained
+into the first, or viceversa:
+
+\begin{equation}
+  V_{\text{int}}\left(S_1,S_2\right)\neq 0 \Leftrightarrow \left(\exists P \in
+    B\left(S_1\right) : P \in S_2\right) \vee \left(\exists P \in
+    B\left(S_2\right) : P \in S_2\right) 
+\end{equation}
+
+When computing an intersection, the volume can thus be set to $V_{\text{int}}=0$
+if no point of the surface of each shape is contained into another; as
+approximating the surface of each shape results in $O(l^2)$ points, the
+computation time taken by the algorithm if this strategy is applied will be
+reduced by a factor $l$ if the shapes don't intersect (which is the most
+probable case, given the above heuristic considerations), while the penalty for
+computing the surface in case of failure of the strategy will be negligible with
+respect to the volume computation's execution time.
