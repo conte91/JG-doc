@@ -393,7 +393,7 @@ $R$ and $r$, with $R\geq r$:
   \end{array}\right.
 \end{equation}
 
-\subsection{Computation skipping via surface intersections}
+\subsection{Computation skipping via surface and edges intersections}
 Another consideration can improve a lot the execution speed of the algorithm:
 due to the real-life nature of the application scenario, the gripper will
 actually seldom hit more than one object at a time. Thus, if the algorithm is
@@ -404,7 +404,7 @@ A sufficient and necessary condition for two shapes $S_1$ and $S_2$ to intersect
 one of the two, at least one point of the surface $B$ of the other must be contained
 into the first, or viceversa:
 
-\begin{equation}
+\begin{equation} \label{eqn:no-surface-in-volume}
   V_{\text{int}}\left(S_1,S_2\right)\neq 0 \Leftrightarrow \left(\exists P \in
     B\left(S_1\right) : P \in S_2\right) \vee \left(\exists P \in
     B\left(S_2\right) : P \in S_2\right) 
@@ -418,3 +418,30 @@ reduced by a factor $l$ if the shapes don't intersect (which is the most
 probable case, given the above heuristic considerations), while the penalty for
 computing the surface in case of failure of the strategy will be negligible with
 respect to the volume computation's execution time.
+
+On the other size, if of of the two shapes is fully contained into the other
+one, the intersection's volume is equal to the volume of the contained shape.
+A sufficient and necessary condition for a shape $S_1$ to be fully contained into
+another shape $S_2$ is that all of the points of the surface $B$ of the first
+are contained into the second, and none of the points of the surface of the
+second are contained into the first:
+
+\begin{equation} \label{eqn:surface-in-volume}
+  S_1 \in S_2 \Leftrightarrow \left( P \in S_2 , \forall P \in B(S_1) \right)
+  \wedge \left( \not \exists P \in B(S_2) : P \in S_1 \right).
+\end{equation}
+
+A lot of special cases exists for these situations too, that can improve the
+execution speed (although this is asymptotically negligible, as the average
+execution time will already be $O(l^3)$); for example, for cube-to-sphere
+intersection, eqn. \ref{eqn:surface-in-volume} can be reduced to constant time by
+noticing that it is sufficient for all the vertices $V$ of the cube to be
+contained into the sphere in order for its whole surface to be contained too;
+more in general, for polygonal, convex, meshes-like shapes, only the edges must
+be checked to be contained one into the volume of the other. Also, if the shapes
+are \emph{simply connected}, the second part of eqn. \ref{eqn:surface-in-volume}
+can be omitted as it is implicitly true if the first part is. The number of
+points to check is thus halved or reduced to a constant number in these cases --
+which actually represent the majority of cases.
+
+

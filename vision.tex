@@ -1,3 +1,5 @@
+\section{Recognition and pose estimation pipeline}
+
 In this chapter a pipeline similar to the one introduced in
 \cite{linemod-pipeline} is presented, which is used to detect and estimate
 the pose of the objects to be recognized. First a template matching approach is
@@ -10,7 +12,7 @@ performing depth-based alignment of the match and the real object.
 %TODO
 TODO
 
-\section{False positive rejection based on hue values}
+\subsection{False positive rejection based on hue values}
 The first step of pose matching is made by purpose to be overly tolerant in
 template matching. This is because the used objects are quite small and simple
 in shape - which can reduce the number of features to match - and at the first
@@ -40,7 +42,89 @@ this, white and black pixels are turned to be zero-saturated, zero-valued
 pixels with fixed hue, corresponding to yellow (for white) and blue (for
 black). When matching, these are treated as special values and two pixels are
 said to match either if their actual hue match (which
-happens in case of strong lightning changes) or if their modified hue match
+is robust to moderate lightning changes) or if their modified hue, saturation
+and values match
 (which happes if both the model and the scene appear to be actually white or
-black).
+black). 
 
+After computing the new HSV values, the four resulting images (two belonging to
+the source image, two belonging to the rendered one) are scaled down of a
+factor $K_s$. This makes the four images to be downsampled, and improves the
+success rate of the subsequent step as it does minimize small alignment errors
+due to the pose estimation error within the template. The render's mask $m$ is
+scaled down of the same factor.
+
+After scaling, the mask is first filtered in order to keep only the points for
+which the mask's value is 1 (thus correcting the interpolated values on the
+border which come out of the scaling algorithm) and then
+eroded by a small amount (1 pixel). This allows to further remove the noise
+which usually comes into the object's borders.
+
+Finally, for each pixel belonging to the newly created mask, a comparison if
+done between the corresponding render's and scene's pixel. If their difference
+is below a certain threshold $t$, the two pixels correspond. The corresponding
+pixels are counted and the matching ratio $P_{match}$ is computed with respect to the
+total number of pixels belonging to the scaled mask:
+
+\begin{equation}
+P_{match}=\frac{\text{count}\left[(u,v) : m_{u,v}=1 \wedge \left( \lvert
+\text{Hue}(r_{u,v})-\text{Hue}(s_{u,v})\rvert < t \vee R_{u,v}=S_{u,v} \right)
+\right]
+}{\text{count}\left[ (u,v) : m_{u,v}=1 \right] }
+\end{equation}
+
+Here, $r$ indicates the scaled-down render, $s$ indicates the scaled-down scene
+portion, while $R$ and $S$ indicate the corresponding images with modified hues.
+
+The whole matching and filtering part is repeated until at least one match
+passes the filtering step. If no valid matches are found during the first
+iteration, the threshold level for the LineMOD algorithm is decreased; in this
+way, objects with small, partial occlusions can be recognized. If the threshold
+value steps below a certain threshold, the algorithm fails and no valid poses
+are returned.
+
+\subsection{Point cloud alignments and pose refinement}
+The matches that passed the first false-positive rejection step are saved and
+sorted based onto their matching percentage. At this point, matches are probably
+valid, but only colour information has been considered. Also, a good pose
+approximation has been obtained for each match, but coming from a template, it
+is not precise enough to be used for grasping. To overcome these problems,
+another step is required for each match, which is pose refinement through point
+clouds' alignment. In this step, colour information is dropped, and only depth
+information is used. 
+
+The Microsoft Kinect RGBD camera provides good depth informations for the template-matching
+requirements, but it is not suitable for precisely find the pose of an object
+for grasping. This is due mainly to the limitations of its depth sensor, having
+a nonlinear depth error of about $1\%$\footnote{TODO:link at MS device page}.
+Although this is quite a standard error, it must be combined with the minimum
+depth range of $80\unit{cm}$ for the sensor. This leads to an error of about
+$1\unit{cm}$ on the depth's values. Also, the field of view of the (fixed)
+kinect does not allow to precisely detect the object's pose, as the depth error
+increases the more the obejct is not centered with respect to the sensor. As a
+higher precision is needed for good 
+object grasping, a dedicated, precision depth sensor (\emph{Structure Sensor by
+Occipital})has been mounted onto the robot's arm.
+
+
+This camera's specifications\footnote{http://structure.io/developers} are much better than the kinect's ones, although it
+does not provide RGBD images but only depth informations -- hence the need for two
+different cameras; it has a much lower minimum range of $40\unit{cm}$ and is suitable for
+precision depth measurements, having a maximum error of about $1\%$, which comes
+down to $0.15\%$ at $40\unit{cm}$ of distance. This means having an absolute
+error of less than $0.2\unit{mm}$ when the camera is close enough to the object.
+
+As the matches already provided a good estimation of the object's position, the
+iterative closest point algorithm explained into sec. \ref{sec:icp} can be
+applied. 
+
+First, a frame can be taken
+First, the point cloud %TODO
+for the scene is obtained as explained in sec. \ref{sec:cloud-reconstruction}.
+As the mask of the render has already been computed, it is exploited at this
+point and only the part of the scene corresponding to the actual object is
+transformed to a 3D point cloud.
+
+During the process of 3D reconstruction a lot of invalid values can be
+generated: these are the points for which the depth sensor failed to obtain a
+valid representation

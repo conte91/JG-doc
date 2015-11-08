@@ -1,0 +1,75 @@
+\section{Offline pose training}
+An algorithm have been produced which can automatically generate a set of
+poses, or read a set of poses from file. In this way, poses for a given object
+can be generated, and heuristic poses can be given by the programmer as a hint
+for the grasping algorithm.  
+
+Each grasping pose is associated with a \emph{preference score} $P_{g}$: this will be taken
+into account as a second-level sorting value for grasps, meaning that the
+grasping algorithm will first search for the grasp with the lower score (i.e.
+intersection volume, as described in sec. \ref{sec:grasp_score}, but in case of
+a tie, it will prefer the grasp with a higher preference score.
+
+The parameter used to assign to each grasp a preference score is the supposed
+easiness to grasp the object without having it dropped during the subsequent
+movement phase: for example, for the duck-toy object shown in fig.
+\ref{fig:duck-toy-grasps}, a grasp done with a sucker on the plastic covering
+should work properly enough, but, being the plastic covering not rigid, the
+object is not sure to be taken without possibility of falling. Instead, a grasp
+done with clamps on the rigid, cardboard top of the envelope would work almost
+for sure. In this case, both poses would be added to the grasp list, but the
+latter would be preferred if both would not make the gripper collide with the
+rest of the scene.
+
+The pose generation has been splitted into two, minor problems: indentifying a
+set of points onto the object which can be used for efficient grasping, and
+assigning to each point a reference frame into the gripper's model; after these
+informations have been combined, the desired gripping pose is well-defined, as the
+whole pose of the gripper can be computed. Problem splitting is useful in this
+case, as the two parts are independent and only a little number of gripper's
+reference frames -- the one corresponding to the gripper's tools -- are actually
+useful for grasping. On the other hand, the problem of  generating poses for a generic
+reference frame can be solved by exploiting the geometric properties of the
+object itself, and this makes the algorithm agnostic with respect to the actual
+gripper's shape and thus more flexible and general.
+
+The point of connection between the two subproblems has been constrainted at the
+implementation's level for simplicity's sake: all of the generated pose
+points will be associated to a vector at generation time. This vector will
+coincide with the tool's $Z$ axis at the time of pose binding. When describing
+the pose of the tools associated with a certain set of gripping poses, it will
+be sufficient to set their $Z$ axis into the operative direction (e.g. suiction
+direction for suckers) in order to have the generation algorithm automatically
+bind points to an actual gripper's pose.
+
+\subsection{Pose generations on a line and on a plane's surface}
+If a set of poses on a plane surface must be generated, a good method is simply
+to sample the plane onto equally distanced points. Starting from the center of
+the plane, which would be the preferred point for the gripper to land onto,
+samples can be taken at increasing distances until the border of the surface is
+reached. when doing this, it assumed that the algorithm requiring pose
+generation will already have taken into account a good margin from the gripper
+to operate, and so none of the poses will actually result into a gripping
+failure. With this in mind, a good preference score can be obtained as the
+squared distance from the gripping point $\vec{p}$ to the center $\vec{c}$ of the surface:
+
+\begin{equation}
+P_{g}=(\vec{p}-\vec{c})(\vec{p}-vec{c})^\tau
+\end{equation}
+
+Regarding the pose's orientation, the $Z$ axis is well-defined, as it will
+coincide with the plane's perpendicular vector. Two cases have been considered,
+as it is useful to have two different descriptions for the plane's section: if
+the plane is described using a width and a height vector, named $\vec{w}$ and $\vec{h}$ the perpendicular
+direction is the direction of their product:
+
+\begin{equation}
+  \vec{z_{g}}=\vec{w} \times \vec{h}
+\end{equation}
+
+On the other hand, it is helpful sometimes to describe the plane by its
+perpendicular direction and center point: in this case, the $Z$ axis will just
+be the same as the perpendicular vector.
+
+
+

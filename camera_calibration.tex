@@ -121,6 +121,7 @@ If we consider $E$ to be the relative pose between world and camera, we have
 The matrix $E$ is called \emph{Extrinsic camera matrix}.
 
 \subsection{3D cloud reconstruction from RGBD image}
+\label{sec:cloud-reconstruction}
 By inverting equations \ref{eqn:intrinsics} and \ref{eqn:extrinsics} we can pass from homogeneous
 $(u,v,z_c)$ coordinates to homogeneous $(x,y,z)$ coordinates. In practice, this
 means passing from points into a camera-generated image to a cloud of points in

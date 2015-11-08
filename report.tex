@@ -5,6 +5,7 @@ backend=biber,
 style=numeric, %TODO ask 
 ]{biblatex}
 \addbibresource{mobius.bib}
+\addbibresource{icp.bib}
 \addbibresource{bibliography.bib}
 \newcommand{\vmiddle}[1]{\begin{tabular}{@{}c@{}} {#1} \end{tabular}}
 \begin{document}
@@ -14,9 +15,14 @@ style=numeric, %TODO ask
 \input{openGL}
 \input{training}
 \chapter{Object detection and pose estimation} \label{sec:vision}
+\input{icp}
 \input{vision}
 \chapter{Object grasping via multi-object grasping strategy}
 \input{intersection}
+\input{grasp_strategy}
+\input{gripper}
+\input{gripper_modelling}
+\input{pose_generation}
 \chapter{This section is just to fix TODO references, remove it after they
 disappear!} \label{sec:TODO}
 \printbibliography

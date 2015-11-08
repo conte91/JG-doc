@@ -1,0 +1,180 @@
+\section{The iterative closest point (ICP) algorithm for 3D point clouds
+alignment}
+
+A common problem when performing 3D point cloud analysis is the one of finding
+matches between a set of data, each sharing a partial set of points
+corresponding to a part of the scene they refer to. After finding two sets of
+matches which are known to correspond each other into the scenes, the
+corresponding rigid transformation between the two can be computed. If one of the two
+point clouds is then transformed using this transformation, the matches will
+come in (almost) exact correspondance, and the two point clouds will then refer
+to the same, global coordinate system. This problem is known as
+\emph{point cloud registration} or \emph{point cloud alignment}. In this case,
+the point cloud which must be aligned to a fixed scene is called \emph{data
+cloud}, while the fixed point cloud, set into the global reference frame, 
+which the data cloud must be aligned to is called \emph{model} or
+\emph{reference cloud}.
+
+If the scene is known to be still, this can be used to assemble together
+different views of a same scene,
+taken from different positions either by purpose or due to human error; in
+fact, one of the most common use of registration algorithms is 3D scene
+reconstruction starting from a set of views of the same scene. This is useful
+for example in 3D scanning applications, where a 3D camera (like a Microsoft
+Kinect) is moved slowly around an object and subsequent shots are taken;
+after doing this, each image is registered to the previous taken one and a
+bigger and bigger point cloud is obtained each time. When the last image is
+reached, it is aligned to a known, ground-truth location to obtain a full
+reconstruction of the scanned object in 3D global coordinates.
+
+In this project, point cloud registration is used to find a transformation
+between a computer-generated image -- the render of an object which is thought
+to be recognized into the world -- and the real scene to which the image refers
+to, i.e. the portion of image in which the object is thought to have been
+found. The practical effect of this is that, if the object which will be
+aligned to the scene is rendered with an associated, known pose, by applying
+the resulting transformation the correct, refined pose of the object in the 3D
+space can be found. This will be used in the later stages of the execution by
+the gripper's algorithm.
+
+Although numerous algorithms have been developed for 3D point clouds
+registration, one of the most known and used ones remain the
+\emph{Iterative Closest Point (\emph{ICP})}. Introduced first in 1992 in
+\cite{icp}, the algorithm had sudden success into the computer vision
+environment, due to its extreme simplicity, low computational cost and high
+effectiveness. Numerous variants have been developed, which target either
+computational efficiency, such the ones described in
+\cite{icp-fast-algorithms}, or robustness with respect to certain parameters,
+such as measurement noise, as in \cite{icp-bayes} or a good compromise between the
+two as in \cite{icp-robust}. The basic concept between these implementation
+remains, anyway always the same, and thus the processing steps stated in
+\cite{icp} are taken here as a reference.
+
+ICP is based on the assumption that, given a set of points with a good starting
+guess for their reciprocal transformation, the point which corresponds to a
+datum point into the data cloud is the one which is its
+nearest neighbour in the reference cloud. At each instant within the
+algorithm, a rough estimation of the transformation can be defined by computing
+the transformation that would minimize the average distance between these
+points. If the whole data cloud is then transformed using this transformation,
+it will come closer to the reference; by iterating these steps several times a
+solution can be found.
+
+\subsection{Closest point computation}
+First of all, the notion of \emph{distance} $d(\vec{p},C)$ between a point $\vec{p}$ in the data cloud
+and a given model $C$ -- composed of $N_c$ model points $\vec{m_i}, i \in \{0 \dots
+N_c\}$  -- is introduced:
+
+\begin{equation}
+d(\vec{p},C) = \text{min}\left\{ E(\vec{p}, \vec{m}) : \vec{m} \in C \right\}
+\end{equation}
+
+Here, $E(\vec{x},\vec{y})=\lVert \vec{x} - \vec{y} \rVert$ represents the well-known
+euclidean distance between two points. With this definition, the distance of a
+point $\vec{p}$ to a cloud is given as the distance from $p$ to its closest
+point within $C$. Using the same definition, the closest point $\vec{p_c}$ to
+$\vec{p}$ is the point satisfying the equation $E(\vec{p},
+\vec{p_c})=d(\vec{p}, C)$. Finding this point is an operation which can be done
+with an average cost of $O\left(\text{log}\left(N_c\right)\right)$ using a K-D
+tree as explained in sec. \ref{kdtree}, with a worst-case computational cost of
+$O\left( N_c \right)$; thus, finding the complete set of closest points to
+every point in the reference, i.e. finding the set $P_{c} = \left\{ p_c :
+E(\vec{p},\vec{p_c}) = d(\vec{p},C) , p \in C \right\}$, has an average
+computational time of $O\left( N_p \text{log}\left(N_c\right) \right)$, and a
+worst-case one of $O\left( N_p N_c \right)$.
+
+\subsection{Best transformation choice}
+After assigning to each point in the data cloud a correspondance within the
+model cloud, the problem of finding the best transformation, which is the one
+giving the least possible average squared distance between every point $p$ and
+its corresponding point $p_c$, has two well-known solutions. 
+
+In the case of 3D point clouds with no additional informations to register, a
+good approach is the use of unit quaternions, i.e. quaternions $q$ which norm is
+equal to 1:
+
+\begin{equation} \label{eqn:quaternion}
+q = \begin{pmatrix}a\\b\\c\\d\end{pmatrix}, a^2+b^2+c^2+d^2=1
+\end{equation}
+
+Unit quaternions are a well-known form of representation for rotations, which can
+thus be combined with a translation to form a complete affine transformation
+representing reciprocal pose\footnote{In this case, the scaling factor $s$ of
+the resulting affine transformation is assumed to be 1, as the registration is
+performed between clouds of the same scale (i.e. the registration process
+results in a rigid transformation)}. Given the quaternion $q$ of
+eqn.\ref{eqn:quaternion}, it can be univocally associated with a rotation
+matrix, without redundancy:
+
+\begin{equation}
+  R = \begin{pmatrix}
+    a^2+b^2-c^2-d^3 & 2\left(b c - a d \right) & 2\left( b d + a c \right) \\
+    2\left(b c + a d \right) & a^2+c^2-b^2-d^2 & 2\left( c d - a b \right) \\
+    2\left( b d - a c \right) & 2\left(c d + a b\right) & a^2+d^2-b^2-c^2
+  \end{pmatrix}
+\end{equation}
+
+If a translation vector $t=\begin{pmatrix}x_0 & y_0 & z_0\end{pmatrix}^{\tau}$
+is combined with $R$, and this affine transformation is applied to the point
+$p$, the resulting point $p_1$ will be:
+\begin{equation}
+  p_1=R*p+t
+\end{equation}
+
+Thus, in order to find the optimal transformation between the two clouds, $R$
+and $t$ must be found so that
+
+\begin{equation}
+  S=\frac{1}{N_p}\sum_{i=1}^{N_p}\lVert p_{c,i} - Rp_i -t  \rVert
+\end{equation}
+
+is minimized.
+
+It has been proven in \cite{extrinsics-algorithm}that the optimal rotation
+quaternion $q$ can be found by first computing the centers of mass of the data
+cloud $\vec{\mu_d}$ and of the reference cloud $\vec{\mu_r}$, then using these for
+computing the cross-covariance matrix $\Sigma_{p}$ between the two points' set:
+
+\begin{eqnarray}
+  \vec{\mu_d} & = &  \frac{1}{N_p}\sum_{i=1}^{N_p}\left(\vec{p_i}\right) \\
+  \vec{\mu_r} & = &  \frac{1}{N_p}\sum_{i=1}^{N_p}\left(\vec{p_{c,i}}\right) \\
+  \Sigma_{p} & = &
+  \frac{1}{N_p}\sum_{i=1}^{N_p}\left[\left(\vec{p_i}-\vec{\mu_d}\right)\left(\vec{p_{c,i}}-\vec{\mu_r}\right)\right]
+\end{eqnarray}
+
+After this, the matrix $A=\Sigma_{p}-\Sigma_{p}^{\tau}$ is built, and its cyclic
+components are used to build a column vector $\Delta$. These data are used to
+build the $4 \times 4$ matrix $Q$ shown in
+eqn.\ref{eqn:q-of-extrinsics-algorithm}, and the best solution for $q$ is given
+by the eigenvector of $Q$ corresponding to its maximum eigenvalue.
+
+\begin{eqnarray}
+  A & = & \Sigma_{p}-\Sigma{p}^{\tau} \\
+  \Delta & = & \begin{pmatrix}A_{2,3}\\A_{3,1}\\A_{1,2}\end{pmatrix} \\
+  Q & = & \begin{pmatrix}
+  \text{tr}(\Sigma_{p}) & \Delta T \\
+  \Delta & \Sigma_{p}+\Sigma_{p}^{\tau}-\text{tr}(\Sigma_{p}I_{3}) 
+\end{pmatrix} \label{eqn:q-of-extrinsics-algorithm}\\
+  q & = & \left\{ \vec{x} \in \text{Eigenvectors}(Q) :
+  \text{Eigenvalue}(x)=\text{max}\left(\text{Eigenvalue}(x)\right) \right\}
+\end{eqnarray}
+
+
+After finding the rotation matrix $R$ as described above, it has been shown that the best solution for $t$
+is for it to be the translation vector between the center of mass of the
+reference cloud $\vec{M_{r}}$ and the one of the rotated
+data cloud $R\vec{M_d}$ 
+
+\begin{equation}
+  t = \vec{M_r}-R\vec{M_d} =  \frac{1}{N_p}\sum_{i=1}^{N_p}\left(\vec{p_{c,i}}-R\vec{p_{i}}\right) 
+\end{equation}
+
+With this procedure, best transformation between corresponding point clouds can
+be found in $O(N_p)$ steps.
+
+
+\subsection{K-D Trees} \label{kdtree}
+In order for the problem of finding the closest point $\vec{p_c}$ to $p$ not to
+have fixed computational cost $O(n^2)$, a \emph{K-D tree} is used; it is
+a data structure which extends to more than one dimension the concept of binary
+partition tree.

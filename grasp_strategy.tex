@@ -1,0 +1,15 @@
+\section{Grasping poses' filtering and best grasp computation}
+In this section the algorithm for selecting a set of good grasps from the set of
+possible ones is presented.
+
+When a set of poses has been generated for each object, either automatically or
+manually, the main problem with it is that it will be a very big set (assuming
+10 samples on each direction for each plane of the object, and 4 in-plane
+rotations for each, for example, would
+lead to 2400 samples for a cuboid, plus manually-added poses). As intersecting
+objects is the most time-consuming task for this part, is thus
+important to filter the poses in a good way.
+
+The implemented strategy goes as follows: for each object, the whole set of
+poses is put into a list and is then sorted base on preference scores.
+
