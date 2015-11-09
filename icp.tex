@@ -66,7 +66,7 @@ and a given model $C$ -- composed of $N_c$ model points $\vec{m_i}, i \in \{0 \d
 N_c\}$  -- is introduced:
 
 \begin{equation}
-d(\vec{p},C) = \text{min}\left\{ E(\vec{p}, \vec{m}) : \vec{m} \in C \right\}
+  d(\vec{p},C) = \text{min}\left\{ E(\vec{p}, \vec{m}) : \vec{m} \in C \right\}
 \end{equation}
 
 Here, $E(\vec{x},\vec{y})=\lVert \vec{x} - \vec{y} \rVert$ represents the well-known
@@ -83,7 +83,7 @@ E(\vec{p},\vec{p_c}) = d(\vec{p},C) , p \in C \right\}$, has an average
 computational time of $O\left( N_p \text{log}\left(N_c\right) \right)$, and a
 worst-case one of $O\left( N_p N_c \right)$.
 
-\subsection{Best transformation choice}
+\subsection{Best transformation choice} \label{sec:icp-best-transformation}
 After assigning to each point in the data cloud a correspondance within the
 model cloud, the problem of finding the best transformation, which is the one
 giving the least possible average squared distance between every point $p$ and
@@ -100,8 +100,8 @@ q = \begin{pmatrix}a\\b\\c\\d\end{pmatrix}, a^2+b^2+c^2+d^2=1
 Unit quaternions are a well-known form of representation for rotations, which can
 thus be combined with a translation to form a complete affine transformation
 representing reciprocal pose\footnote{In this case, the scaling factor $s$ of
-the resulting affine transformation is assumed to be 1, as the registration is
-performed between clouds of the same scale (i.e. the registration process
+  the resulting affine transformation is assumed to be 1, as the registration is
+  performed between clouds of the same scale (i.e. the registration process
 results in a rigid transformation)}. Given the quaternion $q$ of
 eqn.\ref{eqn:quaternion}, it can be univocally associated with a rotation
 matrix, without redundancy:
@@ -150,12 +150,12 @@ by the eigenvector of $Q$ corresponding to its maximum eigenvalue.
 
 \begin{eqnarray}
   A & = & \Sigma_{p}-\Sigma{p}^{\tau} \\
-  \Delta & = & \begin{pmatrix}A_{2,3}\\A_{3,1}\\A_{1,2}\end{pmatrix} \\
+\Delta & = & \begin{pmatrix}A_{2,3}\\A_{3,1}\\A_{1,2}\end{pmatrix} \\
   Q & = & \begin{pmatrix}
   \text{tr}(\Sigma_{p}) & \Delta T \\
   \Delta & \Sigma_{p}+\Sigma_{p}^{\tau}-\text{tr}(\Sigma_{p}I_{3}) 
 \end{pmatrix} \label{eqn:q-of-extrinsics-algorithm}\\
-  q & = & \left\{ \vec{x} \in \text{Eigenvectors}(Q) :
+q & = & \left\{ \vec{x} \in \text{Eigenvectors}(Q) :
   \text{Eigenvalue}(x)=\text{max}\left(\text{Eigenvalue}(x)\right) \right\}
 \end{eqnarray}
 
@@ -172,9 +172,154 @@ data cloud $R\vec{M_d}$
 With this procedure, best transformation between corresponding point clouds can
 be found in $O(N_p)$ steps.
 
+\subsection{Iterations and ending conditions}
+The ICP algorithm applies the two previous steps of nearest neighbour search and
+best transformation computation iteratively, hence its name; at every step, the
+relative pose between the two clouds gets better. This is not only an heuristic
+supposition, as a theorem has been proven
+proven in \cite{icp}, stating that the whole algorithm will converge
+\emph{monotonically} to a minimum of the distance function: thus, every
+iteration will yield to a better result no matter the current state of the
+algorithm.
 
-\subsection{K-D Trees} \label{kdtree}
+Two main termination conditions are used by ICP: the first is the best-case one,
+in which the total distance between the two point clouds $R$ and $D$ becomes smaller than a
+given threshold:
+\begin{equation}
+  d(D,R) = \sum_{i=1}^{N_p}\left(p_i,R\right) < t_{\text{good}}
+\end{equation}
+
+The second is a condition that lets the algorithm end if it is stuck in a local
+minimum of the distance function: in this case, as the error will always
+decrease as stated before, its variation will decrease too and eventually become
+smaller than a certain threshold $t_{\text{stop}}$ at time $t$:
+\begin{equation}
+  \Delta d_t(D,R) = d_t(D,R)-d_t(D,R) < t_{\text{stop}}
+\end{equation}
+
+The whole algorithm can be then summed up in this way:
+\begin{enumerate}
+\item{Start with given data cloud $D$, reference cloud $R$, transformation
+  guess $P$, last transformation $T=P$;}
+\item{Transform each point $p \in D$ using the current transformation $T$;}
+\item{For each point, search for the nearest neighbour $p_c \in R$ and create
+  the set of associations $A=\left\{(p,p_c) : p \in D \right\}$;}
+\item{Find the best transformation from $D$ to $A$ as explained in sec.
+  \ref{sec:icp-best-transformation}, and save it into $T$;}
+\item{Stack the current transformations together into $P$: $P=TP$;}
+\item{If $d(D,R)<t_{\text{good}}$ or $\Delta d(D,R)<t_{\text{stop}}$, exit;}
+\item{Go to step 2.}
+\end{enumerate}
+\subsection{$K$-d Trees} \label{kdtree}
 In order for the problem of finding the closest point $\vec{p_c}$ to $p$ not to
-have fixed computational cost $O(n^2)$, a \emph{K-D tree} is used; it is
+have fixed computational cost $O(n^2)$, a \emph{$K$-d tree} (i.e.
+$K$-dimension tree) is used; it is
 a data structure which extends to more than one dimension the concept of binary
-partition tree.
+partition tree. If a point cloud is organized using a $K$-d tree, its points
+result iteratively sorted with respect to their coordinates, which allows a
+faster division of the search space.
+
+As in a binary tree, data inserted in a $K$-d tree is organized in a
+hierarchical way. Each item in the tree is a single vector with $K$ dimensions.
+Starting from the top node, called \emph{root}, navigation into the tree is done
+top-down: nodes have two trees below them (called \emph{subtrees}), containing one
+or more elements, called \emph{children}; children in the first (or \emph{left})
+subtree are always lesser then their father's node, with respect to a certain
+evaluation function, while children in the second (\emph{right}) subtree are
+greater\footnote{The case in which an exact duplicate of a datum is inserted is
+ not covered here, as it is assumed that the point cloud to be transformed in a
+ $K$-d tree is sparse enough}. The discriminant function for a given node is usually chosen to be an hyperplane, to
+which the node belongs to: in
+this way, the whole points' space is, at each level, subdivided in half. Thus,
+points which belong to the same subtree are spatially near each other.
+Fig.~\ref{fig:kd-tree-subdiv} exemplifies this concept.
+
+For 3D data, the choice of the hyperplane can be different at each level of
+subdivision: the dividing plane is usually chosen to be parallel to the X axis
+for the first level, Y axis for the third level, and so on; this makes the
+discriminant function very lightweight, as it only consists of comparing one of
+the coordinates of the object to be inserted (or searched for) with the same
+coordinate of the current node.
+
+\begin{figure}[htbp] \label{fig:kd-tree-subdiv}
+\centering
+  \includegraphics[width=2.5in]{./Graphics/kdtree} 
+  \caption{A $K$-d tree recursively subdivides the data space in smaller
+  hypercubes by means of hyperplanes: thus, points belonging to the same subtree
+  are spatially near to each
+  other. Image source:
+https://upload.wikimedia.org/wikipedia/commons/b/b6/3dtree.png (GNU GPLv2) }
+\end{figure}
+
+If a new value must be inserted into a list, the usual rules of BSTs apply:
+the value is compared with the root node, and the insertion algorithm moves to
+the left or to the right subtree based on the result of this comparison. This
+process is reiterated, and the
+value is inserted when the algorithm reaches a node which has no subtree into
+which to move further (\emph{leaf}). The problem with this approach is the
+possibility of building a tree which is not \emph{balanced}, i.e. with a much
+higer number of nodes in one of the subtrees with respect to the other. However,
+when building a $K$-d tree out of a point list, the insertion algorithm can sort
+the elements to be added before starting: in this way, a balanced tree is easier
+to build, as it is sufficient to choose, for each subtree, the median element of
+the data as the root.
+
+When the whole tree has been built, it is easy to exploit its properties to
+simplify the operation of nearest-neighbour search for a datum value. The
+algorithm is recursive, and proceeds by searching the nearest neighbour in one
+of the subtrees, then exploiting the properties of $K$-d trees to avoid
+computation on the other subtree if not strictly necessary. In practice, given
+the point $\vec{P}=\left(p_0,p_1,\dots,p_n\right)$, it goes
+as follows:
+
+\begin{enumerate}
+  \item{At start, set the distance of the nearest neighbour to be $d=+\infty$
+    and the root of the tree as the current node;}
+  \item{the nearest neighbour is the root node if the tree has only 1 element
+    (termination condition);}
+  \item{if the current node $\vec{C}=\left(c_0,c_1,\dots,c_n\right)$ has a lower distance than the best one, set it as
+    the nearest neighbour;}
+  \item{search the nearest neighbour (recursion step) into the tree $T_1$ to which $\vec{P}$
+      belongs to, i.e. into the left tree if $p_i < c_i$, into the right tree
+    otherwise; update $d$ if a new nearest neighbour has been found;}
+  \item{using the current best distance, examine whether the other branch $T_2$ of
+      the tree has to be examined. This is the \emph{crucial} step of the
+      algorithm, being the one that makes it better with respect to the trivial
+    ones. Geometrically, the other branch of the tree must not be examined if no
+    point lies on the other half of the space such that it is contained in the
+    hypersphere centered in $\vec{P}$ and with radius $d$; however, for how the $K$-d
+    tree is structured, it can be seen that this definition is equivalent to
+    saying that the same sphere does not cross the division hyperplane generated
+    by $\vec{C}$: this, in turn, is equivalent to saying that the distance from $\vec{P}$
+    and $\vec{C}$ (taking only the $i$-th coordinate into account) is less than $d$:
+    \begin{equation}
+      \not \exists \vec{x} \in T_2 : \lVert \vec{x}-\vec{P} \rVert < d
+      \Leftrightarrow \lvert c_i-p_i \rvert < d
+    \end{equation}
+    if this property, which is shown in fig. \ref{fig:kdtree-hypersphere}, does not apply, search recursively into the other branch
+  $T_2$ as well.}
+\end{enumerate}
+
+\begin{figure}[htbp] \label{fig:extr_alignment}
+\centering
+  \adjustbox{valign=m}{\includegraphics[width=2in]{./Graphics/kdtree_graph}} 
+\begin{tabular}{c|c}
+  \adjustbox{valign=m}{\includegraphics[width=2in]{./Graphics/kdtree_graph}} &
+  \adjustbox{valign=m}{\includegraphics[width=2in]{./Graphics/kdtree_graph}}
+\end{tabular}
+    \caption{A $K$-d tree, like the one shown on the top, subdivides the
+      points' space based on points' coordinates. If the distance from a point
+      $\vec{P}$
+      to an hyperplane is less than a value $d$, then no points on the other
+      half of the space have a distance smaller than $d$ to $\vec{P}$ (center). If
+      there is such a point, the distance from the point to the plane is smaller
+    than $d$ too: this means that the hypersphere centered in $\vec{P}$ of
+  radius $d$ crosses the plane.} 
+\end{figure}
+
+Exact computational analysis of this algorithm is quite tricky; however, it is
+intuitive to see that, given a well-balanced $K$-d tree and a point chosen
+randomly, the algorithm will skip processing half of the tree about one half of
+the times: this gives an average  execution time of $O(\log N_p)$, as stated
+before.
+

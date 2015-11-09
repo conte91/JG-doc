@@ -1,0 +1,21 @@
+graph kdtree{
+  a [label="(2,1)"]
+  b [label="(1,1)"]
+  c [label="(3,1)"]
+  d [label="(-2,0)"]
+  e [label="(1,3)"]
+  f [label="(3,0)"]
+  g [label="(4,2)"]
+  h [label="(-4,0)"]
+  i [label="(-1,-1)"]
+  j [label="(5,2)"]
+  a -- b
+  a -- c
+  b -- d
+  b -- e
+  d -- h
+  d -- i
+  c -- f
+  c -- g
+  g -- j
+}
