@@ -4,15 +4,7 @@
 backend=biber,
 style=numeric, %TODO ask 
 ]{biblatex}
-\addbibresource{mobius.bib}
-\addbibresource{icp.bib}
-\addbibresource{bibliography.bib}
-\addbibresource{how-kinect-work.bib}
-\addbibresource{linemod-origins.bib}
-\addbibresource{primesense-patent.bib}
-\addbibresource{stereo-vision-robot.bib}
-\addbibresource{stereo-precision.bib}
-\addbibresource{grasp-training.bib}
+\input{bibliography-list}
 \newcommand{\vmiddle}[1]{\begin{tabular}{@{}c@{}} {#1} \end{tabular}}
 \begin{document}
 \english
@@ -25,6 +17,7 @@ style=numeric, %TODO ask
 \input{camera_calibration}
 \input{openGL}
 \input{training}
+\input{linemod}
 \input{icp}
 \input{vision}
 \chapter{Object grasping via multi-object grasping strategy}
