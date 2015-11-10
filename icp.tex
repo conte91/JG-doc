@@ -2,7 +2,7 @@
 alignment}
 
 A common problem when performing 3D point cloud analysis is the one of finding
-matches between a set of data, each sharing a partial set of points
+matches between two sets of data, each sharing a partial set of points
 corresponding to a part of the scene they refer to. After finding two sets of
 matches which are known to correspond each other into the scenes, the
 corresponding rigid transformation between the two can be computed. If one of the two
@@ -22,7 +22,7 @@ fact, one of the most common use of registration algorithms is 3D scene
 reconstruction starting from a set of views of the same scene. This is useful
 for example in 3D scanning applications, where a 3D camera (like a Microsoft
 Kinect) is moved slowly around an object and subsequent shots are taken;
-after doing this, each image is registered to the previous taken one and a
+after doing this, each image is registered to the previous one and a
 bigger and bigger point cloud is obtained each time. When the last image is
 reached, it is aligned to a known, ground-truth location to obtain a full
 reconstruction of the scanned object in 3D global coordinates.
@@ -45,9 +45,9 @@ environment, due to its extreme simplicity, low computational cost and high
 effectiveness. Numerous variants have been developed, which target either
 computational efficiency, such the ones described in
 \cite{icp-fast-algorithms}, or robustness with respect to certain parameters,
-such as measurement noise, as in \cite{icp-bayes} or a good compromise between the
+such as measurement noise, as in \cite{icp-bayes}, or a good compromise between the
 two as in \cite{icp-robust}. The basic concept between these implementation
-remains, anyway always the same, and thus the processing steps stated in
+remains, anyway, always the same, and thus the processing steps stated in
 \cite{icp} are taken here as a reference.
 
 ICP is based on the assumption that, given a set of points with a good starting
@@ -76,7 +76,7 @@ point within $C$. Using the same definition, the closest point $\vec{p_c}$ to
 $\vec{p}$ is the point satisfying the equation $E(\vec{p},
 \vec{p_c})=d(\vec{p}, C)$. Finding this point is an operation which can be done
 with an average cost of $O\left(\text{log}\left(N_c\right)\right)$ using a K-D
-tree as explained in sec. \ref{kdtree}, with a worst-case computational cost of
+tree as explained in sec. \ref{kdtree}, and with a worst-case computational cost of
 $O\left( N_c \right)$; thus, finding the complete set of closest points to
 every point in the reference, i.e. finding the set $P_{c} = \left\{ p_c :
 E(\vec{p},\vec{p_c}) = d(\vec{p},C) , p \in C \right\}$, has an average
@@ -212,7 +212,7 @@ The whole algorithm can be then summed up in this way:
 \end{enumerate}
 \subsection{$K$-d Trees} \label{kdtree}
 In order for the problem of finding the closest point $\vec{p_c}$ to $p$ not to
-have fixed computational cost $O(n^2)$, a \emph{$K$-d tree} (i.e.
+have fixed computational cost $O(n)$, a \emph{$K$-d tree} (i.e.
 $K$-dimension tree) is used; it is
 a data structure which extends to more than one dimension the concept of binary
 partition tree. If a point cloud is organized using a $K$-d tree, its points
@@ -228,7 +228,7 @@ subtree are always lesser then their father's node, with respect to a certain
 evaluation function, while children in the second (\emph{right}) subtree are
 greater\footnote{The case in which an exact duplicate of a datum is inserted is
  not covered here, as it is assumed that the point cloud to be transformed in a
- $K$-d tree is sparse enough}. The discriminant function for a given node is usually chosen to be an hyperplane, to
+ $K$-d tree is sparse enough.}. The discriminant function for a given node is usually chosen to be an hyperplane, to
 which the node belongs to: in
 this way, the whole points' space is, at each level, subdivided in half. Thus,
 points which belong to the same subtree are spatially near each other.
@@ -241,14 +241,14 @@ discriminant function very lightweight, as it only consists of comparing one of
 the coordinates of the object to be inserted (or searched for) with the same
 coordinate of the current node.
 
-\begin{figure}[htbp] \label{fig:kd-tree-subdiv}
+\begin{figure}[htbp]
 \centering
   \includegraphics[width=2.5in]{./Graphics/kdtree} 
   \caption{A $K$-d tree recursively subdivides the data space in smaller
   hypercubes by means of hyperplanes: thus, points belonging to the same subtree
   are spatially near to each
   other. Image source:
-https://upload.wikimedia.org/wikipedia/commons/b/b6/3dtree.png (GNU GPLv2) }
+https://upload.wikimedia.org/wikipedia/commons/b/b6/3dtree.png (GNU GPLv2)  \label{fig:kd-tree-subdiv}}
 \end{figure}
 
 If a new value must be inserted into a list, the usual rules of BSTs apply:
@@ -258,7 +258,7 @@ process is reiterated, and the
 value is inserted when the algorithm reaches a node which has no subtree into
 which to move further (\emph{leaf}). The problem with this approach is the
 possibility of building a tree which is not \emph{balanced}, i.e. with a much
-higer number of nodes in one of the subtrees with respect to the other. However,
+higher number of nodes in one of the subtrees with respect to the other. However,
 when building a $K$-d tree out of a point list, the insertion algorithm can sort
 the elements to be added before starting: in this way, a balanced tree is easier
 to build, as it is sufficient to choose, for each subtree, the median element of
@@ -300,21 +300,22 @@ as follows:
   $T_2$ as well.}
 \end{enumerate}
 
-\begin{figure}[htbp] \label{fig:extr_alignment}
+\begin{figure}[htbp]
 \centering
   \adjustbox{valign=m}{\includegraphics[width=2in]{./Graphics/kdtree_graph}} 
+  \vspace{0.5in}
 \begin{tabular}{c|c}
-  \adjustbox{valign=m}{\includegraphics[width=2in]{./Graphics/kdtree_graph}} &
-  \adjustbox{valign=m}{\includegraphics[width=2in]{./Graphics/kdtree_graph}}
+  \adjustbox{valign=m}{\includegraphics[width=2in]{./Graphics/kdtree_plane_2}} &
+  \adjustbox{valign=m}{\includegraphics[width=2in]{./Graphics/kdtree_plane_1}}
 \end{tabular}
     \caption{A $K$-d tree, like the one shown on the top, subdivides the
       points' space based on points' coordinates. If the distance from a point
       $\vec{P}$
       to an hyperplane is less than a value $d$, then no points on the other
-      half of the space have a distance smaller than $d$ to $\vec{P}$ (center). If
+      half of the space have a distance smaller than $d$ to $\vec{P}$ (left). If
       there is such a point, the distance from the point to the plane is smaller
     than $d$ too: this means that the hypersphere centered in $\vec{P}$ of
-  radius $d$ crosses the plane.} 
+  radius $d$ crosses the plane (right). \label{fig:kdtree-hypersphere}} 
 \end{figure}
 
 Exact computational analysis of this algorithm is quite tricky; however, it is

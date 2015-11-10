@@ -7,17 +7,24 @@ style=numeric, %TODO ask
 \addbibresource{mobius.bib}
 \addbibresource{icp.bib}
 \addbibresource{bibliography.bib}
+\addbibresource{how-kinect-work.bib}
+\addbibresource{linemod-origins.bib}
+\addbibresource{primesense-patent.bib}
+\addbibresource{stereo-vision-robot.bib}
+\addbibresource{stereo-precision.bib}
+\addbibresource{grasp-training.bib}
 \newcommand{\vmiddle}[1]{\begin{tabular}{@{}c@{}} {#1} \end{tabular}}
 \begin{document}
 \english
 \tableofcontents
 \listoffigures
 \listoftables
-\chapter{Object modelling and training for detection purposes}
+\chapter{Detection and fine pose estimation of objects through computer vision}
+\label{sec:vision}
+\input{kinect}
 \input{camera_calibration}
 \input{openGL}
 \input{training}
-\chapter{Object detection and pose estimation} \label{sec:vision}
 \input{icp}
 \input{vision}
 \chapter{Object grasping via multi-object grasping strategy}

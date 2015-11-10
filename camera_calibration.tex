@@ -15,7 +15,9 @@ provides the correct approximation for both RGB cameras and depth-capable ones.
 A camera, be it a digital camera or the human eye, can be modeled by
 considering the path the light coming from a point will take when
 captured. By approximating the camera's objective with a single point (hole),
-light rays come onto projective plane (where the light sensor is) with central
+light rays come onto projective plane (where the light sensor is), which is at a
+distance $f$ (called \emph{focal length}) from the hole of the camera; light
+travels with central
 simmetry with respect to the position of the point in world coordinates. By
 rotating the $(u,v)$ reference frame of the image so that it has the same
 orientation as the image seen by the camera \footnote{Notice that the image
@@ -26,16 +28,16 @@ $Z$ axis pointing forward.}, the point corresponding to the camera hole
 becomes the destination point for all the light paths, as seen in single-point
 prospective. This transformation is called \emph{perspective projection}.
 
-\begin{figure}[htbp] \label{fig:pinhole_camera}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=2.5in]{./Graphics/pinhole_camera}
-\caption{The pinhole camera model}
+\caption{The pinhole camera model \label{fig:pinhole_camera}}
 \end{figure}
-\begin{figure}[htbp] \label{fig:intrinsics}
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=2.5in]{./Graphics/camera_intrinsics}
 \caption{Geometric projection of a general point into the camera's projective
-plane.}
+plane. \label{fig:intrinsics}}
 \end{figure}
 Examining the geometric properties of this system from fig. \ref{fig:intrinsics}, we can easily extract the
 transformation from a point $P_c(x_c,y_c,z_c)$ in the local coordinate system
@@ -68,7 +70,7 @@ directly measured from the depth sensor and is reported on a per-pixel basis
 without the need of further processing.
 
 If we use \emph{homogeneous coordinates} as described in sec.
-\ref{homogeneous-coordinates}
+\ref{sec:homogeneous-coordinates}
 to describe both 3D and 2D points, we get
 
 \begin{equation} \label{eqn:intrinsics}
@@ -122,7 +124,7 @@ The matrix $E$ is called \emph{Extrinsic camera matrix}.
 
 \subsection{3D cloud reconstruction from RGBD image}
 \label{sec:cloud-reconstruction}
-By inverting equations \ref{eqn:intrinsics} and \ref{eqn:extrinsics} we can pass from homogeneous
+By inverting eqns. \ref{eqn:intrinsics} and \ref{eqn:extrinsics} we can pass from homogeneous
 $(u,v,z_c)$ coordinates to homogeneous $(x,y,z)$ coordinates. In practice, this
 means passing from points into a camera-generated image to a cloud of points in
 the global coordinate system.
@@ -139,8 +141,8 @@ frames containing a single, known object with known size and features. In
 particular, a big chessboard pattern has been chosen for this work.
 
 Intrinsic camera matrix can be obtained by using the built-in
-\texttt{calibrateCamera} OpenCV's feature %TODO ref
-. Before calling it, the pattern's features can be found using the corresponding
+\texttt{calibrateCamera} OpenCV's feature. %TODO ref
+Before calling it, the pattern's features can be found using the corresponding
 facilities like \texttt{findChessboardCorners}. This function examines a serie
 of $(u,v)$ points corresponding to the features as they are seen from multiple
 frames and multiple pattern's poses, and tries to minimize the RMS error on a
@@ -183,11 +185,11 @@ fig. \ref{fig:extr_alignment}.
 Both intrinsic and extrinsic matrices are saved to a camera model file by the
 calibration programs.
 
-\begin{figure}[htbp] \label{fig:extr_alignment}
+\begin{figure}[htbp] 
 \centering
 \begin{tabular}{c|c}
   \adjustbox{valign=m}{\includegraphics[width=2.5in]{./Results/Chessboard_points_cut}} &
   \adjustbox{valign=m}{\includegraphics[width=2.5in]{./Results/Chessboard_alignment}}
 \end{tabular}
-\caption{Left: Chessboard's points are correctly found during calibration. Right: Chessboard's points are correctly aligned after full camera calibration.}
+\caption{Left: Chessboard's points are correctly found during calibration. Right: Chessboard's points are correctly aligned after full camera calibration.\label{fig:extr_alignment}}
 \end{figure}

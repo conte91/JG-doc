@@ -35,7 +35,7 @@ considerations have been done:
     object for the high-level strategy to pick first;}
   \item{on the other hand, a grasp which puts the
       gripper at risk of hitting the borders of the object's container -- being them
-      the edges of a bin or the floor -- shall have score $d=\infty$. Trying to pick the
+      the edges of a bin or the floor -- shall have score $d=+\infty$. Trying to pick the
       object with this grasp could cause physical damage to the robot, the floor or
     even humans, thus the high-level strategy should discard it completely;}
   \item{if a grasp puts the gripper in contact with other objects of a scene, its
@@ -74,7 +74,7 @@ extracted from the above:
     the need of caring about floating point's approximations;}
   \item{it must have a parameter $\alpha>0$ defining how much
     intersection volume globally affects hardness of grasp;}
-  \item{it must have another parameter $K>=1$ defining how much the hardness is
+  \item{it must have another parameter $K\geq1$ defining how much the hardness is
     increased rapidly after reaching the brushing threshold $V_{easy}$;}
   \item{when the intersection volume is greater than the brushing threshold, the
       function
@@ -98,17 +98,17 @@ The chosen function, which satisfies all of the above properties, is
   \right.
 \end{equation}
 
-It is shown in appendix \ref{app:score_function} that $s(V_{int})$ satisfies all
-of the above properties for any $K>=1$, and is thus suitable as a score
+It is shown in appendix \ref{sec:TODO} that $s(V_{int})$ satisfies all
+of the above properties for any $K\geq1$, and is thus suitable as a score
 function. Some examples of this function varying the two parameters $\alpha$ and
 $K$ are shown in fig. \ref{fig:score_function}.
 
-\begin{figure}[htbp] \label{fig:score_function}
+\begin{figure}[htbp]
   \centering
   \includegraphics[height=3in]{./Graphics/score_alpha}
   \includegraphics[height=3in]{./Graphics/score_k}
   \caption{Resulting score function for different values of $\alpha$ (top) and
-  $K$ (bottom)}
+  $K$ (bottom) \label{fig:score_function}}
 \end{figure}
 
 \subsection{Object representation as elementary shapes} \label{sec:shapes}
@@ -116,13 +116,13 @@ A good representation of objects is essential in order to compute efficiently
 their intersection. In this project, objects have been represented by means of a
 uniform data structure breaking down complex meshes to the union of simpler
 shape, as done with the \emph{Constructive Solid Geometry (\emph{CSG})} tools of
-most mainstream CAD application. Each object is represented, for the purpose of
+most mainstream CAD applications. Each object is represented, for the purpose of
 grasp computation, by means of simpler, basic shapes, associated to their pose
 relative to the object's reference system. These will be called
 \emph{primitives}. A tree structure can also be created
 by considering compound objects created in this manner to be a shape type on
 their own, thus allowing recursive object building. This is similar to what the
-\emph{assembly} and \emph{group} tools of mainstream CAD application do, as well
+\emph{assembly} and \emph{group} tools of common CAD applications do, as well
 as what the library used for mesh representation (Assimp) does for
 multiple-nodes meshes. This approach has a serie of advantages:
 \begin{itemize}
@@ -134,7 +134,7 @@ multiple-nodes meshes. This approach has a serie of advantages:
       which is useful both for debugging and for execution purposes (for
       example, the database of objects, together with their shapes, can be made
     distributed with no effort and version control tools can be useful);}
-  \item{using an approach similar to what is supported by mainstream CAD
+  \item{using an approach similar to what is supported by CAD
       applications results in the possibility of scripting the latter in order
       to automatically produce an exact representation of the object starting
       from a CAD model, which could be the same used for training in sec.
@@ -160,7 +160,7 @@ is checked at runtime to be coherent to the associated shape. To the shape is
 associated a pose information, represented as an affine transformation as in the
 rest of the project. To each shape type functions have been implemented to
 recognize whether a it intersects with, or contains, a point, an edge, a line, or
-another shape. When computing intersections, these are efficiently used asZ c
+another shape. When computing intersections, these are efficiently used as
 special cases to recognize whether an intersection exists or not before
 eventually running the computationally expensive intersection's volume
 algorithm.
@@ -283,8 +283,7 @@ intersection, as if it was
 analitically computed by an integral. More in detail, each shape knows how to
 approximate both its surface and its volume at different levels; both these
 representations are returned by the shape as a serie of points, or \emph{point
-cloud}, which is the same representation used for visualization purposes 
-% TODO as described in blablabla
+cloud}, which is the same representation used for visualization purposes% TODO as described in blablabla
 . While the surface's points represent real points onto the surface of the
 object, the volume's points are the center of the approximating cubes described
 before. Each shape also knows how to analitically compute its total surface and
@@ -314,11 +313,11 @@ constraints are needed for the algorithm to work properly:
         N_{p,\text{volume}}(l) & = & O(l^3) \label{volume-l-3}\\
         d & \propto & \frac{1}{l}
       \end{eqnarray}
-    ;}
+    }
   \item{also, because of how the volumes are treated in the integration
       algorithm, another constraint of the approximation functions is that, for
       volume approximation, at any level \emph{no points} of the approximation
-      must lie outside the shape itself, nor on its surface. This allows the
+      must lie neither outside the shape itself, nor on its surface. This allows the
       integration algorithm to assume that at least a neighbourhood of the point
     $V_{\epsilon}$ will actually be contained into the shape;}
   \item{a third, desirable property of the approximation functions is for the
@@ -338,7 +337,7 @@ constraints are needed for the algorithm to work properly:
 
 Some levels of approximation of different surfaces can be seen in fig. \ref{fig:approximate_shapes}.
 
-\begin{figure}[htbp] \label{fig:approximate_shapes}
+\begin{figure}[htbp]
   \centering
   \begin{tabular}{c|c|c}
     \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/sphere_vol}}&
@@ -349,7 +348,7 @@ Some levels of approximation of different surfaces can be seen in fig. \ref{fig:
     \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/compound_surf}}
   \end{tabular}
   \caption{Surface (top) and volume (bottom) approximation of a cube (left), a sphere (center) and a compound
-  (right) for different values of $l$, depicted in red, green, and blue.}
+  (right) for different values of $l$, depicted in red, green, and blue. \label{fig:approximate_shapes}}
 \end{figure}
 
 \subsection{Volume computation via central points} \label{volume-via-points}

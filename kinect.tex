@@ -1,0 +1,92 @@
+\section{Depth cameras' working principles}
+
+The world of computer vision has, in recent years, benefit a lot of new hardware
+technologies and improvement. In particular, object pose estimation algorithms
+have been developed which, differently from the past ones which based themselves
+either on standard, RGB images, or on couples of RGB images to use for
+stereoscopic vision, exploit new generations of camera sensors which can provide
+3D data to the user. Within the most common types of these are comprehended the
+so-called \emph{depth sensors}; these particular kinds of sensors can provide
+the user with an image which is built of floating-point, or integer, values,
+each representing the distance from the sensor itself to the nearest obstacle
+within line-of-sight, along the sensor's axis. If combined with the commonly
+used geometric model for a camera, described in detail in sec.
+\ref{sec:camera_modelling}, this measurement can lead to having not only a $z$
+coordinate for each sampled point, but a complete 3D point $P=(x,y,z)$.
+
+Other known approaches have been used in the past to obtain 3D vision systems:
+in particular, the stereoscopic (or \emph{binocular}) system -- i.e., emulating the human vision by usage
+of two different cameras -- has been widely studied and used, particularly into
+the robotics' field, leading to
+results such as \cite{stereo-vision-robot}; using this system, images taken
+from two cameras are first scanned for correspondant, infuential features
+(\emph{keypoints}); pose information for each keypoint is then extracted from
+the geometrical properties of the system in what is called \emph{triangulation}
+as shown in fig. \ref{fig:stereo-triangulate}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=3in]{./Graphics/stereo-triangulate}
+\caption{Two different cameras can match the same feature into different points
+of their image: these will allow to extract 3D coordinates for the feature.\label{fig:stereo-triangulate}}
+\end{figure}
+
+Anyway, this approach has several limitations and can't be applied for proper
+pose estimation of objects. Advantages of using depth sensors instead of
+stereoscopic cameras include:
+\begin{itemize}
+  \item{Stereoscopic cameras can't produce an image with depth information for
+      each pixel: in fact, this system is optimized for measuring depth over a
+      small subset of the image (the keypoints), while completely ignoring the
+      rest of the pixels. This comes as a natural consequence of the fact that
+      features must be matched together in order to produce a depth information,
+    as points in the background will seldom own such features;}
+  \item{Although the previous problem could be solved by only looking for
+      objects' keypoints when recognizing them, stereoscopic vision also can't
+      be, by nature, as precise as depth sensors; \cite{stereo-precision} has
+      shown that in order to have $2\unit{mm}$ of error in depth measurements
+      with these systems, one must have precise information about the
+      geometrical properties of the searched object, and must apply strong data
+      filters in order not to have a high number of outliers; on the other hand,
+      good depth sensors such as Occipital's Structure have an average error of
+    some fractions of millimeter;}
+  \item{Searching for matches into images in order to obtain good precision in
+      stereoscopic vision is computationally expensive; also, effectiveness of
+      these algorithms suffers from common RGB vision problems such as
+    illumination changes or weakly textured images.}
+\end{itemize}
+
+Obviously, depth sensors have their disadvanteges too: the most problematic one
+is usually their very limited range of operation. For example, Microsoft
+Kinect's Primesense module can sense in a range going from about $80\unit{cm}$
+to about $3\unit{m}$; this makes it useless to adopt a visual depth sensor as
+the main vision system in large environments, while stereoscopic vision,
+especially if implemented with a high-definition camera, has
+virtually no limit (except for focal loss) to the maximum depth it can sense;
+this is the main reason for which stereoscopic vision is preferred for
+autonomous robots, smart-cities, or search-and-rescue applications. Anyway, this
+limited range is adequate for gripping purposes, as the objects will ordinarily
+stand fixed within a range of one to two meters from the robotic arm.
+
+For this project, two different type of depth cameras have been used: the first
+is Microsoft Kinect, a common camera which can merge together both depth and RGB
+informations, widely used in both consumer and research environment,
+the layout of which is shown in fig. \ref{kinect-fig}; the second is Occipital's
+Structure sensor, which is a depth-only camera with optimal minimum range
+($40\unit{cm}$) and precision capabilities (about $1\unit{mm}$ of maximum error,
+with very reduced noise).
+
+\subsection{Structured light sensors}
+In this section, a common type of depth sensor is introduced, which is the one
+implemented by Kinect's Primesense hardware, called \emph{structured light
+sensor}. This technology was first patented by Shpunt et al. in
+\cite{primesense-patent}; although it is used into Microsoft Kinect for its
+XBox360 devices, and thus is a mainstream, common device, very few technical
+details about the implementation are available. \cite{how-kinect-work}, together
+with the original patent's text, remain the best available sources of
+information about this kind of technology.
+
+The idea behind structured light sensors is the use of a strong infrared projector
+which can draw a known pattern onto the scene. Being made of infrared light,
+the pattern will not disturb any RGB camera which is operating in parallel with
+it. 

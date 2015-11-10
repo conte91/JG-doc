@@ -1,14 +1,14 @@
 \section{OpenGL rendering process} \label{sec:opengl-rendering}
 In order to obtain good renderings for training and recognition purposes, it is
 important to create photo realistic, virtual snapshots of the objects in
-diffent poses. It is also important to use the same model of camera described in sec.
+diffent poses. It is also important to use the same model of camera introduced in sec.
 \ref{sec:camera_modelling} in the most uniform manner as possible.
 
-In this chapter, this modelling is described. First, a brief
+In this section, this modelling is described. First, a brief
 introduction to OpenGL (sec. \ref{sec:opengl-intro}) and to the correct usage of homogeneous coordinates (sec.
 \ref{sec:homogeneous-coordinates}) is done, followed by a description of OpenGL reference systems (sec.
 \ref{sec:opengl-reference-systems}). After this, the OpenGL rendering
-process is described (sec. \ref{sec:opengl-rendering-process}), and finally the
+process is analyzed more in details (sec. \ref{sec:opengl-rendering-process}), and finally the
 implementation of objects' rendering for the purpose of this project is
 described keeping all of the previous into account (sec. \ref{sec:renderer3d}).
 
@@ -25,11 +25,11 @@ optimized implementation of the library together with the hardware.
 
 Being industrial-level free software, this library has become very popular, and
 well-working implementations exist for most of the modern graphics hardware
-available nowadays. Being highly portable (stripped-down versions of OpenGL
+available nowadays. Also, it is highly portable (stripped-down versions of OpenGL
 called \emph{OpenGL-ES} exist for embedded systems and systems with limited
 resources in general, such as Android mobile phones); in this sense, OpenGL is
 a perfect fit for image processing systems requiring a 3D rendering feedback to
-work, like this, in order to be easily ported and implemented in real-world
+work, like this one, in order to be easily ported and implemented in real-world
 applications.
 
 As a 3D graphics engine, and considering that it targets a wide range of devices, OpenGL only manages simple primitives' rendering, such
@@ -121,7 +121,7 @@ to native formats (e.g. COMAU robots' euler axis representation) only in the
 final backend of the applications, so that data representation is unique and
 coherent in the whole scope of the project.
 
-\subsection{OpenGL reference systems} \label{opengl-reference-systems}
+\subsection{OpenGL reference systems} \label{sec:opengl-reference-systems}
 Opposing to a lot of 3D manipulation systems, such as COMAU's robotic arms or
 CAD applications, which use different coordinate systems for different logical
 aspects of their work, typically requiring at least a \emph{local} and a
@@ -153,7 +153,7 @@ render a 3D mesh, from scene generation to actual mapping of 3D points into a
 for brevity.
 
 OpenGL library implements a state machine: sequential calls to library
-functions modify internal state variables (e.g. colour information) , allowing the renderer to be
+functions modify internal state variables (e.g. colour information), allowing the renderer to be
 instructed about how to add elements in the scene and how to transform them to
 get the final renderer. Thus, single, independent objects can draw themselves
 into the scene and manage each one a single part of the scene (e.g. camera and
@@ -171,7 +171,7 @@ rendering procedure using OpenGL's \emph{fixed pipeline} has been used; this
 procedure assimilates the rendering process to an assembly line, in which every
 element of the scene undergoes a predefined sequence of processing steps before
 being merged with others to form the final render. In particular, geometric data
-like lines or polygons are moved into the scene , cut based on their $z$ coordinate, and
+like lines or polygons are moved into the scene, cut based on their $z$ coordinate, and
 finally mapped to 2D screen coordinates through the \emph{projection matrix}.
 Mapped points are then bound to 2D data like bitmaps and 2D points in a
 process called \emph{rasterization}; finally, every token can be modified by
@@ -208,17 +208,17 @@ reference for minimum and maximum value. So, having a too wide range in near and
 far planes results in heavy loss of depth information due to discretization of
 depth values.
 
-\begin{figure}[htbp] \label{fig:clipping-planes}
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=4in]{./Graphics/clipping_planes}
-  \caption{Near and far clipping planes are used to minimize the number of
-  primitives to process, as well as reference points for depth computation.}
+  \caption{Defined into the camera's coordinate system (left), the near and far clipping planes are used to minimize the number of
+  primitives to process, as well as reference points for depth computation. \label{fig:clipping-planes}}
 \end{figure}
 
 Raw colouring information in applied at this stage and primitives are finally
 mapped into screen by a second $4\times 4$ matrix, the \emph{perspective
 matrix}. At the end of this process objects are said to be in \emph{normalized
-device coordinates \emph{NDC}}. In NDC, the cube spawning the
+device coordinates \emph{NDC}}. In NDC, the (virtual) cube spawning the
 $\left(-1,1\right)$ range in each direction is projected orthographically on the
 output image buffer (considering $x$ and $y$ coordinates), with each corner
 corrisponding to an angle of the window (called \emph{Viewport}) -- top, bottom,
@@ -247,13 +247,13 @@ polygons' edges and texture data can improve image quality by blending the
 boundaries between adjacent polygons, thus providing a more photorealistic
 render.
 
-\begin{figure}[htbp] \label{fig:polyline}
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=2.5in]{./Graphics/antialiasing}
   \caption{A 1-pixel line generates rough boundaries on when rendering on a
   per-pixel basis. Multisample antialiasing can solve the problem by
 approximating the line as a 4-pixel rectangle and averaging each multisampled
-pixel with its neighbours.}
+pixel with its neighbours. \label{fig:polyline}}
 \end{figure}
 
 Old versions of OpenGL provided a set of features called \emph{smoothing}, which
@@ -280,9 +280,11 @@ the software will draw onto), keeping the allocated memory area totally
 independent from the actual video memory of the rendering window. Apart from
 their physical location, they look totally equivalent to a normal rendering
 window, and just like it they have a set of buffers to which the application can
-draw, the main ones being the color and depth buffer. These can be generated and
-swapped at runtime by assigning new buffers to the \emph{attachment point} of a
-framebuffer.
+draw, the main ones being the color and depth buffer. These can be bound 
+at runtime to a physical location in memory by assigning (\emph{plugging}) new buffers to the \emph{attachment point} of a
+framebuffer. A framebuffer can be drawn onto if and only if it is
+\emph{complete}, i.e. if all its main attachment points (colour and depth) have
+been bound to a physical buffer.
 
 Apart from multiple uses which are irrelevant for this project (like dynamically
 updating a texture by offscreen rendering onto it), the main scope of FBOs is
@@ -305,7 +307,7 @@ buffer can be copied byte-per-byte into the raw FBO.
 Texture multisampling is also implemented with this method and provides a good
 result. However, for textures the situation is different as also another factor
 must be considered: as the object reduces
-its dimension, texture internal data will be dropped during the mapping from 3D
+its dimensions, texture internal data will be dropped during the mapping from 3D
 to 2D coordinate, because it actually is applied on a per-2D-pixel basis during the
 last stage of rendering (after rasterization has been done), as depicted in sec.
 \ref{sec:opengl-rendering}. This process downsamples heavily the texture -- even if
@@ -325,7 +327,7 @@ a middle texture component.
 
 As said in sec. \ref{sec:opengl-intro}, OpenGL tends to be extrimely frugal in the
 number of implemented features: the only supported method for adding mipmaps to
-a texture is manually adding a serie of differently sized images to the texture
+a texture is manually adding a series of differently sized images to the texture
 data. As it is quite easy to generate this data automatically and with good
 quality, however, the GLUT library exports useful functions to automatically
 build the set of textures of increasing size and adding them to the texture.
@@ -342,20 +344,20 @@ produce high-quality, low-sized images when initializing the system (i.e. when
 the program can afford to lose time to produce this data using complex filters
 such as cubic interpolation). The visual result of texture mipmapping is
 qualitative relevant and can be observed, together with the effect of
-multisample on geometry, in fig. \ref{fig:multisampling-on}.
+multisample on geometry, in fig. \ref{fig:multisampling-on}
 
-\begin{figure}[htbp] \label{fig:multisampling-on}.
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=2.5in]{./Results/antialiasing}
   \caption{Rendering with antialiasing and mipmapping on (left)
   can improve a lot the quality of the result with respect to the same options
-turned off (right).}
+turned off (right). \label{fig:multisampling-on}.}
 \end{figure}
 
 \section{Implementation of objects' rendering} \label{sec:renderer3d}
 With the details explained in sec. \ref{sec:opengl-rendering} in mind, a mesh renderer has been implemented, capable of
-reading objects' meshes from files as needed together with the full model of
-camera with which training has to be done and rendering them in the required
+reading objects' meshes from files as needed; together with meshes, it reads the full model of
+camera with which training has to be done, and renders them in the required
 pose, also extrapolating useful informations from the render which can be used
 for training. All the interface of the renderer with the external world is done
 using the conventions of the whole project: cameras are modelled using OpenCV's
@@ -364,7 +366,7 @@ standard reference systems and calibration matrices described into sec.
 transformations acting on homogeneous coordinates as in sec.
 \ref{sec:homogeneous-coordinates}. At time of objects' creation, the Assimp library
 is used to convert the mesh file, in whichever format it is, into Assimp's
-unified structure, which for simplicity's sake can be simplified to a tree of
+unified structure, which for simplicity's sake can be simplifiethought of as a tree of
 nodes, each representing a face, a texture to be applied to children, or
 an affine transformation to be applied to children. When the renderer is created
 it configures itself using GLUT to open a window and create the RGB and depth
@@ -374,7 +376,7 @@ this phase, renderer also initializes the needed parameters for multisampling as
 described in sec. \ref{sec:antialiasing}.
 
 Three main features have been implemented, which can be used as an access point
-to the renderer : the first one can set the
+to the renderer: the first one can set the
 camera model by reading it from the project's camera data structure; the second
 one can set the reference position of objects into camera's space (in this project's
 conventions, i.e. in OpenCV not in OpenGL one); the third function can render a
@@ -569,7 +571,7 @@ this means that the pixel was not generated by the render (it is 0 or NaN, i.e.
 the depth buffer's clearing value);}
   \item{next, the object's bounding box is extracted from the mask. Assuming it
 to be a rectangle, the bounding box can be computed by considering the minimum
-and maximum $(u)$ and $v$ values in which the mask is not null:
+and maximum $u$ and $v$ values in which the mask is not null:
 \[
   \begin{array}{c}
     m_u=min\left(\left\{u | \exists i, mask_{(u,i)}\neq 0\right\}\right),
