@@ -125,8 +125,7 @@ databases. Original source is unknown.}
 \begin{figure}[htbp]
 \centering
 \begin{tabular}{c|c}
-  \multicolumn{2}{c}{\adjustbox{valign=m}{\includegraphics[height=2in]{./Graphics/scimmia}}}
-    \\
+  \multicolumn{2}{c}{\adjustbox{valign=m}{\includegraphics[height=2in]{./Graphics/scimmia}}} \\
     \multicolumn{2}{c}{\vspace{0.2in}} \\
   \adjustbox{valign=m}{\includegraphics[height=2in]{./Graphics/scimmiagradient}} &
   \adjustbox{valign=m}{\includegraphics[height=2.5in]{./Graphics/scimmiafrecce}}
@@ -137,9 +136,272 @@ has been applied. Resulting absolute value (left) and vector field
 \end{figure}
 
 \subsection{Fast normal computation from depth images} \label{sec:linemod-depth}
+One of the most important features which can be extracted from a 3D
+image is points' normals. These, just like an image's gradient, form a
+vector field inside the image, representing the approximated normals
+to the surface for which the RGBD picture has been taken, sampled in
+correspondance of the image's pixel centers.
 
-\subsection{Gradient quantization and binary representation of templates for
-fast matching} \label{sec:linemod-binary}
+Of course, starting with sampled (and noisy) data from the image
+implies that the normals which are computed are only a supposition:
+if it is assumed that the quantized depth value is sufficient to give
+informations about normals, the assumption must also be made that the
+function is almost flat in local neighbourhoods, otherwise the Nyquist
+theorem would be violated. With this assumption, neverthless, it is
+possible to approximate the planar surface corresponding to each pixel
+with a plane connecting the plane and each of its neighbour points,
+and from this compute the normal vector to each point.
+
+The Line-MOD algorithm in its original implementation
+(\cite{linemod-paper}) makes use of this idea to compute normals which will be used
+as a feature for templates.
+
+First, for each point $p$ in the image, the neighbour pixels are
+considered. Assuming that the objects to be computed could be into a
+cluttered scene, however, before taking each of them, a check is done
+for drastic changes in the depth value $d$: if the variation is too
+high (over a certain threshold $t_d$), this means that two separate
+surface actually considered, and this would break the assumptions
+stated before, so the pixel is discarded; this technique also removes
+possible outliers caused by bad sensor's performance.  The remaining pixels are put
+into a neighbourhood set $N_p$. 
+
+Considering the hypotetical plane which $p$ belongs to, its
+orientation can be described by means of the gradient $\nabla$ of the
+depth function $D(u,v)$. This, in turn, can be approximated by using first-order
+Taylor expansion over the $(u,v)$ coordinate. For every point $p_2 \in N_p$:
+
+\begin{eqnarray}
+  p_2 & = & \begin{pmatrix} u_2 \\ v_2 
+  \end{pmatrix} \\
+  D(p_2)-D(p) & = & dp^{\tau}\nabla D (p) + o (p) \text{(taylor
+    expansion)} \label{eqn:taylor-depth-expansion}\\
+  \nabla d(u,v) \approx \begin{pmatrix} \frac{\partial d(u,v)}{\partial u}
+    \\ \frac{\partial d(u,v)}{\partial v}
+  \end{pmatrix} & = & \begin{pmatrix} \frac{d(u2,v2)-d(u,v)}{u2-u} \\
+    \frac{d(u2,v2)-d(u,v)}{v2-v} 
+  \end{pmatrix}
+\end{eqnarray}
+
+With this approximation, each of the points in $N_p$ defines a
+constraint over $N_p$, which is defined with the reasonable assumption
+that at least 2 points in the neighbourhood will be considered
+(otherwise, a null normal vector will be assigned to $p$). In the best
+case of 8 valid neighbours, each of them is considered and, being the
+system over-constrained, the
+gradient $\nabla$ is computed in order to minimize the least-squared
+error on eqn.\ref{eqn:taylor-depth-expansion}. This will smooth away
+the noise on depth due to sensor's limitations and values'
+quantization (assuming it is randomly distributed).
+
+After computing the best approximation for the depth function's
+gradient over $p$, the normal vector $N(p)$ can be approximated by computing
+two principal axes of the surface's plane and deriving it from the
+external product of these two:
+
+\begin{eqnarray}
+  dU & = & D(p)+\frac{\partial D(p)}{\partial u} \\
+  dV & = & D(p)+\frac{\partial D(p)}{\partial v} \\
+  N(p) & = & \frac{dU \times dV}{\lVert dU \times dV \rVert}
+\end{eqnarray}
+This algorithm, which is similar to what is implemented by most 3D
+processing libraries -- most notably, Point Cloud Library --, produces
+a good result in terms of an acceptable precision and a very good
+performance. In this case, the latter is much more important as
+precision in normal computation will be not very relevant, as the
+algorithm will highly cut down the resolution of this computation to
+better stand small transformations as explained in
+sec. \ref{sec:linemod-quantization}. On the other hand, computational speed
+is important as Line-MOD wants to be able to have future real-time applications.
+
+\subsection{Gradient and depth quantization} \label{sec:linemod-quantization}
+The main innovation introduced by \cite{linemod-origins}, and thus by
+\cite{linemod-paper}, is a big improvement over matching time due to
+a novel, binary representation for templates' data. This
+representation provides both fast matching time and robustness to small
+deformation of the objects (or pose changes with respect to the
+template's ground pose), as it spreads every feature into its surronding
+area, thus making it possible to detect them even in the case in which
+they perform a relative movement between each other.
+
+Before coding each template data with a binary pattern, it is
+\emph{quantized}. The number of quantization steps to be considered
+will affect many aspects of the algorithm's behaviour; in particular,
+an high number of steps will result in bigger templates, longer
+execution time, but much fewer false positives, as more accuracy will
+be needed for the features to match; for the same reason, it also will
+decrease the algorithm's tolerance to illumination or camera
+changes. On the other hand, a lower number of steps will imply more
+tolerant matches: this will provide faster execution time and an
+improved detection capability in case of template changes, but at the
+cost of a high number of false positives, which will have to be filtered.
+
+The Line algorithm of \cite{linemod-origins} only considered colour gradient; however, Line-MOD
+generalized this algorithm to be capable to match different set of
+features, each represented by a \emph{modality} comprehensive of a
+feature-computation algorithm, a discretization one, and a match score
+computation. In this way, the binary encoding and matching algorithms
+can be applied to whatever feature set is more appropriate for the
+template, and thus the whole algorithm can be easily extended and find
+new application areas. In practice, in this implementation two
+modalities have been used, which are colour gradient as described in
+sec.~\ref{sec:linemod-gradient} and depth normals as in
+sec.~\ref{sec:linemod-depth}, for which good computation algorithms have
+been already stated.
+
+For the image colour gradient, discretization of the gradient's direction is
+considered; this is represented by the angle $\alpha$ from the
+base of the positive $X$ axis to the gradient's direction line. Given
+the number $N$ of samples, the orientation angle is approximated to
+the nearest discrete quantity $\alpha_d = \frac{k\pi}{N}, k \in
+{0\dots N-1}$. 
+This process is repeated for each of the three (in case of an RGB
+image) channels, and only the gradient with the strongest absolute
+magnitude is kept. The result of this last step is a gradient which is
+much more descriptive of the actual image, with respect to the
+standardized technique of computing the gradient over the
+corresponding greyscale image: as it can be seen from
+fig. \ref{fig:duck-gradient}, in which the gradient has been computed
+over a duck-toy image using both this and the standard algorithms,
+borders are neatly identified: this approach is thus more appropriate for
+template creation and detection. In this case the red arrow,
+representing the gradient of a pixel into the image, is approximated
+to the nearest location; also, as only the direction is considered,
+the vector will never be approximated to a point lying into the lower
+part of the angles' space.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[height=2.5in]{./Graphics/duck-gradient}
+\caption{Approximation of the gradient for the image of a duck toy:
+  the discretization algorithm used by Line-MOD (right) provides a
+  much better edge recognition performance with respect to standard
+  algorithms (left). Image courtesy of Stefan Hinterstoi\ss er. \label{fig:duck-gradient}}.
+\end{figure}
+
+By considering only the direction of the gradient, and not its
+full vector, two problems are solved: first, the gradient extracted
+from the template will be compatible with the matching one,
+independently of illumination changes. Second, by not taking into
+account the way of the gradient, it will be valid both if the shape
+stands on a dark background, and if it stands on a clear background:
+the gradient will, in this case, mantain its module and direction and
+only change its way, which will be discarded.
+
+Regarding normals' discretization, the same considerations can be
+applied. Dropping the normal vector's magnitude comes naturally, as
+it will be $1$ by definition. Thus, again only the direction of the vector is
+considered. Being a 3D vector, opposed to the 2D vector which is the
+image's gradient, it is more difficult to find a good discretization
+for the possible value. The solution of \cite{linemod-paper} is to
+discretize the normals' direction with respect to a set of possible
+directions over the edges of a right, circular cone pointing towards
+the camera. Each vector is then first flattened to the edge of the
+cone, then to the nearest sample: in this way, the obtained value
+is a representation of the radial direction in which the normal is deviating from the
+camera's axis, which is a reasonable definition for what the normals
+conceptually mean. Also, using a cone as a reference surface allows to
+have a higher approximation level with a lower number of discrete
+quantities, as each vector spawning the same radial direction
+(longitude) will be well-represented no matter its latitude.
+
+As depth sensors suffer from measurement noise, especially on the high
+distances, after computing each pixel's normal vector and assigning a
+quantized value to it, a convolutionary filter is applied to the whole
+image: for each pixel, the local $5\times 5$ neighbourhood is
+considered, and to that pixel is assigned, as a final depth value, the
+sample that occours most frequently into it (nulled normal vectors are
+not considered at this step). This is useful as,
+considering the surfaces as mostly smooth over a small area (sudden
+changes in depth have been already removed by the normals' computation
+step of sec.~\ref{sec:linemod-depth}), a voting algorithm can further
+help with outliers' removal.
+
+The result of this process can be seen in fig.~\ref{fig:depth-man}:
+the man figured into the top-left corner has been captured with a
+depth camera, and the resulting depth function can be seen in the
+bottom-left corner; applying this quantization algorithm to the depth
+map returns a result which is perfectly capable of distinguishing
+different objects' borders (on which the image has been cut) and at
+the same time subdivide smooth areas between each other.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[height=2.5in]{./Graphics/depth-man}
+\caption{Discretization of the possible values for a surface's normal
+  vector to the surface of a circular cone (top-left). If applied to a
+  real image (top-right), the input depth map (bottom-left) produces a
+  normal map (bottom-right) which is already aware of difference
+  between objects and can reproduce a good level of detail with
+  respect to the original scene. Image courtesy of Stefan Hinterstoi\ss er. \label{fig:depth-man}}.
+\end{figure}
+
+\subsection{Binary representation of quantized images} \label{sec:linemod-binary}
+After the images have been quantized, they are ready to be encoded
+with a binary format, which is suitable for fast template
+matching. Each quantized feature, being it gradient orientation,
+normal orientation, or a custom one, is assigned to a $N$-bit value
+($N$ representing the number of quantization levels), corresponding to
+the value having a $1$ into one of its bits and $0$ into the other
+ones: this allows a unique representation of both single values and
+set of values. After this,
+the values are ``spreaded'' in the neighbourhood of their corresponding
+pixel. In simple term, each binary pixel from the previous step is
+transformed into a binary pixel containing informations about which of
+the quantization levels are present into the neighbourhood of size
+$T$. At binary level, this is very easy and efficient to implement
+given how the values are represented: in fact, it is sufficient to
+generate $T^2$ images, each one shifted of a different number of
+pixels in the range $\delta p = \left\{\left[-\frac{T}{2},
+  \frac{T}{2}\right], \left[-\frac{T}{2},
+  \frac{T}{2}\right]\right\}$; the result of a general \texttt{OR}
+operation between all of these images will have the required
+characteristics, as it will be formed of pixels having $1$ in the bits
+corresponding to the features' values which are present at least once in
+the adjacent pixels.
+
+Spreading pixels in this way has the advantage of introducing at no
+cost a good flexibility and robustness in terms of rigid deformation:
+in fact, it mantains locality of features, but at the same time
+permits to match features with a good margin of skew: the value of $T$
+can be reduced if the algorithm is thought to be too permissive, but
+it should never be deleted as this would cause all features to be
+fixed to their pixel, which would cause obvious problems -- at least
+due to the quantization error of the camera in terms of $(u,v)$
+coordinates.
 
 \subsection{Line-MOD runtime algorithm} \label{sec:linemod-usage}
+With all the premises of the previous sections, the Line-MOD algorithm
+can be described. Line-MOD is a subset of Line
+(\cite{linemod-origins}), which takes the same processing steps of
+Line and applies it to match multiple features, computed from
+different modalities, in parallel (hence the name, for
+\emph{multiple-MODalities Line}). After computing and discretizing
+set of modalities, seen by the algorithm through a simple abstraction
+layer given by these three operations (the process at the upper level
+is thus, indeed, completely modality-agnostic), this algorithm
+converts them to binary form and spreads them, as explained in
+sec.~\ref{sec:linemod-binary}. Each binary image is at this point filtered
+through a certain logic, given by the feature itself: for example,
+considering the case of untextured objects, colour gradients can be
+found mostly onto the external edges of the objects: thus, only these
+are extracted after gradient computation, as this will improve a lot
+the algorithm's performane without impacting the recognition
+process. %TODO esperimentino
+On the other hand, considering normals on the edges would for sure
+worsen the performance in terms of recognition accuracy, as normals
+are not well-defined in proximity of the borders. Thus, normals are
+filtered out and only those strictly inside the object are
+considered. As shown in fig.~\ref{fig:duck-linemod}, this
+complementary set of features, which cover the entire object if summed
+up, is the main reason of the good performance of this algorithm with
+respect to its predecessor as demonstrated in \cite{linemod-paper}.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=4in]{./Graphics/duck-linemod}
+\caption{Combination of different modalities, which is the main
+  characteristic of the Line-MOD algorithm, allows to spread uniformly
+  the detection of features upon the whole object, which is the main
+  reason for its robustness. Image courtesy of Stefan Hinterstoi\ss er. \label{fig:duck-linemod}}.
+\end{figure}

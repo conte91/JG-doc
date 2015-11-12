@@ -11,4 +11,6 @@ val=(gx.^2+gy.^2).^0.5
 normal=val/max(max(val))
 imshow(normal)
 imwrite(normal,"scimmiagradient.png")
-quiver(1:10:size(gx,1)', 1:10:size(gx,2)',gx(1:10:end,1:10:end),gy(1:10:end,1:10:end),4)
+s=size(gx,2)
+R=1:10:size(gx,2)'
+quiver(1:10:size(gx,1)',s(1)-R,gx(1:10:end,1:10:end),-gy(1:10:end,1:10:end),4)

@@ -65,7 +65,7 @@ With these considerations in mind, a suitable, global score function $s(V_{\text
 can be found. The score function must obey certain properties which can be
 extracted from the above:
 
-\begin{itemize}
+\begin{enumerate}
   \item{The function must be monotonic and always positive;}
   \item{it must be linear when x is low enough, in order to evaluate
     lightly touches adequately;}
@@ -82,11 +82,11 @@ extracted from the above:
     region, i.e. $\text{max}\left( \left\{ \frac{ds(x)}{dx} | 0 \leq
     x \leq V_{\text{easy}} \right\} \right) \leq \text{min}\left( \left\{
   \frac{ds(x)}{dx} | x > V_{\text{easy}}\right\} \right)$.}
-\end{itemize}
+\end{enumerate}
 
 The chosen function, which satisfies all of the above properties, is
 
-\begin{equation}
+\begin{equation} \label{eqn:score-function}
   s(V_{int})=\left\{
     \begin{array}{lcr}
       \alpha V_{\text{int}} & \text{when} & 0 \leq V_{\text{int}} \leq V_{\text{easy}}, \\
@@ -98,7 +98,7 @@ The chosen function, which satisfies all of the above properties, is
   \right.
 \end{equation}
 
-It is shown in appendix \ref{sec:TODO} that $s(V_{int})$ satisfies all
+It is shown in appendix \ref{sec:demonstrate-score} that $s(V_{int})$ satisfies all
 of the above properties for any $K\geq1$, and is thus suitable as a score
 function. Some examples of this function varying the two parameters $\alpha$ and
 $K$ are shown in fig. \ref{fig:score_function}.
