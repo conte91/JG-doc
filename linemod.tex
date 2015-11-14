@@ -161,7 +161,7 @@ considered. Assuming that the objects to be computed could be into a
 cluttered scene, however, before taking each of them, a check is done
 for drastic changes in the depth value $d$: if the variation is too
 high (over a certain threshold $t_d$), this means that two separate
-surface actually considered, and this would break the assumptions
+surface are actually considered, and this would break the assumptions
 stated before, so the pixel is discarded; this technique also removes
 possible outliers caused by bad sensor's performance.  The remaining pixels are put
 into a neighbourhood set $N_p$. 
@@ -248,6 +248,12 @@ modalities have been used, which are colour gradient as described in
 sec.~\ref{sec:linemod-gradient} and depth normals as in
 sec.~\ref{sec:linemod-depth}, for which good computation algorithms have
 been already stated.
+
+Before discretization, every feature is discarded if it is not strong
+enough, i.e. if its corresponding vector's magnitue is less that a
+threshold $t_{filter}$. This helps too keep only the most important
+features into the image, which is important as the feature's magnitude
+will be flattened in the following steps.
 
 For the image colour gradient, discretization of the gradient's direction is
 considered; this is represented by the angle $\alpha$ from the
@@ -370,6 +376,14 @@ fixed to their pixel, which would cause obvious problems -- at least
 due to the quantization error of the camera in terms of $(u,v)$
 coordinates.
 
+When the most important features have been spreaded in their surronding
+area, non-null pixels are left; this is the final result of the
+template creation process, and the corresponding template can be
+stored in memory for future usage. It is important to notice that a
+template is actually a \emph{collection} of these sets of pixels
+(i.e. features): for an image $I$, the corresponding template built
+from modality set $M$ is thus a set of sets, $T(I) = \left\{ S_m(I), m \in M \right\}$.
+
 \subsection{Line-MOD runtime algorithm} \label{sec:linemod-usage}
 With all the premises of the previous sections, the Line-MOD algorithm
 can be described. Line-MOD is a subset of Line
@@ -386,8 +400,7 @@ through a certain logic, given by the feature itself: for example,
 considering the case of untextured objects, colour gradients can be
 found mostly onto the external edges of the objects: thus, only these
 are extracted after gradient computation, as this will improve a lot
-the algorithm's performane without impacting the recognition
-process. %TODO esperimentino
+the algorithm's performance without impacting the recognition process. %TODO esperimentino
 On the other hand, considering normals on the edges would for sure
 worsen the performance in terms of recognition accuracy, as normals
 are not well-defined in proximity of the borders. Thus, normals are
@@ -404,4 +417,132 @@ respect to its predecessor as demonstrated in \cite{linemod-paper}.
   characteristic of the Line-MOD algorithm, allows to spread uniformly
   the detection of features upon the whole object, which is the main
   reason for its robustness. Image courtesy of Stefan Hinterstoi\ss er. \label{fig:duck-linemod}}.
+\end{figure}
+
+After feature spreading, each newly-created template is ready for
+matching into an image. The scenario is thus changed from template
+building to template matching, and the task to perform, for each
+template $T$ which is put into a template list to be matched, is to
+find a similarity measure $\epsilon_m (T,I)$ between the template itself
+and a portion $P(I,c)$ of
+the input image $I$, centered on $c$, on which the template has to be matched. Given a
+similarity function $S_m(p_1, p_2)$ between two points $p_1$ and $p_2$
+with respect to their discretized value with modality $m$ -- the ones
+of which the templates' images are built -- the maximum similarity
+score for each point in $P$ with respect to the corresponding
+neighbour pixels in $T$ with maximum distance $r$ is taken, and these values are summed up:
+
+\begin{equation}
+  \epsilon_m (T,I,c)=\sum_{p\in P(I,c)} { \left( \max \left\{ S_m
+      (p,p_2) , p_2 \in P(c\dots c+r) \right\} \right) }
+\end{equation}
+
+Althought similarity functions can be customized, the main ones used
+by the Line-MOD algorithm consider the difference of direction between
+corresponding pixels:
+
+\begin{eqnarray}
+  S(I,T,p_1,p_2) & = & \lvert \cos(\text{ori}(I,p_1) -
+  \text{ori}(T,p_2)) \rvert \text{(for gradient)} \\
+  S(I,T,p_1,p_2) & = & \lvert N(I,p_1)^{\tau} N(T,p_2)\rvert \text{(for normals)}
+\end{eqnarray}
+
+Here, $\text{ori}(I,p)$ indicates the orientation of the strongest
+gradient of I at point p, as computed in
+sec.~\ref{sec:linemod-gradient}, while $N(I,p)$ indicates the
+approximation of the normalized vector normal to the surface of I as
+computed in sec.~\ref{sec:linemod-depth}.
+
+This is a good conceptual algorithm, but it would be enormously slow
+if applied ad-litteram for each template and point into the image, as
+it would require score computation for each point into the template,
+each point into the image, each point into the neighbourhood; this
+would lead to a cost of $O(\text{size}(I)\times \text{size(T)}\times
+r^2)$, which is obviously unacceptable. A new data structure is used for
+the purpose of matching, which is described below; usage of this
+structure can lower drastically the computation time and bring it back
+again to good levels.
+
+The basic consideration for this is that the actual number $n_0$ of levels (bins)
+on which each feature will be quantized, and thus the possible values
+to which each pixel in the image will be matched, is actually really low; if,
+for example, 8 bins are used to quantize values, after spreading the
+binary representation of each pixel will be 8 bits, and thus contain
+64 possible values. It is thus perfectly feasible to do a one-shot,
+a-priori computation of the score function $S$ for each possible
+combination of input values. The spreaded image $I$ can be, in this way,
+tranformed into another serie of images $\tau_i(I), i \in 1 \dots 2^{n_0}$, resorting a lookup table, in
+which each pixel corresponds to a list of values for $S$ which can be
+easily matched with each possible value into the template $T$ by only
+indexing it. Once this lookup tables has been built, the total
+similarity function $S(I,T,c)$ will thus be much more easier to compute:
+
+\begin{equation}
+  \epsilon_m (T,I,c)=\sum_{p\in P(I,c)} { \tau_{I[p]} }
+\end{equation}
+
+It should be noticed that the lookup tables $\tau_i$ must be computed
+only once, which reduces the computational effort of the matching
+algorithm.
+
+The result of this implementation is a fast (the computationally
+intensive part has been reduced to direct memory accesses) and
+versatile (the modalities can be of any type, as long as they provide
+the characterising functions) matching algorithm, which can associate
+to each couple $(T_i,p_j)$ of possible positions of a template into
+the input image an output value which is a good representation of how
+much the template fits well the chosen part of input. A natural but
+important consequence of this is that no template will be flagged as
+matching or not by the algorithm itself, so for example in case of light objects'
+occlusions the ``good'' matches will find themselves to be the
+ones with the highest score no matter the situation. After doing
+this, it sufficient to discard every match for which the matching
+score is below a chosen threshold -- which can be adapted with the
+tradeoff of recognition capabilities versus potential false positives,
+but will have no impact over performance -- in order to correctly
+detect objects in every scene. With the same steps it is possible to
+match more than one object type at the time, by simply putting more
+than one template set into the list of templates to be recognized, and
+assign to each a label indicating the object's type.
+
+\subsection{Memory linearization for fast memory access on modern
+  CPUs}
+Being, for certain aspects, a quite low-level kind of algorithm, and
+exploiting binary logic operations and intensive lookup tables access
+for its matches, Line-MOD can improve a lot its performance by
+exploiting the hardware features available to modern processors. In
+particular, if the lookup table is not accessed properly, a high
+number (near $100\unit{\%}$) of cache misses will impact heavily onto
+the algorithm's performance. Line-MOD introduces thus the concept of
+\emph{memory linearization} (from which the name \emph{Line} comes) to
+ensure that, at matching time, the best possible sequence of pixels
+will be matched in order to minimize cache misses.
+
+One of the advantages of spreading the features' values as done in
+sec.~\ref{sec:linemod-binary} is the fact that, if a feature is
+present at point $p(u,v)$, it will be present also in all of its
+neighbourhood of size $t$. As the similarity function only considers the maximum
+value for each point into the considered pixel, it will be sufficient
+to match one each $t$ pixels: if the point $p$ would affect this
+maximum value, it will actually affect it being in a neighbourhood; if
+it wouldn't, it can safely be ignored as it value would be obscured by
+the maximum pixel's value.
+
+Checking one every $t$ pixels would of course reduce the number of
+steps by a factor $t^2$, but it would cause a lot of problems with
+memory cache as stated above. Thus, the lookup table $S_i(I)$ is
+reorganized in memory before matching by taking each $t$-th
+pixel (i.e. creating a subsampled image starting at $p$) and storing it in a contiguous memory region, in a row-major
+way; this will cause most of the image's salient points to fit the L1
+cache of the CPU. When the subsampled image ends, the same process is
+reiterated starting from the position following $p$. At the end of the
+process, the whole image will be represented in memory in a manner
+which is similar to how interlaced formats work, as shown in fig.~\ref{fig:linemod-linearize}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=5in]{./Graphics/linemod-linearize}
+\caption{A precomputed lookup table $S_i(I)$ is, before matching,
+  reorganized in memory so that the matching algorithm, taking one
+  pixel every $t$, will seldom cause a cache miss. Image courtesy of Stefan Hinterstoi\ss er.\label{fig:linemod-linearize}}.
 \end{figure}

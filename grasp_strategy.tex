@@ -1,6 +1,14 @@
-\section{Grasping poses' filtering and best grasp computation}
+\section{Grasping poses' filtering, best grasp computation, high-level
+  grasping strategy} 
 In this section the algorithm for selecting a set of good grasps from the set of
-possible ones is presented.
+possible ones is presented, together with the high-level strategy for
+order management, which is a closely related task for how the
+implementation is done. The rationale to the  approach which is
+presented here is to make the main order-management software aware of
+which items can be easily grasped, and which will be difficult or
+dangerous to take. In this way, by starting from the most simple ones,
+it is possible for the hardest objects to take to have their way
+freed and become so more accessible by the robotic arm.
 
 When a set of poses has been generated for each object, either automatically or
 manually, the main problem with it is that it will be a very big set (assuming
@@ -10,6 +18,110 @@ lead to 2400 samples for a cuboid, plus manually-added poses). As intersecting
 objects is the most time-consuming task for this part, is thus
 important to filter the poses in a good way.
 
+In the project's specification it has been stated that the list of
+objects to be grasped will come from a text file, and will have a
+predefined bin from which the grasp will have to be done; this section
+refers to this particular situation, but as it will be seen it is
+trivial to make this algorithm use different constraints in order to
+suite anyone's needs.
+
 The implemented strategy goes as follows: for each object, the whole set of
-poses is put into a list and is then sorted base on preference scores.
+poses is put into a list and is then sorted base on preference
+scores.
+In this way, important poses will be tried first, and the
+algorithm will be able to stop itself if a good pose has been
+generated for the object which does not collide with anything into the
+scene.
+
+Taking out one by one the possible poses from this list, the main
+function to compute volume intersection is called. Keeping in mind all
+the heuristic strategies stated in the previous sections, the
+operations described in the next paragraphs are performed.\footnote{Most of these operations are
+  actually, as already introduced, performed automatically into the
+  implementation by the C++
+  language's objects mechanism through inheritance. The algorithm is
+  reported here in a procedural manner for clarity.}
+
+First, an empty scene (represented as a compound shape) is created,
+located into the origin, and the shape $B$ of the bin for which the grasp has to be computed
+is appended into it. This object is cached to speed up the next
+computations, as each shape is able to cache its own point cloud
+internally and the bin shape's approximation will probably be quite computationally
+long to compute, being it a compound too.
+
+Possible grasping poses are popped one at a time from the poses' list.%TODO
+The poses of the objects into the bin are read from memory, and a
+scene is 
+
+
+
+
+
+
+
+
+
+
+
+
+
+#########GRASP STRATEGY#############
+Preference score is used as the main field on which ordering of
+grasps is performed: however, in certain cases, it is preferred to
+force a grasp to move up or down. Thus, a more complete strict
+ordering for grasps have been implemented:
+\begin{itemize}
+\item {If a grasp has been manually flagged as good, it has
+  precedence over every other grasp which has been not;}
+\item{If a grasp has been manually flagged as bad, every other object
+  which has been not has precedence over it;}
+\item{The total volume of every object which has not been found into
+  the bin in which the grasp has to be done is summed: grasps with a
+  lower value (which is indicative of lower uncertainty over
+  obstacles) have precedence over grasps with a higher one. This
+  will ensure that grasps are done first if objects have been
+  correctly mapped into the bins' space;}
+\item{In all other cases, the normal intersection score introduced
+  in \ref{sec:grasp_score} is applied.}
+\end{itemize}
+
+\begin{enumerate}
+\item{At initialization time, the gripper model $G$ is read from a
+  model file and stored into memory; a set of bins' position is read
+  from a file too; these are treated as a set of local reference
+  frames on which shapes $B_i$ will be placed when searching for a
+  grasp on a specific bin, in order to consider the bins' borders; the
+  bin's shapes $B_i$ are read from file too.}
+\item{The input JSON file is parsed, and the contents of each bin are
+  updated with the set of contained objects. When searching for a
+  particular object into a bin, every object's position will be actually
+  identified into it. At this time, objects' positions are all set to
+  local bin origin $(0,0)$ and every bin is marked as \emph{dirty}.}
+\item{A table is built to store the list of objects for which a
+  valid pose has already been computed: as the poses of objects won't
+  change if the robotic arm will not pass near them (i.e. in their
+  bin), this will make it possible to reuse already-computed poses for
+  every bin until they are actually executed or become invalid;}
+\item{The order list is scanned from the JSON file, and saved in
+  memory;}
+\item{All depth cameras are shut down to avoid mutual interference;}
+\item{For each item into the order list, if the bin corresponding to
+  the object to be grasped is marked as dirty, the positions of the
+  objects into its local reference system are updated. To do this, the
+  camera assigned to the object is turned on, a shot is taken, and the
+  camera is turned off again. After this, the precision depth camera
+  is moved in front of the bin and another shot is taken, again turning on
+  and off the sensor. These images are saved into a global
+  bin-to-frames table. For each object which is stored into the bin,
+  the corresponding recognition algorithm (mainly, Line-MOD) is
+  called; the recognition process will take care of optimizing this
+  process, e.g. by calling a single instance of Line-MOD for all the
+  objects which can be recognized this way; after a first pass, the
+  same recognition algorithm will try to refine the pose of the known
+  objects using the depth image obtained previously, as explained in
+  detail into the whole sec.~\ref{sec:vision}; for all the objects for which
+  these algorithms converge correctly, the corresponding count of
+  properly detected objects is updated into the bin status.}
+\item{The object is checked to see whether it is }
+\end{enumerate}
 
