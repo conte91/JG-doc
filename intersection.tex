@@ -443,4 +443,74 @@ can be omitted as it is implicitly true if the first part is. The number of
 points to check is thus halved or reduced to a constant number in these cases --
 which actually represent the majority of cases.
 
+\subsection{Final volume intersection algorithm}
+The full algorithm used to compute shapes' intersections is stated
+now. This applied is succession all of the heuristic considerations
+stated in previous sections.\footnote{Most of these operations are
+  actually, as already introduced, performed automatically into the
+  implementation by the C++
+  language's objects mechanism through inheritance. The algorithm is
+  reported here in a procedural manner for clarity.}
+
+When two shapes $S_1$ and $S_2$ have to be intersected, given their poses $P_1$ and $P_2$:
+\begin{enumerate}
+  \item{If either $S_1$ or $S_2$ are compound shapes, they are
+    subdivided into their composing primitives and the intersection
+    volume is computed separately for each pair of primitives. This
+    will call this algorithm recursively with new values for $S_1$ and
+    $S_2$, and is thus implemented automatically; the total
+    intersection volume is then found by summing up all the resulting volumes;}
+  \item{First, $S_1$ is queried to know if it has some heuristics to
+    skip the computation of the intersection with $S_2$ in case of no
+    intersection. The same is queried to $S_2$ to skip the
+    intersection with $S_1$. If one of those queries is true, the
+    corresponding heuristic is called; this can be considered an
+    operation with no cost, so it is alright to call both the
+    heuristics even if the two shapes are of the same type; the
+    advantage which comes with this is that in case of different
+    object types, each heuristic consideration has to be written only
+    once, thus avoiding code redundancy;}
+  \item{If at least one of the heuristic algorithms of step 2
+    succeded, the intersection volume is set to $0$ and this algorithm
+    exits;}
+  \item{If there is the possibility of and intersection, the surface
+    representation of $S_2$ is obtained and it is checked to see
+    whether at least one point is contained into $S_1$. In order to
+    have a probability $p=1$ of the two objects not to intersect if
+    no points of $S_1$ belong to $S_2$'s surface, it
+    would be needed to approximate the latter with infinite level of
+    precision; in practice, the opposite path is taken and, starting
+    from a minimal level of approximation  $l=2$, the algorithm moves
+    on if at least one intersecting point has been found. If it
+    doesn't, it exponentially increases the value of $l$ multiplying
+    it of a factor $k$, and repeats
+    the calculus until $l$ is higher than a threshold
+    $t_{(p\approx 1)}$ for which it is reasonable to say that the
+    objects don't actually intersect. Using this approach, at each
+    step the number of points will increase of about a factor $k^2$
+    due to the properties of the surface approximation function; this
+    means that although the previous steps, with a lower $l$, are
+    discarded if no intersections are there, the wasted time will be
+    negligible with respect to the upcomping one, and so they introduced virtually no penalty;}
+  \item{If no point of the surface is found which intersects the other
+    shape, the volume approximation algorithm is used to compute the
+    actual intersection volume. The two shapes' volumes are computed,
+    and the volume approximation is obtained for the shape with the
+    smaller volume. This, at the same approximation level, will lead
+    to a smaller absolute value on intersections as the smaller object
+    will lead to approximating cubes with smaller volumes.}
+\end{enumerate}
+
+As it can be seen, this algorithm proceeds by steps, and each step is
+computationally one order of magnitude bigger than the previous
+one. This means that, if heuristic is used for the wrong reason, the
+drop in performance will be negligible, as the steps which will have
+to be done will require much more time to execute that what has been
+wasted before. Also, in this way, the algorithm can be easily
+parallelized, which is an obvious pro for it, and flexibility is
+obtained easily: if, for example, intersection with a torus is needed,
+it is sufficient to implement the two functions which approximate its
+surface and volume with points, and heuristic algorithms can be left
+apart for when their implementation will be needed. The whole codebase
+will need no modification to work with the new shape.
 

@@ -1,0 +1,135 @@
+Robotics has always been an appealing research field for many
+application fields. Since the first industrial revolution, machinery
+has been built in order to automate repetitive tasks which had been
+completed by humans before that moment. This process brought the
+entire humanity to change its way of life, bringing the main part of
+society from an agricultural, artisanal system to a modern,
+industrialized one. In general, this has been pointed out as one of
+the biggest turns in the human history, which changed almost every
+aspect of people's life; although many changes due to the automation
+processes have been seen as catastrophics by some, such as
+\cite{bombarolo} and \cite{extinction}, mainly because of the
+increased gap between wealthy countries and poorest ones, it is
+undeniable that the increase of material wealthness which has come as a natural
+consequence of all of this is a great benefit for any person.
+
+In the first century since industrial revolution, research on
+automation has focused on applying new technologic discoveries to
+special-purpose machines; this has brought to automating tasks like
+cloth washing, objects' manufacturing, and warehouses' management.
+
+However, this approach has shown its drawbacks in recent times: having
+a different machine for each single task, especially in case of
+factory automation ones, pays a lot in terms of flexibility of the
+machine itself, and this brings a much higher cost in the scenario,
+which is going to be actually very common in the near future, in which
+a factory wants to automate its whole structure. Also, recent
+technological improvements have lowered a lot the need of
+mechanics-based machinery, preferring solutions based on electronics
+and complex software. This allowed a further push on automatic tasks'
+completion by reducing a lot the cost of machinery (expect for
+non-recurring engineering costs) due to limited material cost, which
+are the most important to optimize in a world based on
+mass-production. Thus, research on automation has moved to find a
+solution for completing general tasks, in order to obtain, in the far
+future, a robotic product which will have the ability to substitute
+almost completely humans in labour.
+
+The main research projects operating with this goal have, for obvious
+reasons, focused their efforts on the study of \emph{humanoid
+  robotics}, as the human body is, by an engineering point of view,
+one of the most optimized, general-purpose machines in existance,
+being capable of directly fulfilling extremely complex tasks, except for the
+ones needing extreme precision or strength to complete. From this point of view, a
+robot able to compare with the human brain in terms of decision capabilities
+would make the general automation task totally completed, bringing to
+the complexity of human intelligence the added value of virtually
+infinite working strength and precision, due to its ad-hoc mechanical
+and electronical components.
+
+One of the main application fields in which human-like robotic devices
+have always had their space is the one of objects' manipulation. In
+fact, since the beginning many automatisation tasks involving
+nontrivial handling of items, notably pick-and-place into
+manifacturing pipelines, have been solved by usage of human-like
+robotic arms, which for this reason gained their own industrial sector
+since the early '70s, with the birth of companies like the Italian COMAU,
+producing industrial automation solutions from the start, and the
+expansion of others like the German KUKA, which moved its commercial
+focus from the production of goods for manual use (wielding equipment,
+communal vehicles) to the development of automated industrial robots,
+which lead to the production of the first 6-DOF electric robot, named
+\emph{FAMULUS}, in 1973.\footnote{http://www.kuka-robotics.com/usa/en/company/group/milestones/1973.htm}
+
+Picking objects has thus always been a fundamental task for all of this
+scenarios, and can nowadays be considered fully solved in most
+cases. However, this are again all special-purpose solutions: most of
+these solution are built for situations in which the pose of the
+objects which will have to be manipulated is known a-priori, as they
+are often coming from a preceding section of a production pipeline,
+and the set of movement which the object will have to do is fixed
+too. Thus, an ad-hoc solution can be studied and built, and the robot
+can be thought, built and programmed to fullfill robustly its unique
+task. The more general manipulation scenario, in which a robot is able
+to be instructed at runtime to which object to take, how to manipulate
+it, and where to find it, is far beyond the current state of the art
+in robotics. Neverthless, research is growing more and more
+quickly on this topic; it would, in fact, lead to virtually infinite
+new opportunities for a lot of fields. One of the most important use
+cases for this include
+the relatively recent growth of e-commerce platforms, such at the 
+most known company of this sector, \emph{Amazon.com, Inc.}, or the
+online retail platform \emph{Overstock.com, Inc.}, which has become
+famous as the first major e-commerce platform to accept Bitcoin as a
+valid currency. Automated object manipulation is, anyway, absolutely
+not limited to big companies' automation systems: another utility case
+is the use of mobile, robotic platforms, equipped with robotic arms,
+for domotic and household tasks, either to bring further ease in
+domestic work, or to help diseased people, especially if with motion
+or mental impairment. In this case, a human-like robotic arm, or a
+complete humanoid robot, would be for sure the best solution, as all
+the domestic scenarios are naturally designed for being interacted
+with humanoids.
+
+Research on the topic of automated object picking has, by now, started
+to bring interesting and promising results; for example, universal gripping systems
+are being studied for robotic arms both for industrial and domestic
+scenarios (which, being so different, will hardly converge to a unique
+solution); for the latter, most of the systems which have been created
+take their inspiration from natural gripping systems: for example, the
+solution proposed by the
+robotics department of the \emph{Pisa/IIT} research centre, called
+\emph{SoftHAND} and introduced in \cite{pisa-softhand}, which is shown in fig.~\ref{fig:pisa-softhand}, makes
+use of a single motor to close a human-like, five-fingered hand. Each
+finger, just like in a human hand, is capable of small deformations in
+order to get a better grip on objects. This brings goods result in
+all the scenarios in which a real human hand would suitable, which in
+case of domotic areas corresponds to almost everything. Human-like
+grippers are, obviously, not the only solution which is in
+development: other, original systems are in study, such as Empire
+Robotics' \emph{Versaball}: this gripper, which is shown in
+fig.~\ref{fig:versaball}, makes use of a latex sphere filled with thin
+sand, combined with a penumatic system which draws the internal air
+from the sphere, thus compressing the latex: if put onto the suface of
+a small, hand-pickable object, the sand will make the latex fold
+perfectly the object, and when the pneumatic system is opened it will
+thus close with good strength on it.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=3in]{./Graphics/pisa-softhand}
+\caption{Pisa/IIT's robotic gripping system, called \emph{SoftHAND},
+  takes its design from the structure of a human hand, and is thus
+  suitable for every task in which the latter would be.\label{fig:pisa-softhand}}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=3in]{./Graphics/versaball}
+\caption{Empire Robotics' gripping system, called \emph{Versaball},
+  diverges from the recent humanoid research and proposes a novel
+  approach to the gripping problem.\label{fig:versaball}}
+\end{figure}
+
+\section{A case study for automated gripping systems: Amazon Picking
+  Challenge}

@@ -1,6 +1,6 @@
 \section{Grasping poses' filtering, best grasp computation, high-level
   grasping strategy} 
-In this section the algorithm for selecting a set of good grasps from the set of
+In this section the algorithm for selecting a set of good grasp from the set of
 possible ones is presented, together with the high-level strategy for
 order management, which is a closely related task for how the
 implementation is done. The rationale to the  approach which is
@@ -25,8 +25,8 @@ refers to this particular situation, but as it will be seen it is
 trivial to make this algorithm use different constraints in order to
 suite anyone's needs.
 
-The implemented strategy goes as follows: for each object, the whole set of
-poses is put into a list and is then sorted base on preference
+The implemented strategy goes as follows: when pose computation is required for an object,  the whole set of
+its poses is put into a list and is then sorted base on preference
 scores.
 In this way, important poses will be tried first, and the
 algorithm will be able to stop itself if a good pose has been
@@ -36,11 +36,7 @@ scene.
 Taking out one by one the possible poses from this list, the main
 function to compute volume intersection is called. Keeping in mind all
 the heuristic strategies stated in the previous sections, the
-operations described in the next paragraphs are performed.\footnote{Most of these operations are
-  actually, as already introduced, performed automatically into the
-  implementation by the C++
-  language's objects mechanism through inheritance. The algorithm is
-  reported here in a procedural manner for clarity.}
+operations described in the next paragraphs are performed.
 
 First, an empty scene (represented as a compound shape) is created,
 located into the origin, and the shape $B$ of the bin for which the grasp has to be computed
@@ -49,9 +45,28 @@ computations, as each shape is able to cache its own point cloud
 internally and the bin shape's approximation will probably be quite computationally
 long to compute, being it a compound too.
 
-Possible grasping poses are popped one at a time from the poses' list.%TODO
-The poses of the objects into the bin are read from memory, and a
-scene is 
+The scene list, which is the list of objects which are present into
+the bin, togheter with their poses, is built, and the object which has
+to be taken -- identified by its index into the scene list -- is
+removed. This will lead to a scene representing only objects that
+the gripper will need not to bump in. This new, scene object, is then
+transformed using the inverse of the object's transform: this will
+make the scene make use of the object's coordinate system, in which
+all the gripper's poses are.
+
+Possible grasping poses are popped one at a time from the poses'
+list. A new compound, representing the gripper into its corresponding
+pose, is built now. Then the algorithm for shapes intersections is
+called, and if it returns a value of 0, this means that the pose is
+the best one, so the algorithm can stop. If the returned value is
+greater than 0, a better pose could be still in the list, with a worse
+preference value: in this case, the algorithm should prefer it
+first. Thus, the algorithm moves on with finding another pose.
+
+
+%%% BULLSHIT Thus, the current preference score is compared with the maximum
+%%% BULLSHIT of the preference scores (as grasps are better if their preference
+%%% BULLSHIT score is lower): if the current score is still higher, 
 
 
 
@@ -64,8 +79,7 @@ scene is
 
 
 
-
-#########GRASP STRATEGY#############
+%#########GRASP STRATEGY#############
 Preference score is used as the main field on which ordering of
 grasps is performed: however, in certain cases, it is preferred to
 force a grasp to move up or down. Thus, a more complete strict
