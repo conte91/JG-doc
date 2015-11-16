@@ -432,7 +432,7 @@ of which the templates' images are built -- the maximum similarity
 score for each point in $P$ with respect to the corresponding
 neighbour pixels in $T$ with maximum distance $r$ is taken, and these values are summed up:
 
-\begin{equation}
+\begin{equation} \label{eqn:similarity-function}
   \epsilon_m (T,I,c)=\sum_{p\in P(I,c)} { \left( \max \left\{ S_m
       (p,p_2) , p_2 \in P(c\dots c+r) \right\} \right) }
 \end{equation}

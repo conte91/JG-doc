@@ -8,6 +8,82 @@ positives detection) based on hue values; finally valid matches are
 progressively refined by physically moving a precision depth camera and
 performing depth-based alignment of the match and the real object.
 
+\subsection{Image matching using the Line-MOD algorithm} \label{sec:match-with-linemod}
+The proposed object recognition algorithm is started by an upper
+algorithm, managing the whole gripping strategy, which requires to the
+recognition system to find a set of known objects into an RGBD
+image. Three images are actually passed for recognition, which are
+assumed to be registered at a pixel level: the RGB image of the scene,
+the corresponding depth image, and a mask. The latter is an 8-bit
+image with the same size of the whole scene, having each pixel with
+value 255 if the pixel must be evaluated for recognition, and 1 if it
+must be discarded.
+
+For each object, the recognition system can be instructed to use a
+recognition algorithm different from Line-MOD: if it isn't, the object
+is assumed to correspond to a valid object for the Line-MOD
+training database. This is the case which is treated in the rest of
+this section.
+
+For each model which has to be recognized using Line-MOD, the
+corresponding training database is read from memory; this database
+is created at initialization time from a directory tree which
+associates each object's ID with the corresponding detector
+description (number of modalities, type of modalities, mesh used for
+rendering the object, etc.) and with the list of templates which are
+associated to the object. After reading the objects, all of their
+templates are merged together to form a single template list which
+will be used for matching: information about the nature of each
+template is mantained inside the template itself, as each item of the
+list contains both the template's features and some metadata, like the
+object ID the template refers to, the pose of the object which
+corresponds to it, and additional informations which can were saved
+during training (for example, if a simple filtering algorithm for false
+positives  based on RGB histograms has to be implemented, it is enough
+to link these data to the templates when training, and they will be
+easily recovered when matching); the features of the image which is
+included into the input mask are then computed, their binary
+representation and response map are generated as described in
+sec.~\ref{sec:linemod-binary}, and each template is matched upon
+this. As the most intensive part for Line-MOD is the computation of
+the reponse map for the scene's image, while template matching is
+almost istantaneous, it is very convenient to match all the possible
+templates in a single pass, as this will require the scene image to be
+processed only once.
+
+For each match, a corresponding matching percentage is defined. Given
+the similarity function of eqn.~\ref{eqn:similarity-function}, the
+percentage $S_\%$ of match for each template $T$ can be easily defining by noting
+that the maximum possible similarity score, given when the two
+images match perfectly, is given by the similarity function of the
+scene's section $I$ with itself:
+
+\begin{equation} \label{eqn:match-percentage}
+  S_\%(T) = \frac{S(I,T)}{S_max(I)} = \frac{S(I,T)}{\sum_{p \in I}
+    \left( \tau I_{p} \right)}
+\end{equation}
+
+In order to avoid considering matches which bring too little
+information due to the extremely low matching area, a filter is put on
+all the matches that come out from this cycle, checking both the
+matching percentage defined in eqn.~\ref{match-percentage} to be over
+a threshold $t_\%$ and the total area (in pixels) of the template
+which matched to be over a threshold $t_{\text{area}}$. All the
+matches that pass this check are kept as valid and stored into a
+match list.
+
+When this loop exits, thus, it will output a list of matches which are
+tolerably strong and matched with a valid object pose and ID.
+
+As it operates on multiple objects at the same time, this algorithm
+will make sure to find at least a valid match for each object before
+exiting; if this does not happen at the first iteration, the
+Line-MOD algorithm is started again, and the minimum similarity
+threshold $t_\%$ is decreased by a factor 0.95; matches (which can
+uniquely identified by the object ID, template ID, and matching
+coordinates $(u,v)$) which have already been processed will be
+discarded in the following loops in order not to count them twice.
+
 \subsection{False positive rejection based on hue values}
 The first step of pose matching is made by purpose to be overly tolerant in
 template matching. This is because the used objects are quite small and simple
@@ -74,10 +150,20 @@ portion, while $R$ and $S$ indicate the corresponding images with modified hues.
 
 The whole matching and filtering part is repeated until at least one match
 passes the filtering step. If no valid matches are found during the first
-iteration, the threshold level for the LineMOD algorithm is decreased; in this
-way, objects with small, partial occlusions can be recognized. If the threshold
-value steps below a certain threshold, the algorithm fails and no valid poses
-are returned.
+iteration, the threshold level for the LineMOD algorithm is decreased
+just like it was done in the previous step of the pipeline; in this
+way, objects with small, partial occlusions can be recognized.
+
+If the threshold $t_\%$ falls below a threshold $t_{\%,\text{bad}}$
+and no valid matches have still been found to pass this check for every object, however, the
+algorithm exits anyway: exeperimental tests have, in fact, shown that
+when the matching threshold becomes below about $80\%$ the algorithm
+thends to recognize almost every template as matching, but it will
+still fail to recognize correctly the object in its correct
+position. This will lead to a huge number of false positives (about
+$50\%$) of the total templates, and the hue matching step described in
+this section will in turn last several minutes just to continue
+failing, which is a situation to avoid. 
 
 \subsection{Point cloud alignments and pose refinement}
 The matches that passed the first false-positive rejection step are saved and
