@@ -1,5 +1,124 @@
-\appendix{Demonstration of the required properties of the gripping score function} \label{sec:demonstrate-score}
+\appendix
+\chapter{Demonstration of the required properties of the gripping score function} \label{sec:demonstrate-score}
 In this appendix the various properties which were required for the
 grasp score's function expressed in eqn.~\ref{eqn:score-function} are
-demonstrated to be true.
+demonstrated to be true. These are essential in order to give a good sense to the score function.
 
+Given the score function $s_{K,\alpha}(x), K>0, \alpha>0$:
+\begin{equation} 
+  s(x)=\left\{
+    \begin{array}{lcr}
+      \frac{\alpha}{V_{\text{easy}}} x & \text{when} & 0 \leq x \leq V_{\text{easy}}, \\
+      \alpha
+      \left[1-K\left(1+\frac{V_{\text{max}}-V_{\text{easy}}}{x-V_{\text{max}}}\right)\right]
+      & \text{when} &  V_{\text{easy}} < x < V_{\text{max}}, \\
+      +\infty & \text{when} & x \geq V_{\text{max}}.
+    \end{array}
+  \right.
+\end{equation}
+
+we want to demonstrate the following:
+
+\begin{eqnarray}
+\forall x, 0 < x < V_{\text{max}} : && s(x) > 0; \label{eqn:xm0}\\
+\forall x, 0 < x < V_{\text{max}} : && \frac{ds(x)}{dx} > 0; \label{eqn:dxm0}\\
+\exists \epsilon : \forall x, x < \epsilon : && f(x) \approx kx; \label{eqn:fxekx} \\
+\forall x : && \lim_{x\rightarrow x_0^+} f(x) =\lim_{x\rightarrow x_0^-}= f(x_0); \label{eqn:fxcont}\\
+\forall (k_1,k_2), k_1 > k_2 : && \left( \forall x > V_{\text{easy}} : V_{K=k_1}(x) > V_{K=k_2}(x) \right); \label{eqn:kgrows}\\
+ && \text{max}\left( \left\{ \frac{ds(x)}{dx} | 0 \leq
+    x \leq V_{\text{easy}} \right\} \right) \leq \text{min}\left( \left\{
+  \frac{ds(x)}{dx} | x > V_{\text{easy}}\right\} \right). \label{eqn:kreallygrows}
+\end{eqnarray}
+
+Demonstration of \ref{eqn:xm0} is trivial for the interval $0 < x \leq
+V_{easy}$, as $s(x)=\frac{\alpha}{V_{\text{easy}}} x$ is the product of two positive
+quantities and is thus positive itself. When $V_{\text{easy}} < x <
+V_{\text{max}}$ the following holds:
+
+\begin{equation} \label{eqn:sxm0part}
+  s(x) > 0 \Leftrightarrow \frac{Kx - KV_{\text{easy}} - x + V_{\text{max}}}{x-V_{\text{max}}} <
+  0 \Leftrightarrow Kx-KV_{\text{easy}} -x + V_{\text{max}} > 0 \text{(as } x-Vm < 0 \text{)}
+\end{equation}
+
+This last function $f(x) = Kx - KV_{\text{easy}} - x + V_{\text{max}}$ evaluates into the
+extremes of the considered interval to $f(V_{\text{easy}}) = V_{\text{max}}-V_{\text{easy}}$, which is positive, and $f(V_{\text{max}}) = K(V_{\text{max}}-V_{\text{easy}})$,
+which is positive too. Also, its derivative $\frac{df(x)}{dx}=K-1$ is
+a constant, which makes $f(x)$ a monotonic function. Thus, $f(x)>0,
+V_{\text{easy}} < x < V_{\text{max}}$, which makes the
+right part of \ref{eqn:sxm0part} verified, and so is \ref{eqn:xm0}.
+
+In order to demonstrate the other statements, it is necessary to directly compute the first-order derivative of $s(x)$:
+\begin{equation}
+  \frac{ds(x)}{dx}, 0 < x < V_{\text{max}}=\left\{
+    \begin{array}{lcr}
+      \frac{\alpha}{V_{\text{easy}}} & \text{when} & 0 \leq x \leq V_{\text{easy}} \\
+      \alpha K \frac{V_{\text{max}}-V_{\text{easy}}}{{\left(x-V_{\text{max}}\right)}^2}
+      & \text{when} &  V_{\text{easy}} < x < V_{\text{max}} \\
+    \end{array} \right.
+\end{equation}
+
+eqn.~\ref{eqn:dxm0} is thus true by definition for $0 < x <
+V_{\text{easy}}$, and is true for $ V_{\text{easy}} < x <
+V_{\text{max}}$ as the derivative is a product of multiple positive
+values.
+
+eqn.~\ref{eqn:fxekx} is true by definition for $\epsilon<\alpha$.
+
+As the two sections of $s(x)$ for $0<x\leq V_{\text{easy}}$ and
+$V_{\text{easy}} < x < V_{\text{max}}$ are compositions of continuous
+functions, $s(x)$ is continous too in these open intervals and also
+$\lim_{x\rightarrow V_{\text{easy}}^-} s(x) = s(V_{\text{easy}})
+= \alpha .$. By
+definition, however,
+$\lim_{x\rightarrow V_{\text{easy}}^+} =
+{ {
+      \alpha \left[1-K\left(1+\frac{V_{\text{max}}-V_{\text{easy}}}{x-V_{\text{max}}}\right)\right]} \rvert}_{x=V_{easy}}
+      = \alpha$. Thus, \ref{eqn:fxcont} is verified.
+
+\ref{eqn:kgrows} is equivalent to:
+\begin{equation} \label{eqn:kgrowspart1}
+ \forall (k_1,k_2), k_1 > k_2 : \left( \forall x > V_{\text{easy}} :
+ s_{K=k_1} - s_{K=k_2} > 0 \right)
+\end{equation}
+      
+Which can be easily verified by direct computation:
+\begin{equation}
+\Delta s(x) = s_{K=k_1}(x)-s_{K=k_2}(x) = \alpha (k_2-k_1)\left(1+\frac{V_{\text{max}}-V_{\text{easy}}}{x-V_{\text{max}}}\right)
+\end{equation}
+
+As $k_2-k_1 < 0$, \ref{eqn:kgrowspart1} becomes
+\begin{equation}
+\begin{array}{rcl}
+1+\frac{V_{\text{max}}-V_{\text{easy}}}{x-V_{\text{max}}} & < & 0 \\
+ & \Updownarrow & \\
+1-\frac{V_{\text{max}}-V_{\text{easy}}}{V_{\text{max}}-x} & < & 0 \\
+ & \Updownarrow & \\
+-x+V_{\text{easy}} & < & 0 \text{(as } x<V_{\text{max}} \text{)} \\
+ & \Updownarrow & \\
+ x & > & V_{\text{easy}}
+ \end{array}
+\end{equation}
+
+The latter is true for hypothesis, and thus \ref{eqn:kgrows} is true
+too.
+
+Finally, \ref{eqn:kreallygrows} is equivalent to:
+\begin{equation}
+\frac{ds(x)}{dx} \geq \frac{alpha}{V_{\text{easy}}}, \forall x > V_{\text{easy}}
+\end{equation}
+
+as the left part of the unequality is a constant function; the
+second-order derivative of $s(x)$ in the interval $V_{\text{easy}} < x < V_{\text{max}}$
+shows that $\frac{ds(x)}{dx}$ is increasing monotonically, and thus
+its minimum is at the left border of the considered interval, i.e. for
+$x\rightarrow V_{easy}$:
+
+\begin{equation}
+  \frac{d^2 s(x)}{d x^2} = -2 \alpha K \frac{V_{\text{max}}-V_{\text{easy}}}{{x-V_{\text{max}}}^3} >
+  0, \forall x < V_{\text{max}}
+\end{equation}
+
+As $\lim_{x \rightarrow V_{\text{easy}}}\frac{ds(x)}{dx} = \frac{\alpha
+K}{V_{\text{max}}-V_{\text{easy}}}$, \ref{eqn:kreallygrows} is verified for $K \geq \frac{V_{\text{max}}-V_{\text{easy}}}{V_{\text{easy}}}$.
+
+The score function thus satisfied the properties stated in sec.~\ref{sec:grasp_score}.

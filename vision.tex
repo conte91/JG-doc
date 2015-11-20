@@ -59,7 +59,7 @@ images match perfectly, is given by the similarity function of the
 scene's section $I$ with itself:
 
 \begin{equation} \label{eqn:match-percentage}
-  S_\%(T) = \frac{S(I,T)}{S_max(I)} = \frac{S(I,T)}{\sum_{p \in I}
+  S_\%(T) = \frac{S(I,T)}{S_{max}(I)} = \frac{S(I,T)}{\sum_{p \in I}
     \left( \tau I_{p} \right)}
 \end{equation}
 
@@ -83,6 +83,76 @@ threshold $t_\%$ is decreased by a factor 0.95; matches (which can
 uniquely identified by the object ID, template ID, and matching
 coordinates $(u,v)$) which have already been processed will be
 discarded in the following loops in order not to count them twice.
+
+\subsection{Pyramidal matching for faster match}
+As with most of the vision algorithms operating on medium-sized (VGA)
+to large-sized  images, it is often unconvenient to process the
+whole source image each time a detection query is made from a part of
+the program. The solution used in this cases to significantly speed up
+the performance of the recognition pipeline is the usage of
+\emph{image pyramids}.
+
+If pyramids are used to process a sample, the recognition algorithm
+doesn't actually process the whole if it: instead, before recognition
+a set of derivative images are built from the source one, each of a
+smaller scale (usually, halved scale), until a predefined scaling
+level is reached. In order not to lose too much information,
+especially regarding image's features -- which, by definition, often
+are present only in a narrow range of the image -- scaling
+is not done roughly by downsampling the image: instead, first the
+full-scale image is blurred using either a \emph{gaussian} or
+\emph{laplacian} transform, and downsampling is done only after this
+step. The images' set (the pyramid) is built top-down, iterating over
+the lowest-scale image to produces the subsequent one; the mathematics
+behind this transformations has been well studied in literature and is
+omitted here, a good explanation for it can be found in most computer
+vision books such as \cite{computervision}. An example of the pyramidal
+images' building process is seen in fig.~\ref{fig:pyramidal-images}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=3in]{./Graphics/pyramidal-images}
+\caption{Building an image pyramid from an image: at each iteration,
+  the top level of the pyramid (i.e. the image with the smallest
+  scale) is blurred and downsampled to produce the next pyramidal
+  level. Image source: Cmglee (own work) (Cc-BY-SA 3.0)
+  \label{fig:pyramidal-images}}
+\end{figure}
+
+The Line-MOD algorithm's implementation used into this project, based
+on the one implemented into the OpenCV libraries, actively uses
+pyramidal matching in order to speed up its operation. When an
+object's model is requested to create and store a Line-MOD template
+for subsequent usage, it takes the input images and creates a
+two-levels pyramid from them. It then extracts features and template
+data for both levels; in this sense, a template for this detector type
+is actually a set of templates, each operating at a different
+scale. When the detector is told to use its informations to
+match templates over an image, filtering matches with a certain
+confidentiality threshold $t$, it first builds the same pyramid from
+the source image, and searches for template matches on it. Templates
+are accepted only if they match within a certain threshold, which is
+set to a fraction of $t$ in order to sustain the loss of information
+that the lower scaling factor brings with it. Although the matching
+threshold is lowered at this step, this already helps a lot in
+discarding templates which are not present into the source image, and
+thus fastens the operation, as matching at each subsequent pyramidal
+level means having one order of magnitude less of complexity in
+matching.\footnote{although matching templates is an almost
+  instantaneous operation, the big number of templates which have to
+  be matched into the image has to be considered}. Only the templates
+which survive this first matching step are matched against the
+full-scale image; also, as matching at a deeper level already gives a
+good hint about where each template could be present into the whole
+image, when matching at full scale only those parts which are within a
+small radius with respect to the previous match's origin have to  be
+searched, which brings to further performance improvement on the algorithm.
+
+The important thing to notice about all of this process is that,
+starting from full-scale images (when recognizing) and templates (when
+training) the whole process is \emph{totally transparent} to the user:
+this is an obvious advantage as the user probabily will not be willing
+to further manipulate its source images when matching if not strictly needed.
 
 \subsection{False positive rejection based on hue values}
 The first step of pose matching is made by purpose to be overly tolerant in

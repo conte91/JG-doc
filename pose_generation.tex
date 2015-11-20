@@ -42,7 +42,7 @@ be sufficient to set their $Z$ axis into the operative direction (e.g. suiction
 direction for suckers) in order to have the generation algorithm automatically
 bind points to an actual gripper's pose.
 
-\subsection{Pose generations on a line and on a plane's surface}
+\subsection{Pose generations on a line and on a plane's surface} \label{sec:pose-generation-line-plane}
 If a set of poses on a plane surface must be generated, a good method is simply
 to sample the plane onto equally distanced points. Starting from the center of
 the plane, which would be the preferred point for the gripper to land onto,
@@ -71,5 +71,95 @@ On the other hand, it is helpful sometimes to describe the plane by its
 perpendicular direction and center point: in this case, the $Z$ axis will just
 be the same as the perpendicular vector.
 
+In the case that the path on which the gripper can land is a straight
+line segment, for which the direction vector is $l$, the same considerations apply. However, the $Z$ axis is
+not unique anymore in this case: it is, instead, computed by giving
+to the pose, as a parameter, a second vector describing the
+perpendicular direction to the line, $\vec{p_l}$, belonging to the
+same physical plane the line refers to onto the object. The $Z$ axis
+for the grasp can be computed as the cross product of the two
+directional vectors:
+
+\begin{equation}
+  \vec{z_{g}}=\vec{l} \times \vec{p_l}
+\end{equation}
+
+The need for supplying a third vector $\vec{p_l}$ instead of directly
+supplying the grasp direction $\vec{z_g}$ is justified by the need of
+pose constraining, as explained in sec.~\ref{sec:pose-constraining}.
 
 
+It is important to notice that, representing the axis of a grasp tool,
+the direction of $z_g$ is important to distinguish. It will be in fact
+used to determine on which side of the object $z_g$ refers to the
+grasping tool will have to land, i.e. to distinguish between the
+external and internal sides of the objects. In particular, for the
+pose generation on a line, as $\vec{p_l}$ direction is predetermined
+(by the user) based on the needs of the grasping tool, and the line
+directional vector $l$ is computed as $\vec{l}=\vec{p_2}-\vec{p_1}$,
+being $\vec{p_2}$ and $\vec{p_1}$ the two extremes of the line
+segment, the order in which $\vec{p_2}$ and $\vec{p_1}$ are considered
+is important.
+
+Apart from these considerations, using these two simple primitives,
+plus custom-generated points (with custom preference scores), most of
+the commonly used shapes can be described. In particular, planes are
+useful to describe grasping points on cuboidal shapes, while lines are
+used in the same context, but in the case in which the grasping
+direction must be more constrained and the surface the line refers to
+is particularly narrow (e.g. in the case of a grasp on the cardboard
+top for the toy duck of fig.~\ref{fig:duck-toy-grasps}).
+
+An easy possibility to extend this last generation algorithm, instead
+of having it generate points on a straight line, is the use of
+parametric functions $(x,y)=f(t)$; by sampling these at regular $t$
+intervals, most of the odd shapes can be described easily. This has
+not been implemented into the pose generation system, but the
+possibility to do it easily has been left into it, as a part of the
+general expandable structure of the whole system.
+
+\subsection{Pose constraining on different axis} \label{sec:pose-constraining}
+Associating with each gripper's position a single $Z$ axis constraints
+its operation, but is not enough to perfectly define the pose that the
+gripper will have: in-plane rotation of the gripper over the $Z$ axis
+of its gripping tool will, in fact, leave the poses' conditions
+satisfied and change a lot the robot's configuration -- especially if
+the selected tool is not in line with the main gripper axis, as in the
+case of the suckers of the gripper used as a reference into this
+project.
+
+This is done by purpose, as constraining the in-plane rotation of the
+gripper with a directional vector in the relative coordinate system of
+the object would force the gripper to rotate together with the object,
+which can positioned with every orientation into the scene, and thus
+would cause the robot assume unnatural (or impossible) configurations
+in many cases; a trivial solution would be to generate poses at
+runtime after knowing the full pose of the objects, but this would
+both harm the modularity requirement of the system (with the solution
+presented in this section, poses are bound to the object, which thus
+forms an independent blob of abstraction) and the possibility to add
+custom poses to the possibility list, which should not be discarded as
+heuristic is generally a good addition to every automatic system.
+
+Instead, the proposed solution is to associate with each pose a set of
+flags indicating whether each of the three axis of the gripper is
+constrained over a particular direction, and let the robot fit the
+pose independently when grasping. This is particularly useful in the
+case as this in which different tools have to be associated to a set
+of poses generated for a same object: for a sucker, for example, the
+in-plane rotation is totally non influential, as suckers have
+rotational simmetry; for the gripper hands, instead, grasp direction
+must be obviously constrained, otherwise the grasp will not be effective.
+
+When generating poses, each sets a firm contraint over the gripping
+tool's $Z$ axis, as described in
+sec.~\ref{sec:pose-generation-line-plane}; if the poses are generated
+on a plane, this is supposed to be big enough for the other directions
+to be considered equally important: thus, no constraints are set
+neither for the $X$ nor for the $Y$ axis. On the other hand,
+nonetheless, generating poses over a straight line segment requires
+defining a gripping plane, and will be probabily used for grasping
+over narrow regions: thus, a vector constraining the $X$ axis is set;
+this will be both used to constrain the gripper tool and to define the
+plane to which this narrow surface belongs, which can be used in turn
+to find the perpendicular $Z$ axis by cross-product as already explained.

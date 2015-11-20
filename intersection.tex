@@ -87,11 +87,11 @@ extracted from the above:
 The chosen function, which satisfies all of the above properties, is
 
 \begin{equation} \label{eqn:score-function}
-  s(V_{int})=\left\{
+  s(V_{\text{int}})=\left\{
     \begin{array}{lcr}
-      \alpha V_{\text{int}} & \text{when} & 0 \leq V_{\text{int}} \leq V_{\text{easy}}, \\
+      \frac{\alpha}{V_{\text{easy}}} V_{\text{int}} & \text{when} & 0 \leq V_{\text{int}} \leq V_{\text{easy}}, \\
       \alpha
-      \left[1-K\left(\frac{V_{\text{max}}-V_{\text{easy}}}{V_{\text{int}}-V_{\text{max}}}\right)\right]
+      \left[1-K\left(1+\frac{V_{\text{max}}-V_{\text{easy}}}{V_{\text{int}}-V_{\text{max}}}\right)\right]
       & \text{when} &  V_{\text{easy}} < V_{\text{int}} < V_{\text{max}}, \\
       +\infty & \text{when} & V_{\text{int}} \geq V_{\text{max}}.
     \end{array}
@@ -99,7 +99,7 @@ The chosen function, which satisfies all of the above properties, is
 \end{equation}
 
 It is shown in appendix \ref{sec:demonstrate-score} that $s(V_{int})$ satisfies all
-of the above properties for any $K\geq1$, and is thus suitable as a score
+of the above properties for any $K\geq \frac{V_{\text{max}}-V_{\text{easy}}}{V_{\text{easy}}}$, and is thus suitable as a score
 function. Some examples of this function varying the two parameters $\alpha$ and
 $K$ are shown in fig. \ref{fig:score_function}.
 
@@ -475,7 +475,11 @@ When two shapes $S_1$ and $S_2$ have to be intersected, given their poses $P_1$ 
     exits;}
   \item{If there is the possibility of and intersection, the surface
     representation of $S_2$ is obtained and it is checked to see
-    whether at least one point is contained into $S_1$. In order to
+    whether at least one point is contained into $S_1$. This is done
+    so that $S_2$ is always the smaller (in volume) of the two shapes,
+    to have higher spatial precision in the approximation and to
+    exploit the count of these points in the next step.
+    In order to
     have a probability $p=1$ of the two objects not to intersect if
     no points of $S_1$ belong to $S_2$'s surface, it
     would be needed to approximate the latter with infinite level of
@@ -492,8 +496,13 @@ When two shapes $S_1$ and $S_2$ have to be intersected, given their poses $P_1$ 
     means that although the previous steps, with a lower $l$, are
     discarded if no intersections are there, the wasted time will be
     negligible with respect to the upcomping one, and so they introduced virtually no penalty;}
-  \item{If no point of the surface is found which intersects the other
-    shape, the volume approximation algorithm is used to compute the
+  \item{If at least one point of the surface is found which intersects
+    the other shape, the actual count of these points is checked. If
+    this is equal to the total number of points of the surface,
+    this means that the intersection volume is equal to $S_2$ volume
+    and the algorithm exits;}
+  \item{If at least one point was found, but this is not equal to the
+    total count of the points, the volume approximation algorithm is used to compute the
     actual intersection volume. The two shapes' volumes are computed,
     and the volume approximation is obtained for the shape with the
     smaller volume. This, at the same approximation level, will lead

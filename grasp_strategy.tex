@@ -1,5 +1,5 @@
 \section{Grasping poses' filtering, best grasp computation, high-level
-  grasping strategy} 
+  grasping strategy}  \label{sec:best-grasp-computation}
 In this section the algorithm for selecting a set of good grasp from the set of
 possible ones is presented, together with the high-level strategy for
 order management, which is a closely related task for how the
@@ -12,9 +12,8 @@ freed and become so more accessible by the robotic arm.
 
 When a set of poses has been generated for each object, either automatically or
 manually, the main problem with it is that it will be a very big set (assuming
-10 samples on each direction for each plane of the object, and 4 in-plane
-rotations for each, for example, would
-lead to 2400 samples for a cuboid, plus manually-added poses). As intersecting
+10 samples on each direction for each plane of the object, for example, would
+lead to 600 samples for a cuboid, plus manually-added poses). As intersecting
 objects is the most time-consuming task for this part, is thus
 important to filter the poses in a good way.
 
@@ -38,7 +37,7 @@ function to compute volume intersection is called. Keeping in mind all
 the heuristic strategies stated in the previous sections, the
 operations described in the next paragraphs are performed.
 
-First, an empty scene (represented as a compound shape) is created,
+First, an empty scene (represented as a list of shapes) is created,
 located into the origin, and the shape $B$ of the bin for which the grasp has to be computed
 is appended into it. This object is cached to speed up the next
 computations, as each shape is able to cache its own point cloud
@@ -46,7 +45,7 @@ internally and the bin shape's approximation will probably be quite computationa
 long to compute, being it a compound too.
 
 The scene list, which is the list of objects which are present into
-the bin, togheter with their poses, is built, and the object which has
+the bin, together with their poses, is built, and the object which has
 to be taken -- identified by its index into the scene list -- is
 removed. This will lead to a scene representing only objects that
 the gripper will need not to bump in. This new, scene object, is then
@@ -57,38 +56,60 @@ all the gripper's poses are.
 Possible grasping poses are popped one at a time from the poses'
 list. A new compound, representing the gripper into its corresponding
 pose, is built now. Then the algorithm for shapes intersections is
-called, and if it returns a value of 0, this means that the pose is
+called for each object into the scene. The score function of
+sec.~\ref{grasp-score} is then computed on this result,
+weighting in by means of its $\alpha$ parameter, which is used as the
+already introduced movement coefficient in order to define which
+objects can be bounced into without risk and which are hard or
+impossible to touch; for example, the bin object will have a very high
+$\alpha$ value, while lightweight objects will have $\alpha \approx
+1$. At the end, a total score is computed by summing up all these
+values, intersecting the gripper with the scene both into its approach and its
+gripping pose.
+
+If the total grasp score is approximately 0, i.e. below a threshold $\epsilon$, this means that the pose is
 the best one, so the algorithm can stop. If the returned value is
 greater than 0, a better pose could be still in the list, with a worse
 preference value: in this case, the algorithm should prefer it
 first. Thus, the algorithm moves on with finding another pose.
 
+At the end of this search loop, the current best pose will be the
+searched one both in terms of obstacles avoidance  and preference
+score. 
 
-%%% BULLSHIT Thus, the current preference score is compared with the maximum
-%%% BULLSHIT of the preference scores (as grasps are better if their preference
-%%% BULLSHIT score is lower): if the current score is still higher, 
+\section{High-level order management} \label{sec:order-list}
+With the grasping strategy described into
+sec.~\ref{sec:best-grasp-computation}, it is possible to compute the
+best possible grasp for each object, regardless of the current order
+state, and assuming to be in an ideal situation in which the exact
+pose is well-known for each object into the bin. In practice, this is
+at the very least ingenuous: first, the recognition algorithm could
+fail for some objects due to high occlusion or poor illumination
+conditions. Second, some runtime errors (for example, the robot not
+being sure whether a grasp succeded in the past) could lead a bin to a
+situation in which the actual state of the bin is totally
+unknown. Last, no grasping poses could have been found for an object
+which guarantee no intersections at all with the rest of the scene. In
+this sense, it is bad to assume that, given the best grasps for every
+object, the order in which these are executed does not influence the
+success of the algorithm. Given the list of objects which have to be
+taken, it is thus important to \emph{sort} them in a simple way, in
+order to first fulfill simplest orders, and possibly making it easier
+to fullfill the most difficult ones in the subsequent iterations.
 
-
-
-
-
-
-
-
-
-
-
-
-%#########GRASP STRATEGY#############
-Preference score is used as the main field on which ordering of
-grasps is performed: however, in certain cases, it is preferred to
-force a grasp to move up or down. Thus, a more complete strict
+\subsection{Order list' sorting strategy} \label{sec:sort-order}
+Preference score is already used when computing single grasps as a field on which ordering of
+grasps is performed: however, as explained, it is preferred to be able
+force a grasp to move up or down as needed. Thus, a more complete strict
 ordering for grasps have been implemented:
 \begin{itemize}
 \item {If a grasp has been manually flagged as good, it has
-  precedence over every other grasp which has been not;}
+  precedence over every other grasp which has been not; this is
+  useful, for example, if the object is known to be the only one into
+  its bin;}
 \item{If a grasp has been manually flagged as bad, every other object
-  which has been not has precedence over it;}
+  which has been not has precedence over it; this can be used to mark
+  objects into a bin for which the state is unknown;}
 \item{The total volume of every object which has not been found into
   the bin in which the grasp has to be done is summed: grasps with a
   lower value (which is indicative of lower uncertainty over
@@ -98,6 +119,11 @@ ordering for grasps have been implemented:
 \item{In all other cases, the normal intersection score introduced
   in \ref{sec:grasp_score} is applied.}
 \end{itemize}
+
+With this final taxel, the robot is capable of full automatic
+operation. In particular, given an order list as an input, this is the
+serie of steps which it will be able to do in order to complete it at
+the best of its possibilities:
 
 \begin{enumerate}
 \item{At initialization time, the gripper model $G$ is read from a
@@ -135,7 +161,35 @@ ordering for grasps have been implemented:
   objects using the depth image obtained previously, as explained in
   detail into the whole sec.~\ref{sec:vision}; for all the objects for which
   these algorithms converge correctly, the corresponding count of
-  properly detected objects is updated into the bin status.}
-\item{The object is checked to see whether it is }
+  properly detected objects is updated into the bin status and their
+  pose is saved.}
+\item{Each of the objects into the order list is checked to see
+  whether it has been correctly recognized at the previous step; if it
+did, and its bin is marked as dirty, the best grasping pose for it is
+recomputed as described in sec.~\ref{sec:best-grasp-computation}; if
+this object is the only one left into its bin, this pose is marked as good;}
+\item{Each dirty bin is marked as not being dirty anymore;}
+\item{The order list is sorted according to the strategy of
+  sec.~\ref{sort-order};}
+\item{One order is popped from the top of the sorted order list, and
+  the corresponding grasp is executed: first, the robotic arm moves in
+  front of the bin (to have a safe starting position); then, it moves
+  to the approach pose associated with the grasping pose, and finally
+  to the  grasping pose itself. The gripper then returns back to the
+  approach pose, and finally to the safe position;}
+\item{The robot moves the object into the delivery bin and releases its grasp;}
+\item{The bin from which the object has just been taken is marked as
+  dirty;}
+\item{If the order list is empty, the robot stops. Otherwise, the
+  algorithm is restarted from point 5.}
 \end{enumerate}
 
+This is, obviously, a proof-of-concept algorithm: it does, however,
+show how a robot can be programmed with extreme simplicity to
+automatically grasp a complex set of heterogeneous items using the
+framework developed into this project. Also, as every part of the
+framework has been made with a way to expand and control it,
+exploiting the strengths coming out from high-level C++ programming,
+it can be seen how different strategies could be easily developed in
+order to apply this same ideas with the use of different recognition
+algorithms or gripping pose generations.
