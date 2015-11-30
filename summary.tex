@@ -1,0 +1,144 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{adjustbox}
+\begin{document}
+\section*{A framework for automated object detection and gripping}
+\paragraph{Candidate:} Simone Baratta
+\paragraph{Supervisor:} Marco Ghirardi
+\paragraph{Context:} Industrial automation
+\paragraph{Keywords:} Robotics, Gripping, Computer Vision
+\paragraph{}
+Robotics has always been an appealing research field for many
+application fields, starting with the radical technological changes
+introduced by the industrial revolution, up to the most modern
+robotic systems, which find their main application into factory
+automatisation, especially in big factories' pipelines. However, all
+of these approaches have lead mainly to strictly special-purpose
+systems, which can thus not be applied to solve efficiently daily, general problems such as
+robotic help for disabled people or research of missing people in
+dangerous environments. In this sense, one of the most important
+fields in which the state-of-the-art research is being pushed forward
+the most is automated object grasping and manipulation, which would have
+a variety of applications in heavily diversified fields.
+
+As all the state-of-the-art research projects regarding this topic  mainly
+consist of finite, demonstration projects, and most available
+development frameworks for this kind of applications are either
+outdated, nonflexible, or not maintained, this thesis project aims to
+deliver a new, complete framework for automated object detection, pose
+estimation and grasping, with good potentiality to be easily maintained for
+future use in the robotics field. A complete detection and grasping solution is
+built upon this, which can be extended to fit diverse needs.
+
+\subsection*{Project objectives}
+The case study which has been taken as a reference for this project is
+the \emph{Amazon Picking Challenge}, a robotics competition which saw
+its first edition if June, 2015, as part of the 2015 edition of the \emph{IEEE
+International Conference on Robotics and Automation (ICRA)}. This
+event has brought some of the world's top-level research 
+centres to show the state of the art in this field. During the last
+years, Amazon.com, Inc. has
+added more and more automatic processes to their warehouses; in order
+to complete the full automatisation of the company, this challenge
+aimed to push researchers for a solution for the general object gripping
+problem.
+
+The objective of this project is to propose a full solution for the
+problem statement of the Amazon Picking Challenge, building the
+resulting grasping framework out of it. The implementation is based on a
+COMAU's Racer999 robot, which is a small standalone robotic arm,
+equipped with a multi-tool gripping end.
+
+The requirements for the project have been:
+\begin{itemize}
+\item{From  the challenge specifications:
+    \begin{itemize}
+    \item{The robot must be able to take objects from a \emph{shelf},
+      made of several \emph{bins}, whose global location and shape is known
+      a-priori;}
+    \item{The set of objects is known a-priori too; multiple objects
+      of the same type can be present into the same bin;}
+    \item{The robot must be \emph{totally independent} in its
+      operation: input is given to it as a single, JSON-formatted
+      file, and starting the grasping system is the only allowed
+      human intervention into the whole process;}
+    \item{Extreme care must be taken by the robot never to damage any
+      object during manipulation, and never to take any object from a
+      wrong bin or to take the wrong object. This is motivated by the
+      project being applied in warehouse automation.}
+    \end{itemize}
+    }
+\item{From the framework specifications:
+  \begin{itemize}
+  \item{The code structure must be extremely modular, in order to be
+    easy to maintain, extend, and support;}
+  \item{The framework must be totally portable to a variety of hardware
+    platforms and software systems; for this, the C++11 programming language has been used for the
+  whole as a standard, using only well-known, stable and portable libraries
+(OpenCV, PCL, Eigen); this lets any future developer using this system to add
+functionality to its own system at no cost and with the possibility of using
+multiple programming languages at the same time (for example, python bindings have been generated
+for many parts of the code);}
+  \item{The framework must use a single, uniform standard convention through all
+      of its components and data structures, in order to maximize the
+    interoperability between this and other systems through simple wrappers.}
+  \end{itemize}
+  }
+\end{itemize}
+
+The whole source code of the framework has been made available through a
+permissive, open-source license, in order to facilitate knowledge sharing in
+this research area and be of help for future projects; it will be, together with
+the grasping solution built upon it, used by the \emph{IsaacTeam} robotics research
+project of Politecnico di Torino to participate to the 2016 edition of the
+challenge.
+
+\section*{Results}
+The created framework fits the expectations: in particular, it contributes well
+to the research fields it is put into because of the high modularity of the
+whole system, which, as anticipated, has not been found in any of the
+current available solutions; also, it provides the user with both a
+working vision system and a working grasping strategy algorithm, which
+are the main points in the solution of any grasping problem, included
+the Amazon Picking Challenge one. Usage of this project in robotics environments
+offers the user a single, well-defined interface for data interchange
+between each of its components,
+based on commonly accepted standards such as metric units for every
+measure, or unique, well defined reference systems for each physical
+object (camera, robot, objects) to be represented. Although
+simple in concept, these standards of interoperability have been
+lacking in most of the current robotics tools, mainly because of them
+being composition of heavily heterogeneous libraries, each one
+defining its own conventions for the specific application. This
+framework can be instead used as a good starting point to build
+homogeneous systems and applications, which can bring for sure
+improvements to code safety, algorithms clearness, and more flexible solutions.
+
+Each part of the system has been tested for full functionality before
+starting to code the next one: this, and the usage of the C++
+language, makes the created algorithms robust to use without modifications.
+
+In particular, tests have been created for both the vision system and
+the gripping one to evaluate their performance: as shown in
+fig.~\ref{fig:test-vision}, the vision system is able to correctly
+identify and estimate the pose of many rigid objects, even from a
+quite high distance. The gripping system, in turn, is able to produce grasp
+poses for each objects which minimize the probability of hitting other
+objects during its movement, which has been a strong requirement for
+the project as explained. Future extendability of the weaker
+algorithms, such as the relatively slow training process, is
+guaranteed by the possibility to swap components without undermining
+the remaining ones, as in every object-oriented system; a good
+possibility for doing this would be integration of each part of the
+system with a binding to the ROS platform, which has now become a
+standard environment in robotics research.
+
+\begin{figure}[htbp] 
+\centering
+\begin{tabular}{c|c}
+  \adjustbox{valign=m}{\includegraphics[width=2.2in]{./Results/recog}} &
+  \adjustbox{valign=m}{\includegraphics[width=2.2in]{./Results/recog_out}}
+\end{tabular}
+\caption{The object detection system rendering (right) a searched object into
+  the detected pose for a successful match on a cluttered scene (left).\label{fig:test-vision}}
+\end{figure}
+\end{document}
