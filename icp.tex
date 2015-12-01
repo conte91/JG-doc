@@ -1,5 +1,5 @@
 \section{The iterative closest point (ICP) algorithm for 3D point clouds
-alignment}
+alignment} \label{sec:icp}
 
 A common problem when performing 3D point cloud analysis is the one of finding
 matches between two sets of data, each sharing a partial set of points
@@ -106,7 +106,7 @@ results in a rigid transformation)}. Given the quaternion $q$ of
 eqn.\ref{eqn:quaternion}, it can be univocally associated with a rotation
 matrix, without redundancy:
 
-\begin{equation}
+\begin{equation} 
   R = \begin{pmatrix}
     a^2+b^2-c^2-d^3 & 2\left(b c - a d \right) & 2\left( b d + a c \right) \\
     2\left(b c + a d \right) & a^2+c^2-b^2-d^2 & 2\left( c d - a b \right) \\

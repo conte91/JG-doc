@@ -5,7 +5,7 @@ in which to travel in order to correctly grasp it. In this project, this task
 is accomplished by simulating a set of predefined poses over each object before
 gripping. As the goal of the project is grasping a \emph{set} of objects, a
 good grasping strategy must be implemented too; this strategy is described in
-detail in sec. \ref{sec:TODO}. However, this means that, independently from the
+detail in sec. \ref{sec:order-list}. However, this means that, independently from the
 chosen global strategy, grasping pose computation has to assign to each
 possible set of movements (which we will refer to as a \emph{grasp} from now on)
 a \emph{score} representing the difficulty of picking
@@ -283,8 +283,9 @@ intersection, as if it was
 analitically computed by an integral. More in detail, each shape knows how to
 approximate both its surface and its volume at different levels; both these
 representations are returned by the shape as a serie of points, or \emph{point
-cloud}, which is the same representation used for visualization purposes% TODO as described in blablabla
-. While the surface's points represent real points onto the surface of the
+cloud}, which is the same representation used for visualization
+purposes in many of the test examples and most of the figures regarding this chapter. While the surface's points
+represent real points onto the surface of the 
 object, the volume's points are the center of the approximating cubes described
 before. Each shape also knows how to analitically compute its total surface and
 volume, which is a trivial geometric task for each primitive.

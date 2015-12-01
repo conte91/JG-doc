@@ -118,7 +118,7 @@ not been implemented into the pose generation system, but the
 possibility to do it easily has been left into it, as a part of the
 general expandable structure of the whole system.
 
-\subsection{Pose constraining on different axis} \label{sec:pose-constraining}
+\subsection{Pose constraining on different axes} \label{sec:pose-constraining}
 Associating with each gripper's position a single $Z$ axis constraints
 its operation, but is not enough to perfectly define the pose that the
 gripper will have: in-plane rotation of the gripper over the $Z$ axis
@@ -163,3 +163,155 @@ over narrow regions: thus, a vector constraining the $X$ axis is set;
 this will be both used to constrain the gripper tool and to define the
 plane to which this narrow surface belongs, which can be used in turn
 to find the perpendicular $Z$ axis by cross-product as already explained.
+
+When it is time for the gripper to obtain a concrete pose for grasping
+the object, constraints informations are used to extract a rotation
+matrix for the tool in object coordinates.
+
+The chosen default strategy for choosing among the possible tool's
+configurations is to assign to the gripper a rotational-only frame, called \emph{base
+  frame}, which corresponds to the preferred pose $R_{\text{ideal}}$ of the gripper in
+global coodinates; in an ideal situation, the gripper will keep its
+preferred orientation and the tool will be aligned to the picking
+axes. If, however, this is not possible, the minimal rotation will be
+found which aligns the ideal frame with a valid one.
+
+More specifically, two cases can be considered, depending on whether 
+the pose is constrained over at least two axes or not. In both cases,
+the rotation matrix of the tool $R_t$ is obtained. The third case in
+which no constraints are given (which could come from user-defined
+grasps) is trivial as the rotation matrix for the tool can be found by
+transforming the ideal tool's pose in tool coordinates:
+
+\begin{equation}\label{eqn:trivial-pose-constraining}
+  R_t = R_{\text{ideal}} R_{\text{tool}}
+\end{equation}
+
+Here, $R_{\text{tool}}$ represents the rotation matrix of the tool's
+coordinate system with respect to the gripper's one.
+
+If at least two axes have been defined for the grasp, this results to
+be fully constrained; the third axis of the tool can be
+found by applying the additional constraint that the reference system
+of the tool must be right-handed:
+
+\begin{eqnarray}
+  \vec{Z_t} &=& \vec{X_t} \times \vec{Y_t} \\
+  \vec{Y_t} &=& \vec{Z_t} \times \vec{X_t} \\
+  \vec{X_t} &=& \vec{Y_t} \times \vec{Z_t} 
+\end{eqnarray}
+
+After knowing all of the needed axes for the tool in object's
+coordinates, the rotation matrix $R_t$ can be obtained by using the
+three vectors as generators for a vectorial base, whose change of
+base's matrix represents the desired rotation:
+
+\begin{equation} 
+  R_t = \left( \begin{array}{c|c|c} \vec{X_t} & \vec{Y_t} &
+    \vec{Z_t} \end{array} \right)
+\end{equation}
+
+On the other hand, if only one constraint is given for one of the
+axes, it is possible to relax the gripper's pose to be as near as
+possible to the ideal one. In this example, the hypothesis is that the
+$\vec{Z}$ axis is constrained, but it is trivial to extend this
+procedure to other cases as needed.
+
+In order to align the ideal pose with the required one, the minimal
+rotation between the two is searched. Thanks to Euler's rotation
+theorem, this rotation exists for sure, and can be represented
+through and angle $\alpha, 0 \leq \alpha \leq \pi$ of rotation, and
+the axis around which to rotate in counter-clockwise direction,
+represented as a unit vector $V_{\text{axis}}
+= \begin{pmatrix}x_{\text{axis}} \\ y_{\text{axis}} \\ z_{\text{axis}}
+\end{pmatrix} , \lVert V_{\text{axis}} \rVert = 1$.
+
+First, the tool's rotation $R_{t,b}$ with regards to the gripper's
+base frame $R_b$
+is computed from the tool's rotation $R_t$ with respect to the
+gripper's local frame.
+Then, the ideal gripper's orientation, i.e. the base frame,  is ported
+into the coordinate system the object refers to using the inverse of
+the object's rotational transform $R_o$.
+The previously found transformation is used to obtain the ideal pose of the
+tool with respect to the object's coordinate system:
+
+\begin{eqnarray}
+  R_{t,b} &=& R_b^{-1} R_t\\
+  R_{t,\text{ideal}} &=& R_{t,b} R_o^{-1} R_{b} \\
+\end{eqnarray}
+
+This transformation matrix is applied to the tools's $\vec{Z_t}$ axis to found
+were it would land into an ideal situation:
+
+\begin{equation}
+  \vec{Z_{t,\text{ideal}}}  = R_{t,\text{ideal}}\begin{pmatrix}0\\0\\1
+  \end{pmatrix}
+\end{equation}
+
+Knowing the desired tool $Z$ axis $Z_t$ makes it possible to compute
+both the angle and the axis of the minimum rotation between the two:
+
+\begin{eqnarray}
+  \alpha &=& \left\{
+  \begin{array}{lcr}
+    0 & \text{when} & \vec{Z_{t,\text{ideal}}} \approx
+    \vec{Z_{t,\text{real}}} ,\\
+    \pi & \text{when} & \vec{Z_{t,\text{ideal}}} \approx
+    -\vec{Z_{t,\text{real}}} ,\\
+    \cos^{-1}\left(
+    \vec{Z_{t,\text{ideal}}}\vec{Z_{t,\text{real}}}^{\tau}  \right) &
+    & \text{otherwise.}
+  \end{array} \right. \\
+  \vec{V_{\text{axis}}} &=& \left\{
+  \begin{array}{lcr}
+    \begin{pmatrix}
+      1\\0\\0
+    \end{pmatrix} & \text{when} & \vec{Z_{t,\text{ideal}}} \approx
+    \pm \vec{Z_{t,\text{real}}}, \\
+    \vec{Z_{\text{ideal}}} \times \vec{Z_{\text{real}}} &
+    & \text{otherwise.} 
+  \end{array}\right.
+\end{eqnarray}
+
+Here, in the case that the two vectors are on the same line
+($\alpha=\pi$ or $\alpha=0$) the rotation vector can be actually
+chosen freely as a combination of the $\vec{X}$ and $\vec{Y}$ vectors;
+however, the $\vec{X}$ vector as been chosen always for simplicity's sake.
+
+After obtaining a representation of the minimum rotation  that
+aligns the ideal tool $Z$ axis with the correct one, it can be applied
+to the whole ideal tool orientation, computed at the start of this
+process, to obtain the correct alignement of the tool in object
+coordinates.
+
+\begin{equation}
+  R_t=\text{Rot}(\alpha,V_{\text{axis}}) R_{t,\text{ideal}}
+\end{equation}
+
+When a rotation matrix has been obtained with any of the methords
+decribed before, the whole tool pose, represented as an affine
+transformation, can be obtained by knowing the attach point $T_g$ of
+the grasp, as it is stored into the pose information: 
+
+\begin{equation}
+  P_{\text{tool}}=\left( \begin{array}{ccc|c}
+    \multicolumn{3}{c}{R_t} & T_g \\
+    \hline 
+    0 & 0 & 0 & 1
+  \end{array} \right)
+\end{equation}
+
+After this, the pose of the gripper $P_{\text{gripper}}$ corresponding to the obtained
+tool's pose can be obtained by solving the relative geometrical
+equation:
+
+\begin{eqnarray}
+  P_{\text{gripper}} P_{\text{g,t}} &=& P_{\text{tool}} \\
+  & \Updownarrow & \nonumber \\
+  P_{\text{gripper}} &=& P_{\text{tool}}P_{\text{g,t}}^{-1}
+\end{eqnarray}
+
+here, $P_{\text{g,t}}$ is the affine transformation representing the
+pose of the tool into the gripper's reference frame.
+

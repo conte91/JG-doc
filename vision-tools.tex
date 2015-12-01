@@ -1,0 +1,178 @@
+\section{Toolkits and libraries used for recognition purposes}
+In this section, a brief overview of the main tools used for the
+vision system is presented.
+
+Three main libraries have been used for this purpose: OpenCV, OpenGL
+and PCL. Each of these is licensed under copyleft licenses, which has made
+it possible both to use them in the project and to expand them as
+needed (for example, the Line-MOD detection library of OpenCV has been
+modified to accomodate different use cases).
+
+\subsection{OpenCV principles}
+The \emph{Open Computer Vision Library (\emph{OpenCV})} is a C++
+library born with the intent of providing a free (licensed under the
+3-clause BSD License), portable, and easy-to-use platform for computer
+vision systems. Its functions are divided into three main categories:
+the first of those is a set of tools for manipulating images, or more
+generally data matrices; for examples, into this section can be found
+functions to blur, distort, scale images, as well as operating
+transformations over single pixels of it. The second one is a little set of utilities
+to operate on various datatypes, most notably matrices as found in
+linear algebra. The third and most important one is a macroblock of
+functions, divided into \emph{modules}, which can be used to implement
+complex systems at an abstract, high-level of programming; examples of
+modules include object detection, simplified GUI creation, video
+frames' manipulation. For all of these functions, Python bindings
+exist, which can be used both to test the algorithms which have to be used
+before starting the actual system implementation, both to produce
+small scale, complex system in extremely little coding time.
+
+Having a cross-platform library with industrial-standard capabilities
+in this field means a lot to research, as in practice all of the
+state-of-the-art algorithms for computer vision have some kind of
+implementation related to it based on the OpenCV libraries, making
+them a de-facto standard in most cases.
+
+The most important thing to understand about the OpenCV library is
+that all of its functions don't know at all the concept of image as
+commonly intended in graphics software: instead, they operate on
+bidimensional \emph{matrices}, of fixed width and height, in
+which each matrix cell corresponds to a datum of a fixed type. Both
+the matrix size and container type are made explicit when creating
+matrices, and they can be reassigned dynamically if needed, although
+in a sometimes nontrivial manner if data retention is needed. When
+instantiated, a matrix (represented by the class \pre{cv::Mat})
+allocates its own memory, and access to its element can be done
+through a data pointer storing the elements in rowwise order.
+
+Instead of accessing elements into a matrix through their raw memory
+pointer, an abstraction layer is built on top of the latter so that
+matrices can be accessed by coordinates; as matrices can represent
+every type of data, these are accessed by the mathematical  $(row, column)$ notation
+instead of the $(u,v)$ one usually associated with raster
+graphics. Also, if an image is read into a matrix, its $(0,0)$
+coordinate is bound to the upper-left corner of it: thus, care must be
+taken not to confuse row and column index with the actual (euclidean)
+coordinates into the image, which for many standard notation would
+have their origin put into the bottom-left corner. 
+
+Advantage of using OpenCV in this project, and in most of the projects
+when it actually used, for all the image
+manipulation purposes, come directly from its nature as an established
+software library: for example, most of the time-consuming operations
+on matrices (such as filtering based on values) are naturally trivial
+to parallelize: for these, OpenCV is able to independently exploit
+each hardware capability of the system, such as graphics card
+parallelism and SIMD CPU architectures. Also, most of the well-known
+algorithms for computer vision are implemented into the library: even
+if these algorithms could seem simple at a first glance, OpenCV
+implementations have withstanded years of testing and maturement to get
+at the current state, and are thus robust to most of the possible
+bugs, including intensive check for consistent input data at runtime,
+which can be disabled in order to avoid the related performance
+penalities by defining its version of the C++'s \pre{NDEBUG} macro.
+
+\subsection{OpenGL graphics library} \label{sec:opengl-intro}
+OpenGL\footnote{www.opengl.org} is a free (GPL) software interface to graphics hardware \cite{opengl-book}. This
+library allows a programmer to build incredibly complex, interactive 3D graphics
+applications (a lot of modern PC games are an example) without the need of
+directly interfacing the graphics hardware, which in most of cases has an
+extremely complicated architecture and variegated set of features. Instead, a
+set of standard 3D graphics functions (\emph{API}) for the C programming
+language is exposed to the developer, and the hassle of linking these
+functions to the hardware is left to the manufacturer, who will provide its own
+optimized implementation of the library together with the hardware.
+
+Being industrial-level free software, this library has become very popular, and
+well-working implementations exist for most of the modern graphics hardware
+available nowadays. Also, it is highly portable (stripped-down versions of OpenGL
+called \emph{OpenGL-ES} exist for embedded systems and systems with limited
+resources in general, such as Android mobile phones); in this sense, OpenGL is
+a perfect fit for image processing systems requiring a 3D rendering feedback to
+work, like this one, in order to be easily ported and implemented in real-world
+applications.
+
+As a 3D graphics engine, and considering that it targets a wide range of devices, OpenGL only manages simple primitives' rendering, such
+as points', lines' and polygons'. It does \emph{not}, thus, implement
+high level tasks like window management or user input, which may be not even
+available on the system the application's running onto.
+
+However, a set of various complementary libraries exist, which can be used in
+synergy with OpenGL to provide such functionalities. The ones used during the
+course of this project are:
+
+\begin{itemize}
+  \item{\emph{The OpenGL Utility Toolkit
+      (\emph{GLUT})}\footnote{https://www.opengl.org/resources/libraries/glut/} a
+      nonfree library, written by Mark Kilgard to support its OpenGL guide
+      \cite{opengl-book}, tightly bundled to OpenGL and
+      almost always shipped together with it, which helps the programmer in all the
+      aforementioned tasks. In particular, it provides a cross-platform abstraction
+      for window creation and management, and for user event handling; it also
+      provides the programmer with high-level shape creation routines. A free
+      implementation and extension called
+      \emph{FreeGLUT}\footnote{http://freeglut.sourceforge.net/} exists and is used
+      worldwide as a replacement for GLUT, as the last version (3.7) of the latter dates
+      back to
+    1997;\footnote{http://www.ibiblio.org/pub/packages/development/graphics/glut/}}
+
+  \item{
+      \emph{Open Asset Import Library (\emph{Assimp})}, which is a support library which
+      can be used to import various mesh formats into a uniform, object-oriented (C++)
+      data structure. It is useful to generate at runtime a vertex list and rendering
+      data for objects
+      generated from external data, such as the objects' models used into this project
+      for object recognition purposes.
+    }
+\end{itemize}
+
+With this set of additions, OpenGL form a complete 3D graphics
+toolkit, which can be used for manipulation of complex meshes and data
+analysis in GUI frontends, and has bindings for several programming
+languages -- most notably C++ and Python.
+
+\subsection{PCL libraries}
+The \emph{Point Cloud Libraries (\emph{PCL})} are a set of libraries
+designed to operate on sparse datasets, representing samples of a
+continous function, called \emph{point clouds}. A typical example of usage for this, which is the
+main reason for its creation, is analysis of 3D points sampled from a
+real-world scene. From this, PCL is able to compute complex
+evaluations, the first of which is the reconstruction of the continous
+surface of the object as a mesh, based on points' samples.
+
+The main advantage of the PCL library for point clouds analysis comes
+from its extremely high performance: it is, in fact, totally written
+in C++ by means of templates, which makes it possible for the compiler
+to optimize each class instance knowing the specific context in which
+it will be created; doing mostly mathematical computation, it is in
+turn founded over the Eigen library, which is another C++,
+template-based library created mainly for linear algebra computation
+purposes. Both of these have, over years, heavily optimized their
+source code thanks to the community's contributions, and thus present
+to the user a simple API which is able to apply an enourmous set of
+heuristics over each process in order to simplify its computation; one
+of the easiest examples from this is the distinction that both Eigen
+and PCL do for sparse or dense datasets (i.e. matrices or point
+clouds): in these cases, most of the algorithm will make use of an
+efficient data structure to analyze the incoming data, but will skip
+the creation of it if the dataset is marked as sparse, as creating the
+data structure would actually have an higher computational cost with
+respect to point-per-point analysis.
+
+The main features taken from PCL into this project are its
+visualization toolkit, which provides -- in a manner which is similar
+to what OpenCV does -- an extremely simplified GUI toolkit from which
+pointclouds can be added and navigated, and its registration features
+-- mainly the Iterative Closest Point, which principles are explained
+into sec.~\ref{sec:icp}.
+
+Taken together, the three libraries here described form an important
+toolbox, which is in fact used by the biggest part of the research
+community and has become widespread with its adoption in bigger
+systems such as ROS\footnote{www.ros.org}, able to process and
+manipulate different kind of data. This project's standards,
+especially with respect to reference systems, as explained
+into sec.~\ref{sec:standards}, serve as a coherent mean of
+communication between all of these, which is somehow missing in the
+literature due to the special-purpose, demonstrative mission of most
+research projects of this type.

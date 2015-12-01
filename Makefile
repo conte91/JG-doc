@@ -10,6 +10,9 @@ report_twoside.pdf: report_twosided.tex report.tex
 	biber report_twosided
 	pdflatex report_twosided.tex
 
+summary.pdf: summary.tex
+	pdflatex summary.tex
+
 clean:
 	-rm *.toc *.lof *.lot *.aux *.log *.out *.bbl *.blg *.bcf *.xml
 

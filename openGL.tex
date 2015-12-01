@@ -12,59 +12,6 @@ process is analyzed more in details (sec. \ref{sec:opengl-rendering-process}), a
 implementation of objects' rendering for the purpose of this project is
 described keeping all of the previous into account (sec. \ref{sec:renderer3d}).
 
-\subsection{OpenGL graphics library} \label{sec:opengl-intro}
-OpenGL\footnote{www.opengl.org} is a free (GPL) software interface to graphics hardware \cite{opengl-book}. This
-library allows a programmer to build incredibly complex, interactive 3D graphics
-applications (a lot of modern PC games are an example) without the need of
-directly interfacing the graphics hardware, which in most of cases has an
-extremely complicated architecture and variegated set of features. Instead, a
-set of standard 3D graphics functions (\emph{API}) for the C programming
-language is exposed to the developer, and the hassle of linking these
-functions to the hardware is left to the manufacturer, who will provide its own
-optimized implementation of the library together with the hardware.
-
-Being industrial-level free software, this library has become very popular, and
-well-working implementations exist for most of the modern graphics hardware
-available nowadays. Also, it is highly portable (stripped-down versions of OpenGL
-called \emph{OpenGL-ES} exist for embedded systems and systems with limited
-resources in general, such as Android mobile phones); in this sense, OpenGL is
-a perfect fit for image processing systems requiring a 3D rendering feedback to
-work, like this one, in order to be easily ported and implemented in real-world
-applications.
-
-As a 3D graphics engine, and considering that it targets a wide range of devices, OpenGL only manages simple primitives' rendering, such
-as points', lines' and polygons'. It does \emph{not}, thus, implement
-high level tasks like window management or user input, which may be not even
-available on the system the application's running onto.
-
-However, a set of various complementary libraries exist, which can be used in
-synergy with OpenGL to provide such functionalities. The ones used during the
-course of this project are:
-
-\begin{itemize}
-  \item{\emph{The OpenGL Utility Toolkit
-      (\emph{GLUT})}\footnote{https://www.opengl.org/resources/libraries/glut/} a
-      nonfree library, written by Mark Kilgard to support its OpenGL guide
-      \cite{opengl-book}, tightly bundled to OpenGL and
-      almost always shipped together with it, which helps the programmer in all the
-      aforementioned tasks. In particular, it provides a cross-platform abstraction
-      for window creation and management, and for user event handling; it also
-      provides the programmer with high-level shape creation routines. A free
-      implementation and extension called
-      \emph{FreeGLUT}\footnote{http://freeglut.sourceforge.net/} exists and is used
-      worldwide as a replacement for GLUT, as the last version (3.7) of the latter dates
-      back to
-    1997;\footnote{http://www.ibiblio.org/pub/packages/development/graphics/glut/}}
-
-  \item{
-      \emph{Open Asset Import Library (\emph{Assimp})}, which is a support library which
-      can be used to import various mesh formats into a uniform, object-oriented (C++)
-      data structure. It is useful to generate at runtime a vertex list and rendering
-      data for objects
-      generated from external data, such as the objects' models used into this project
-      for object recognition purposes.
-    }
-\end{itemize}
 \subsection{Homogeneous coordinates} \label{sec:homogeneous-coordinates}
 Homogeneous coordinates were introduced by the famous mathematician August Ferdinand Möbius in
 \cite{homogeneous-coordinates}; they are a common way to represent points in

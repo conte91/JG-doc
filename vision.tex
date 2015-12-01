@@ -270,13 +270,63 @@ As the matches already provided a good estimation of the object's position, the
 iterative closest point algorithm explained into sec. \ref{sec:icp} can be
 applied. 
 
-First, a frame can be taken
-First, the point cloud %TODO
-for the scene is obtained as explained in sec. \ref{sec:cloud-reconstruction}.
+First, the point cloud for the scene is obtained as explained in sec. \ref{sec:cloud-reconstruction}.
+As explained, a scene's snapshot obtained by the precision depth
+sensor used and the alignement process is done upon it. In order to
+do this, the found match is rendered again into the position in which
+it would be as seen from the camera -- whose extrinsic caractheristics
+are known because of the fixed locations of the bin; if this was not
+the case, it would be enough to find it again at before rendering
+using the algorithms of sec.~\ref{sec:camera_calibration}, as they
+have neglibible cost with respect to the whole recognition pipeline.
 As the mask of the render has already been computed, it is exploited at this
-point and only the part of the scene corresponding to the actual object is
+point and only the part of the scene corresponding to the actual
+object, increased by a low margin, is
 transformed to a 3D point cloud.
 
 During the process of 3D reconstruction a lot of invalid values can be
 generated: these are the points for which the depth sensor failed to obtain a
-valid representation
+valid measurement, and are ignored from this same algorithm. Two kinds
+of values are dropped: those for which the depth measurement is
+outside the range specified into the camera's specifications, which
+is increased by a small margin to keep uncertainties into account, and
+those for which the camera actually reports a $NaN$ value (e.g. in
+case of a reflecting surface, for which the speckles patterns results
+too heavily distorted).
+
+Both the model's and the scene's cloud are moved to be in global
+coordinates after reconstruction; this is done by transforming them
+with the inverse of each extrinsic transformation.
+
+When this is done, it will be very probable that the two clouds will
+have different point densities, especially for the process of
+information dropping coming from the recognition pipeline. This could
+harm the premises of the ICP algorithm, as different point densities
+or missing points could cause wrong correspondances between points.
+
+To prevent this situation, after reconstruction and transformation,
+both the point clouds are evaluated and filtered through what is
+called a \emph{Voxel grid}. This filter creates a 3D grid of fixed
+size through all the 3D space occupied by the point cloud, and
+maintains the crossings onto the grid which correspond to the cells
+occupied by at least one input point. In practice, this means that the
+output of a voxel grid having a scattered point cloud as an input is
+an approximation of the same point cloud made with \emph{equally
+  spaced}, regular points. Using the latter instead of the first for
+the ICP algorithm results in benefits to the proper
+operation of the algorithm itself, as points' correspondance will
+lead to zones of the clouds that actually correspond perfectly into the 3D space.
+
+After tessellating the two point clouds, whose points are set in global
+coordinates, the resulting filter outputs are aligned using Iterative Closer Point: if the
+algorithm converges correctly, the cumulative transformation
+$T_{\text{final}}$ of the ICP is used to transform the initial guess for the object's
+  pose and obtain the final, refined pose estimation for the object.
+
+Summing up all the points presented into this chapter, the proposed
+system for object detection composes thus a complete system by its
+own: in particular, the recognition pipeline is fully automatized and
+can, starting from the two images taken from the cameras, arrive to
+the estimation of the pose of different objects with sub-millimetric
+precision. This system can thus be used with success into the solution
+of the stated grasping problem.

@@ -1,0 +1,49 @@
+The main purpose of the first part of this project, which is explained
+in detailed into this chapter, is the implementation and testing of a
+flexible, easy-to-use, and scalable system for multiple rigid objects' recognition.
+
+Although several methods have been proposed in the past, the research
+in this field is still very active; a lot of algorithms have been
+proposed in the past years, which can be distinguished in two
+categories: in the first big group of object recognition algorithms,
+either a set of salient points, called \emph{features}, of the image is
+computed, or statistical data is collected over a set of ranges into
+the image itself; then, the same operation is done for a model of the
+object, whose representation is either taken online in a process
+called \emph{training}, or given as an input into same standard
+format. In the second one, a set of \emph{templates} is extracted for
+each object which have to be recognized, which can be directly matched
+into the source image: in practice, each template is considered as it
+was a single object, and informations over the object which it refers
+to is retrieved only after some have matched, by associating metadata
+with each of them.
+
+Although template-matching algorithms do generally provide a good
+performance, in terms of recognition rate, they have found a hard way through
+the last years, especially in the field of high-frame-rates systems,
+mainly due to the relatively huge amount of data and training they require in
+order to work properly; a recent algorithm, called Line-MOD, has been
+proposed, which has the target to solve the main problems of speed and
+training time common of the other ones, while providing the same high
+recognition rate and low false-positive detection. Scope of this part
+of the project is thus also to evaluate the performance of this
+algorithm to find whether it is promising for a future application in contexts such as
+the one presented in sec.~\ref{sec:apc}. In order to do this and in
+the meantime keep the framework as modular and flexible as possible
+for future use, the  whole object detection system has been developed
+so that different recognition strategies can be assigned to each
+object, leaving Line-MOD as a default algorithm suitable in a lot of
+common cases.
+
+During the rest of this chapter, first an overview of the software and
+hardware tools used to solve the vision problem is done; then, the
+developed recognition system is explained in detail, with particular
+focus on how the OpenGL library works
+(sec.~\ref{sec:opengl-rendering}) and how it has been exploited to
+develop a system to programmaticaly train new objects and add them to
+a database with no effort (sec.~\ref{sec:training}). Finally, the
+Line-MOD algorithm used as a default for recognition is explained
+(sec.~\ref{sec:linemod}), together with its actual implementation into
+a full recognition pipeline (sec.~\ref{sec:linemod-pipeline}). The
+latter is the main interface from which the libraries built relative
+to this chapter can be called to perform no-effort recognition.
