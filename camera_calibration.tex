@@ -42,7 +42,7 @@ plane. \label{fig:intrinsics}}
 Examining the geometric properties of this system from fig. \ref{fig:intrinsics}, we can easily extract the
 transformation from a point $P_c(x_c,y_c,z_c)$ in the local coordinate system
 $X_cY_cZ_c$ to the corresponding point $P_p(u,v)$ in the image's coordinate
-system by applying trivial similar triangles' laws:
+ystem by applying trivial similar triangles' laws:
 
 \[
   \begin{array}{c}
@@ -134,7 +134,7 @@ the global coordinate system.
   =E^{-1}K^{-1}\left(\begin{array}{c}u\\v\\z_c\end{array}\right)
 \end{equation}
 
-\subsection{Calibration of camera parameters}
+\subsection{Calibration of camera parameters} \label{sec:camera-calibration}
 Calibration is the process of extracting the intrinsic and extrinsic
 camera matrix for a camera. It is done through the analysys of a serie of RGB and depth
 frames containing a single, known object with known size and features. In

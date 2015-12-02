@@ -9,6 +9,8 @@ style=numeric, %TODO ask
 \newcommand{\vmiddle}[1]{\begin{tabular}{@{}c@{}} {#1} \end{tabular}}
 \begin{document}
 \english
+\selectlanguage{english}
+\input{frontespaaace}
 \input{abstract}
 \tableofcontents
 \listoffigures
@@ -31,8 +33,8 @@ style=numeric, %TODO ask
 \input{gripper_modelling}
 \input{pose_generation}
 \input{grasp_strategy}
-\chapter{This section is just to fix TODO references, remove it after they
-disappear!} \label{sec:TODO}
+\chapter{Result analysis} \label{sec:results}
+\input{results}
 \input{demonstrate_score_function}
 \printbibliography
 \end{document}

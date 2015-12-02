@@ -1,0 +1,167 @@
+In this conclusive chapter, some of the most salient obtained results
+are presented. First, a brief overview of the important tests
+developed during the coding stage of the framework are presented;
+these include complete tests for almost every part or module of the
+system. After this, a qualitative analysis of the performance of both
+the vision and gripping modules is done; finally, some thoughts about
+the overall benefits introduced by this project and the possible
+improvements are stated. 
+
+\section{Developed tests and applications}
+Each part of the system has been extensively tested before moving to
+the next part; here are presented the most important tests and
+programs which have been created for the project. 
+
+First, I/O serialization methods have been created for each module;
+these are capable of creating and reading text files containing their
+own data structures, specified with the YAML format introduced into
+sec.~\ref{TODO}. Serialization is done in a recursive way, i.e. being
+each module capable of reading its own structure, to read the
+corresponding data members it is sufficient to use the standard OpenCV
+functions, which will in turn call the correct methods of each
+member's type. An example of the YAML data produced by
+the \pre{Camera} class when saving camera calibration data is given in
+app.~\ref{TODO}, containing the stored parameters for the Kinect
+camera used during the tests. 
+
+For camera modelling, two separate applications have been built, which
+implement the two algorithms described into
+sec.~\ref{sec:camera-calibration}. This separates the calibration
+training into two stages, one for calibrating the internal parameters
+and one for the extrinsics; this separation is useful as the internal
+parameters of a camera can be calibrated once for its whole lifetime,
+while the  extrinsic parameters can be quickly recomputed online for
+each view, or can be given from known information (e.g. for the
+precision camera used into this project, they can be obtained by
+knowing the pose of the robotic arm). Experiments have shown that the
+program is able to fit both parameters correctly, and in a good
+way. The already shown fig.~\ref{fig:extr_alignment}, is a screenshot
+taken from the extrinsic calibration software from real-world data. A
+special care had to be taken and is useful to know in order to
+calibrate the intrinsics parameters of the depth camera: as the only
+image source that can be used comes from the reflected speckle pattern
+caught by the infrared sensor, speckles are seen neatly by the
+infrared camera, which thus provides a very noisy image to the
+chessboard recognition algorithm; in order to fix this, it has been
+sufficient to fix a piece of very light paper in front of the infrared
+sensor while calibrating: in this way, the speckle pattern is blurred
+uniformly by the paper and a flat, greyscale image is seen by the sensor.
+
+After calibration, two different test programs can be run to check
+for the correct execution of the latter: the first informs the user
+about 3D coordinates of clicked points taken from a stream of images of
+the camera, while the second uses the 3D reconstruction module to show
+the user a 3D point cloud model of the scene the camera's looking at.
+
+Regarding the robot's movement, the main module which works on it uses
+the COMAU's C5GOpen libraries to communicate with the robot; the
+corresponding test makes the robot move in front of each bin in
+rotation, which can be used to check for both correct setup of the
+robot and correct configuration of the bins' reference frames.
+
+Numerous programs have been written to debug every part of the
+OpenGL rendering engine: each of these can render mostly a single
+mesh in different parts of the scene, the main difference between them
+being how the model is read and how the pose is generated: for
+example, one program can draw a single mesh -- which is used to test
+the rendering engine itself -- in sparse poses into the global
+coordinates, while another one can draw the same meshes by parsing 
+the folders used to describe the objects' set in order to test the
+abstraction layer going from the mesh concept to the more practical
+\emph{item} concept.
+
+The vision system is completed with the full training and recognition
+test programs, which are evaluated in detail into
+sec.~\ref{sec:result-tests}.
+
+Regarding the gripping systems, in turn, many programs have been
+created. The first set of them can test the shape generation: when
+writing these, shape visualization libraries have been created which
+complete the framework as a debugging API; another set of tests
+computes several shapes' intersection and outputs the corresponding
+volumes: the scenes it acts on are based onto ad-hoc CAD models, and
+this can be used to verify that the computed volumes are actually
+correct. Finally, a third set of tools tests the grasp generation
+algorithm, by creating a random virtual scene and trying to find the best
+grasp for several input items, and the overall operative strategy of
+the proposed solution, by emulating inputs from the lower-level
+modules and performing a simulation of the order in which the objects
+are taken.
+
+\section{Performance analysis of the implemented solution}
+Here follows a qualitative analysis of the behaviour of the main parts
+of the solution which are found at the upper level of abstraction,
+with focus of the training process, recognition pipeline, and pose
+generation algorithm.
+
+\subsection{Analysis of the Line-MOD training process}
+The training stage explained in sec.~\ref{sec:training} is performed
+by a standalone program, which reads models from an empty training
+folder, containing only YAML files describing the model properties
+(such as name and meshes), and creates for each a set of views of the
+object itself, from which the final set of Line-MOD templates is
+extracted. This is finally stored back into the training folder and
+will be used by the subsequent algorithms for model recognition.
+Three main factors have been found to influence heavily the performance of this algorithm: the used
+detector/trainer, the number of viewpoints, and the accuracy of the
+render. Each of this sets a speed/performance tradeoff which can
+increase the training time but allow a better success rate while
+recognizing.
+
+The first element to take into consideration is the number of points
+on which the templates are built. A higher number of points will lead
+to a proportionally higher computational cost, but will increase the
+chance that a grabbed view of a model corresponds to a known view. It
+is suggested in \cite{linemod-paper} that a good number of 
+for a working recognition system is about 2000. However, this result
+is obtained into an experiment in which the rough position of the
+object is known a-priori, having full vertical rotation range, but
+only 90° tilt rotation and half of the possible in-plane
+rotations. This is not acceptable for the solution of this problem,
+especially because of the presence of many cuboidal objects, which can
+be found lying in every orientation; thus, full coverage of the view
+sphere and of in-plane rotations is needed upon every dimension. Also,
+the Kinect used to perform recognition must stand quite away from the
+object and these are not big at all, being in the range
+$10\sim 20\unit{cm}$ Also, the Kinect used to perform recognition must
+stand quite away from the object and these are not big at all, being
+mainly in the range $10\sim 20\unit{cm}$ for each dimension. Thus, experiments have shown
+that a good candidate for the templates' number is in the range
+$15000\sim 20000$; this surely slows down the overall recognition speed,
+but this is hardly influential with respect to the other algorithms:
+instead, having full coverage of the viewpoints has been noticed to
+increase a lot the success rate, especially due to the small distance
+in radius between each trained viewpoints' sphere. The counterpart for
+this is a higher number of false positives, which have to be filtered
+from the hue filtering algorithm.
+
+The choice of the detector used by the training and recognition
+algorithm for each model is important too; two detectors have been
+implemented for the Line-MOD algorithm; the first is based on the
+original implementation found in \cite{linemod-paper}, while the
+second is a modified version of this, in which colour gradient
+features are not analyzed only onto the object's boundaries, but into
+the whole template image. Again, this choice conditions both the
+training speed, the recognition rate and the false positive one. In
+particular, the training and recognition speeds decrease a lot when
+the full analysis of the image is done, but the false positive rate is
+highly decreased. The recognition rate, for the average case, is not
+increased deeply by the use of this system, which is thus rather
+avoidable for most of the objects. The case in which the full image
+matching performs decisely better is in the recognition of weakly
+textured objects, with trivial shape factors, and poorly saturated
+colours. In such cases, the image gradient found on borders is flat,
+due to the low saturation of colours, and thus informations coming
+from the internal part of the object (text, images, etc.) can be vital
+for the proper operation of the algorithm, although at the cost of
+higher execution times.
+
+Finally, the usage of the improvements on the rendering quality
+explained into sec.~\ref{sec:antialiasing} help mainly by removing the noise on
+the border of the renders; this increases the computation time
+needed by the training algorithm, but has no impact at all on the
+recognition speed; at the same time, the recognition rate is slightly
+increased, and this improvement becomes important in the case of small
+or very far objects: in this case, the distortion brought by the
+missing antialiasing in renders is no more negligible with respect to
+the size of the templates themselves.
