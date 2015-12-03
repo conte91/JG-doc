@@ -1,0 +1,16 @@
+\chapter{Example input JSON file for the Amazon Picking Challenge} \label{app:json}
+JSON is a file interchange format, with a similar application scope of
+its well-known cousin, XML; like XML, it consists of a tree-like
+structure, delimited by braces, forms a set of key-node pairs, is which each node can be
+either a value (numerical, string, etc.), an array of nodes (delimited
+by square brackets), or another JSON tree. In the
+specifications of the Amazon Picking Challenge, it is used as the
+\emph{only} input for the operating robot, in order to describe to it the
+content of each known bin (under the \texttt{bin\_contents} subtree) and
+the required objects to take, together with the ID of the bin from
+which to take them (under the \pre{work\_order} array). Each element of
+the set of possible objects is assigned a unique ID.
+
+An example of JSON file follows.
+
+\listing{json_list.lst}

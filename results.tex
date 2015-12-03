@@ -1,6 +1,6 @@
 In this conclusive chapter, some of the most salient obtained results
 are presented. First, a brief overview of the important tests
-developed during the coding stage of the framework are presented;
+developed during the coding stage of the framework are described;
 these include complete tests for almost every part or module of the
 system. After this, a qualitative analysis of the performance of both
 the vision and gripping modules is done; finally, some thoughts about
@@ -27,7 +27,7 @@ camera used during the tests.
 For camera modelling, two separate applications have been built, which
 implement the two algorithms described into
 sec.~\ref{sec:camera-calibration}. This separates the calibration
-training into two stages, one for calibrating the internal parameters
+training into two stages, one for calibrating the intrinsic parameters
 and one for the extrinsics; this separation is useful as the internal
 parameters of a camera can be calibrated once for its whole lifetime,
 while the  extrinsic parameters can be quickly recomputed online for
@@ -80,7 +80,7 @@ writing these, shape visualization libraries have been created which
 complete the framework as a debugging API; another set of tests
 computes several shapes' intersection and outputs the corresponding
 volumes: the scenes it acts on are based onto ad-hoc CAD models, and
-this can be used to verify that the computed volumes are actually
+these can be used to verify that the computed volumes are actually
 correct. Finally, a third set of tools tests the grasp generation
 algorithm, by creating a random virtual scene and trying to find the best
 grasp for several input items, and the overall operative strategy of
@@ -112,7 +112,7 @@ The first element to take into consideration is the number of points
 on which the templates are built. A higher number of points will lead
 to a proportionally higher computational cost, but will increase the
 chance that a grabbed view of a model corresponds to a known view. It
-is suggested in \cite{linemod-paper} that a good number of 
+is suggested in \cite{linemod-paper} that a good number of these
 for a working recognition system is about 2000. However, this result
 is obtained into an experiment in which the rough position of the
 object is known a-priori, having full vertical rotation range, but
@@ -120,10 +120,7 @@ only 90° tilt rotation and half of the possible in-plane
 rotations. This is not acceptable for the solution of this problem,
 especially because of the presence of many cuboidal objects, which can
 be found lying in every orientation; thus, full coverage of the view
-sphere and of in-plane rotations is needed upon every dimension. Also,
-the Kinect used to perform recognition must stand quite away from the
-object and these are not big at all, being in the range
-$10\sim 20\unit{cm}$ Also, the Kinect used to perform recognition must
+sphere and of in-plane rotations is needed upon every dimension. Also, the Kinect used to perform recognition must
 stand quite away from the object and these are not big at all, being
 mainly in the range $10\sim 20\unit{cm}$ for each dimension. Thus, experiments have shown
 that a good candidate for the templates' number is in the range
@@ -164,4 +161,76 @@ recognition speed; at the same time, the recognition rate is slightly
 increased, and this improvement becomes important in the case of small
 or very far objects: in this case, the distortion brought by the
 missing antialiasing in renders is no more negligible with respect to
-the size of the templates themselves.
+the size of the templates themselves. This makes turning on full
+antialiasing a good choice for most of the applications.
+
+\subsection{Recognition performance of the Line-MOD pipeline}
+A set of tests have been done onto the Line-MOD pipeline in order to
+establish how it performs well for many different types of objects,
+including the ones from the object set of the Amazon Picking Challenge
+and some more taken as a reference. Results show an overall good
+performance, especially is the minimum recognition threshold is kept
+some points below $100\%$ (in these experiments, we used $97\%$ as a
+starting threshold, which can be lowered if needed by the pipeline as
+explained in sec.~\ref{sec:linemod-pipeline}); in this case, many
+false positives arise, which is a problem already observed for the
+Line-MOD algorithm in \ref{linemod-pipeline}, and thus justifies the
+need for the hue-based filtering used as a second step of the
+pipeline. However, this last filter is able to correctly filter out
+most of the false positives correctly, and the seldom remaining ones
+are usually dropped into the last part of the pipeline by the low
+cenvergence threshold of the ICP algorithm. The hue-based filter
+has been however found quite critical to tune for proper operation: in
+particular, it is important to tune the two thresholds for considering
+the pixels to be white or black in order to fit well the general
+illumination conditions of the experiment.
+
+From the experiments, it has been observed that the object set can be
+divided aproximately into four classes: the first is the case in which
+objects have bright colour, medium to big dimensions, and a
+non-standard shape, such as the bottle brush shown in the first part
+of fig.~\ref{fig:apc-object-sets}; the second and most populated one correspond to those
+objects which have standard cuboidal shapes, but still mantain
+well-saturated textures with patterns such as colour changes on the
+contour, like the board eraser of the same figure; these are mainly
+recognized correctly, but the false positive rate is increased
+significantly as many views don't bring sufficient depth information,
+being their faces seen as planes by the depth sensor; however, as
+explained before both the hue filter and the ICP alignment steps are
+usually able to drop all the false positives without relevant
+problems.
+
+The third object set is exemplified by the self-stick notes stack:
+these object have small dimensions and low-saturation foreground
+colours, such as bright yellow or grey. In this case, the background
+may become problematic, and a good tuning of the hue filter becomes
+necessary to avoid it accept false positives corresponding to portion
+of floor or furniture, as they often have low-saturated colours too
+and thus the contrast is minimal. For these objects, a solution which
+has been seen to improve a lot the performance is the use of the
+full-image detector instead of the default one: this makes it possible
+to recognize patterns, usually in the form of a logo, which are
+usually present on every everyday item.
+
+Finally, the last -- and most problematic -- set of object is the one,
+like the last one of fig.~\ref{fig:apc-object-sets}, which have big,
+flat surfaces, with dark, low-saturated colours and low-contrast
+textures on them. These items are rarely recognized properly by the
+detector, as the actual number of features on them is quite low and,
+being the feature themselves very weak, nondeterministic, especially
+due to the black background which impacts the gradient computation and
+adds noise to the depth measurements. For these objects, it would be
+appropriate to exploit the modularity features of the created
+framework to use another, more specific algorithm, for example by
+searching the image for low-saturation areas and fitting a cubical
+shape onto them with a variation of the RANSAC algorithm of \cite{ransac}.
+
+However, the bigger part of the common, daily usage items belong to
+one of the first three categories: this makes the Line-MOD based
+algorithm a good choice both for the purposes of the Amazon Picking
+Challenge and for usage as the default recognition pipeline of the
+framework.
+
+
+
+
