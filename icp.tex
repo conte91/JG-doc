@@ -7,7 +7,7 @@ corresponding to a part of the scene they refer to. After finding two sets of
 matches which are known to correspond each other into the scenes, the
 corresponding rigid transformation between the two can be computed. If one of the two
 point clouds is then transformed using this transformation, the matches will
-come in (almost) exact correspondance, and the two point clouds will then refer
+come in (almost) exact correspondence, and the two point clouds will then refer
 to the same, global coordinate system. This problem is known as
 \emph{point cloud registration} or \emph{point cloud alignment}. In this case,
 the point cloud which must be aligned to a fixed scene is called \emph{data
@@ -84,7 +84,7 @@ computational time of $O\left( N_p \text{log}\left(N_c\right) \right)$, and a
 worst-case one of $O\left( N_p N_c \right)$.
 
 \subsection{Best transformation choice} \label{sec:icp-best-transformation}
-After assigning to each point in the data cloud a correspondance within the
+After assigning to each point in the data cloud a correspondence within the
 model cloud, the problem of finding the best transformation, which is the one
 giving the least possible average squared distance between every point $p$ and
 its corresponding point $p_c$, has two well-known solutions. 
@@ -131,7 +131,7 @@ and $t$ must be found so that
 is minimized.
 
 It has been proven in \cite{extrinsics-algorithm}that the optimal rotation
-quaternion $q$ can be found by first computing the centers of mass of the data
+quaternion $q$ can be found by first computing the centres of mass of the data
 cloud $\vec{\mu_d}$ and of the reference cloud $\vec{\mu_r}$, then using these for
 computing the cross-covariance matrix $\Sigma_{p}$ between the two points' set:
 
@@ -161,7 +161,7 @@ q & = & \left\{ \vec{x} \in \text{Eigenvectors}(Q) :
 
 
 After finding the rotation matrix $R$ as described above, it has been shown that the best solution for $t$
-is for it to be the translation vector between the center of mass of the
+is for it to be the translation vector between the centre of mass of the
 reference cloud $\vec{M_{r}}$ and the one of the rotated
 data cloud $R\vec{M_d}$ 
 

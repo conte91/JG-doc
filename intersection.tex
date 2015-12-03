@@ -147,12 +147,12 @@ multiple-nodes meshes. This approach has a serie of advantages:
   \item{new, complex shapes which have to be implemented in future can be added
       to the primitive shapes as an extension, without the need of rebuilding
       the whole objects' database. This is the main advantage of using an
-      object-oriented approach based on polimorphism for the implementation of this
+      object-oriented approach based on polymorphism for the implementation of this
     part.}
 \end{itemize}
 
 For this project, four main shape types have been implemented, and with these
-the whole set of objects kept in consideration have been succesfully
+the whole set of objects kept in consideration have been successfully
 represented.
 
 Each primitive is represented by its shape type and a set of dimensions, which
@@ -174,7 +174,7 @@ extends over the $Z$ axis.
 A point $P$ (in normalized homogeneous coordinates, i.e. with $w=1$  can be checked for belonging a cuboid $C$ of dimensions $(W,H,D)$ and
 pose $A$ by first representing it into
 the cuboid's coordinate system, and then checking its coordinates to be into the
-cubes'dimensions:
+cubes'  dimensions:
 
 \begin{equation}
 P \in C \Leftrightarrow \begin{pmatrix}0\\0\\0\\1\end{pmatrix} \leq A^{-1}P \leq
@@ -193,7 +193,7 @@ all the three projections belong to the projection of the cube:
 \paragraph{A \emph{sphere}} is a shape representing a sphere of fixed radius,
 which is the only one of its dimensions. The reference system of the sphere, 
 which its transformation refers to, is fixed into the sphere's centre. Having
-central simmetry, the rotation part of the sphere's transformation will actually
+central symmetry, the rotation part of the sphere's transformation will actually
 be ignored.
 
 A point $P$ belongs to a sphere $S$ of radius $R$ if, after moving it into the
@@ -224,7 +224,7 @@ height:
 
 A line segment $L$ in the cylinder's reference system belongs to the same cylinder if its projection on the $XY$
 plane belongs to the base circle and its projection over the $Z$ axis belongs to
-the cilinder's height segment:
+the cylinder's height segment:
 
 \begin{equation}
   L \in C \Leftrightarrow
@@ -262,7 +262,7 @@ make use of them.
 After defining the score function $d(V_{\text{int}})$, the only remaining
 obstacle for computing the best possible grasping strategy is the actual
 computation of shapes' intersections. In order to complete this task the problem
-has been splitted on many levels: a trivial, resource-consuming -- but always
+has been split on many levels: a trivial, resource-consuming -- but always
 working -- algorithm to use whenever the actual volume must be computed and
 there is no known better way to do it, a serie of heuristic algorithms to use if
 the same problem can be brought to a closed-form, more efficient solution for
@@ -280,14 +280,14 @@ of the cube belongs to the other shape, the whole cube is considered to belong
 to the latter. The final intersection volume is brought by the sum of the
 volumes, actually approximating via Riemann's series the real value of the
 intersection, as if it was
-analitically computed by an integral. More in detail, each shape knows how to
+analytically computed by an integral. More in detail, each shape knows how to
 approximate both its surface and its volume at different levels; both these
 representations are returned by the shape as a serie of points, or \emph{point
 cloud}, which is the same representation used for visualization
 purposes in many of the test examples and most of the figures regarding this chapter. While the surface's points
 represent real points onto the surface of the 
 object, the volume's points are the centre of the approximating cubes described
-before. Each shape also knows how to analitically compute its total surface and
+before. Each shape also knows how to analytically compute its total surface and
 volume, which is a trivial geometric task for each primitive.
 
 For each representation, the \emph{level} $l$ of approximation is a representation
@@ -301,13 +301,13 @@ constraints are needed for the algorithm to work properly:
       $N_p$
       computed for a particular level (which is what the computational complexity of
       all of the algorithms used for intersections' computation depends linearly on)
-      is roughly, i.e. asimptotically, proportional to the square of the level in the
+      is roughly, i.e. asymptotically, proportional to the square of the level in the
       case of surface approximation, and to the cube of the level in the case of
       volume approximation. In simpler, though less precise, terms, this means that
       the level value affects the sampling distance $d$ that the shape will apply in each
       of its dimensions when computing itself; this can be used by the algorithms to
       control the precision/speed tradeoff which comes naturally from the
-      approximation of each intergral term with Riemann's series:
+      approximation of each integral term with Riemann's series:
 
       \begin{eqnarray}
         N_{p,\text{surface}}(l)& = & O(l^2) \\
@@ -325,7 +325,7 @@ constraints are needed for the algorithm to work properly:
       points to be as equally sampled as possible; although this constraint can be
       relaxed (it is not important that the points are \emph{exactly} equally
       spaced when approximating), it is important
-      that asimptotically the density of points $\frac{p}{V}$ generated by the approximation
+      that asymptotically the density of points $\frac{p}{V}$ generated by the approximation
       is the same in every neighbourhood of the shape's volume and surface, so
       that the approximation error becomes negligible if enough points are
       generated:
@@ -369,7 +369,7 @@ $l$ will then be
   V_{\text{int}}(l)=V_{\text{shape}} \frac{N_{\text{in}}}{N_p(l)}
 \end{equation}
 
-\subsection{Optimized volume computations for particular cases}
+\subsection{Optimised volume computations for particular cases}
 The method presented in sec. \ref{volume-via-points} is universally valid,
 being able to be applied for every combination of shapes. However, this is
 clearly not efficient if applied to large datasets; also, the computational
@@ -377,7 +377,7 @@ complexity increases cubically with the level of approximation as stated in
 eqn. \ref{volume-l-3}. Thus, when performing intersections for shapes for which
 a closed form solution is known, this is preferred. In this project the case of
 sphere-sphere intersection has been implemented as an example, but other cases
-can be easily added due to the polimorphic structure of the algorithm.
+can be easily added due to the polymorphic structure of the algorithm.
 
 The volume of the intersection of two spheres $S_1$ and $S_2$ can be reduced to three cases which only
 depend on the distance $d$ between the centres of the spheres and their radii
@@ -402,7 +402,7 @@ volume, the resulting speedup will be important.
 
 A sufficient and necessary condition for two shapes $S_1$ and $S_2$ to intersect is that, fixing
 one of the two, at least one point of the surface $B$ of the other must be contained
-into the first, or viceversa:
+into the first, or vice versa:
 
 \begin{equation} \label{eqn:no-surface-in-volume}
   V_{\text{int}}\left(S_1,S_2\right)\neq 0 \Leftrightarrow \left(\exists P \in
@@ -446,7 +446,7 @@ which actually represent the majority of cases.
 
 \subsection{Final volume intersection algorithm}
 The full algorithm used to compute shapes' intersections is stated
-now. This applied is succession all of the heuristic considerations
+now. This applies in succession all of the heuristic considerations
 stated in previous sections.\footnote{Most of these operations are
   actually, as already introduced, performed automatically into the
   implementation by the C++
@@ -472,7 +472,7 @@ When two shapes $S_1$ and $S_2$ have to be intersected, given their poses $P_1$ 
     object types, each heuristic consideration has to be written only
     once, thus avoiding code redundancy;}
   \item{If at least one of the heuristic algorithms of step 2
-    succeded, the intersection volume is set to $0$ and this algorithm
+    succeeded, the intersection volume is set to $0$ and this algorithm
     exits;}
   \item{If there is the possibility of and intersection, the surface
     representation of $S_2$ is obtained and it is checked to see
@@ -496,7 +496,7 @@ When two shapes $S_1$ and $S_2$ have to be intersected, given their poses $P_1$ 
     due to the properties of the surface approximation function; this
     means that although the previous steps, with a lower $l$, are
     discarded if no intersections are there, the wasted time will be
-    negligible with respect to the upcomping one, and so they introduced virtually no penalty;}
+    negligible with respect to the upcoming one, and so they introduced virtually no penalty;}
   \item{If at least one point of the surface is found which intersects
     the other shape, the actual count of these points is checked. If
     this is equal to the total number of points of the surface,

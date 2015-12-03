@@ -1,18 +1,18 @@
 \subsection{Shape modelling of the chosen gripper}
 After projecting the used gripper with a CAD application and producing it, the
 gripper has been modelled as a shape object of the type described in sec.
-\ref{sec:shapes}; naturally, it has been modeled as a compound.
+\ref{sec:shapes}; naturally, it has been modelled as a compound.
 
 After splitting the gripper into several parts, pose informations regarding
 different keypoints of each part have been
 extrapolated from the CAD application in order to obtain the transformation of
 each compound's part with respect to its parent; this allowed to easily build
-the model from scratch, and is indeed an approach that could easily be automatized by
+the model from scratch, and is indeed an approach that could easily be automatised by
 scripting is needed.
 
 The base flange of the gripper has been approximated to a cylinder of the same
 radius and height as the flange. Cuttings into the flange have been just
-ignored, which is a resonable approximation in terms of accuracy because 
+ignored, which is a reasonable approximation in terms of accuracy because 
 of the gripper's flange being big and seldom entering the object's bin.
 
 The gripper's main shaft can be represented with no error at all by a cylinder
@@ -32,11 +32,11 @@ the suckers have been represented with a cylinder of radius equal to the maximum
 tool's radius, while the pliers have been represented as a parallelepiped, its
 dimensions being the clamps' ones when it is fully open.
 
-When the gripper is connected to the robot, is is desiderable that the arm to
+When the gripper is connected to the robot, is is desirable that the arm to
 which it is attached never enters the objects' bin: it is too big to move
 properly inside it and the risks of damage would be too high. Thus, another
 cuboid has been added to the gripper's model, of dimensions equal to the arm's,
-which will avoid this case. The rest of the arm can't be properly modeled as
+which will avoid this case. The rest of the arm can't be properly modelled as
 the position of its shapes depend on the actual configuration of the robot's
 joints, but this will never be a problem, as the lower part of the robotic arm
 will never manage to reach the objects due to its limited length.

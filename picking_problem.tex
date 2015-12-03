@@ -65,7 +65,7 @@ Picking objects has thus always been a fundamental task for all of this
 scenarios, and can nowadays be considered fully solved in most
 cases. However, this are again all special-purpose solutions: most of
 these solution are built for situations in which the pose of the
-objects which will have to be manipulated is known a-priori, as they
+objects which will have to be manipulated is known a priori, as they
 are often coming from a preceding section of a production pipeline,
 and the set of movement which the object will have to do is fixed
 too. Thus, an ad-hoc solution can be studied and built, and the robot
@@ -73,7 +73,7 @@ can be thought, built and programmed to fulfil robustly its unique
 task. The more general manipulation scenario, in which a robot is able
 to be instructed at runtime to which object to take, how to manipulate
 it, and where to find it, is far beyond the current state of the art
-in robotics. Neverthless, research is growing more and more
+in robotics. Nevertheless, research is growing more and more
 quickly on this topic; it would, in fact, lead to virtually infinite
 new opportunities for a lot of fields. One of the most important use
 cases for this include
@@ -109,8 +109,8 @@ grippers are, obviously, not the only solution which is in
 development: other, original systems are in study, such as Empire
 Robotics' \emph{Versaball}: this gripper, which is shown in
 fig.~\ref{fig:versaball}, makes use of a latex sphere filled with thin
-sand, combined with a penumatic system which draws the internal air
-from the sphere, thus compressing the latex: if put onto the suface of
+sand, combined with a pneumatic system which draws the internal air
+from the sphere, thus compressing the latex: if put onto the surface of
 a small, hand-pickable object, the sand will make the latex fold
 perfectly the object, and when the pneumatic system is opened it will
 thus close with good strength on it.
@@ -151,19 +151,19 @@ multi-billionaire business mainly on big volumes on electronic sales
 of material goods, Amazon.com, Inc. has important and obvious interest
 in selling automatization\footnote{http://www.wired.com/2014/06/inside-amazon-warehouse/}. In fact, during the last years, it has
 added more and more automatic processes to their warehouses; in
-particular, the whole organizative process, which receives its
+particular, the whole organisational process, which receives its
 material orders directly from the Amazon web selling system, is
 managed totally in an automatic way, delivers its orders to the
 warehouses, manages the package delivery process, and thus provides
-the totality of the order fulfillment service. This huge organization,
+the totality of the order fulfilment service. This huge organization,
 however, still relies on a huge manpower (the Phoenix warehouses
 consist of an impressive $0.1\unit{km^2}$ structure, employing more
 than 1500 people); the long-term plans for it have been made evident
-in recent years, being to bring full independance from human intervention for the whole
+in recent years, being to bring full independence from human intervention for the whole
 sales process: in this sense, research has first focused on investing
 for the delivery path going from the destination warehouse to the
 buyer's address, with the big investment made in 2013 on drones-based
-systems, and the 2015 announce that deperible products would have been
+systems, and the 2015 announce that perishable products would have been
 made available to the final customer within one hour from order, which
 started to work in the early November, 2015, in major world's
 cities. As this research projects are quickly converging on a
@@ -203,7 +203,7 @@ but for the purpose of focusing on the problem it will be assumed
 that, when instructed to start, the robot will already be in front of
 its shelf;}
 \item{A shelf is made of several \emph{bins}, for which the location
-into the shelf is known a-priori; each bin can contain one or more
+into the shelf is known a priori; each bin can contain one or more
 instances of objects taken from a predefined set. For this challenge,
 a set of 25 items commonly sold on Amazon.com has been selected,
 composed mainly by everyday items such as books, children toys, and
@@ -218,7 +218,7 @@ startup, as a single JSON file (app.~\ref{app:json} contains an
 example of such files); for each item into the work order, both the object's ID and
 the bin from which the object has to be taken are specified; it is not
 possible that an item does not correspond to a real object into its
-bin (i.e. bin descriptions are consistant, and no checks are needed
+bin (i.e. bin descriptions are consistent, and no checks are needed
 for this);}
 \item{For each item into the work order, the robot will have to
 identify the object into the correct bin, pick it, and put it into a
@@ -227,14 +227,14 @@ object. It is very important that the robot does not break any of the
 objects into the shelf while operating, and that it never extracts an
 object for the shelf which is not present into the work order (if it
 does, it will have to put it back in the correct place); in this
-cases, it is preferrable for the robot to do nothing rather than
+cases, it is preferable for the robot to do nothing rather than
 committing an error.}
 \end{itemize}
 
 The rest of this project focuses on implementing a good strategy which
 would comply with these specifications; more constraints which have
 been included for this work have the rationale of preparing for a
-future partecipation in the same challenge for future editions
+future participation in the same challenge for future editions
 (starting with the 2016 one). With this in mind, both flexibility and
 scalability of the work has been kept in mind for all the design
 choices. This led to a software stack that is admittedly more

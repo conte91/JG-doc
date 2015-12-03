@@ -21,15 +21,15 @@ database) makes this technique come with an extremely high computational cost;
 on the other hand, statistical methods require a much longer training phase but
 usually base themselves, at recognition time, on a well-defined, very small set of
 data (e.g. hue histograms, network coefficients) which is not proportional to the number of elements
-analyzed during training phase. Also, template matching usually has poor
-results when the analyzed object has little texturing information, as a low
+analysed during training phase. Also, template matching usually has poor
+results when the analysed object has little texturing information, as a low
 number of features (\emph{keypoints}) can be extracted for each datum.
 
 The Line-MOD template matching algorithm was introduced in 2011 by
-Hintestoi{\ss}er, S. et al. (\cite{linemod-paper}) as a way to address these
+Hinterstoi{\ss}er, S. et al. (\cite{linemod-paper}) as a way to address these
 two problems of template matching approaches. It is based on a previous work by
 the same authors, \cite{linemod-origins}, in which the LINE algorithm was
-descripted, which solved both the problem of template matching velocity and
+descript, which solved both the problem of template matching velocity and
 texture-less detection, modified to give increased robustness and detection
 rates. Another, following work is described in details in sec.
 \ref{sec:linemod-pipeline}, and focuses on a practical application of these
@@ -51,7 +51,7 @@ used for defining salient features into the image is the value (and direction)
 of the image \emph{gradient} $\vec{\nabla} (u,v)$ for each pixel. This vector
 quantity is defined just like the discrete gradient for a function on the
 domain $N$ of natural numbers: by quantizing the differential operator, the
-discrete derivate of a function $f(x)$ is given by
+discrete derivative of a function $f(x)$ is given by
 
 \begin{equation}
 \frac{df(x)}{dx}=f(x+1)-f(x)
@@ -72,13 +72,13 @@ as usual as the vector of partial derivatives:
 f(u,v)\end{pmatrix}
 \end{eqnarray}
 
-This is, anyway, an informal definition, which neverthless finds its
+This is, anyway, an informal definition, which nevertheless finds its
 application being simple to implement and computationally cheap. More formal
 definitions exist, such the \emph{Sobel operator}, which instead of scanning the
 image for difference into a single direction linearly approximates the image as
 a continuous function -- it assumes, in fact, that the underlying intensity
 function for each channel is continuous
-and sampled only in correspondance of pixels' coordinates -- , and thus makes
+and sampled only in correspondence of pixels' coordinates -- , and thus makes
 uses of a convolution operator to approximate samples of the continuous
 gradient $G(f)$:
 
@@ -140,14 +140,14 @@ One of the most important features which can be extracted from a 3D
 image is points' normals. These, just like an image's gradient, form a
 vector field inside the image, representing the approximated normals
 to the surface for which the RGBD picture has been taken, sampled in
-correspondance of the image's pixel centres.
+correspondence of the image's pixel centres.
 
 Of course, starting with sampled (and noisy) data from the image
 implies that the normals which are computed are only a supposition:
 if it is assumed that the quantized depth value is sufficient to give
 informations about normals, the assumption must also be made that the
 function is almost flat in local neighbourhoods, otherwise the Nyquist
-theorem would be violated. With this assumption, neverthless, it is
+theorem would be violated. With this assumption, nevertheless, it is
 possible to approximate the planar surface corresponding to each pixel
 with a plane connecting the plane and each of its neighbour points,
 and from this compute the normal vector to each point.
@@ -166,7 +166,7 @@ stated before, so the pixel is discarded; this technique also removes
 possible outliers caused by bad sensor's performance.  The remaining pixels are put
 into a neighbourhood set $N_p$. 
 
-Considering the hypotetical plane which $p$ belongs to, its
+Considering the hypothetical plane which $p$ belongs to, its
 orientation can be described by means of the gradient $\nabla$ of the
 depth function $D(u,v)$. This, in turn, can be approximated by using first-order
 Taylor expansion over the $(u,v)$ coordinate. For every point $p_2 \in N_p$:
@@ -174,7 +174,7 @@ Taylor expansion over the $(u,v)$ coordinate. For every point $p_2 \in N_p$:
 \begin{eqnarray}
   p_2 & = & \begin{pmatrix} u_2 \\ v_2 
   \end{pmatrix} \\
-  D(p_2)-D(p) & = & dp^{\tau}\nabla D (p) + o (p) \text{(taylor
+  D(p_2)-D(p) & = & dp^{\tau}\nabla D (p) + o (p) \text{(Taylor
     expansion)} \label{eqn:taylor-depth-expansion}\\
   \nabla d(u,v) \approx \begin{pmatrix} \frac{\partial d(u,v)}{\partial u}
     \\ \frac{\partial d(u,v)}{\partial v}
@@ -220,7 +220,7 @@ The main innovation introduced by \cite{linemod-origins}, and thus by
 a novel, binary representation for templates' data. This
 representation provides both fast matching time and robustness to small
 deformation of the objects (or pose changes with respect to the
-template's ground pose), as it spreads every feature into its surronding
+template's ground pose), as it spreads every feature into its surrounding
 area, thus making it possible to detect them even in the case in which
 they perform a relative movement between each other.
 
@@ -250,7 +250,7 @@ sec.~\ref{sec:linemod-depth}, for which good computation algorithms have
 been already stated.
 
 Before quantization, every feature is discarded if it is not strong
-enough, i.e. if its corresponding vector's magnitue is less that a
+enough, i.e. if its corresponding vector's magnitude is less that a
 threshold $t_{filter}$. This helps too keep only the most important
 features into the image, which is important as the feature's magnitude
 will be flattened in the following steps.
@@ -266,7 +266,7 @@ image) channels, and only the gradient with the strongest absolute
 magnitude is kept. The result of this last step is a gradient which is
 much more descriptive of the actual image, with respect to the
 standardized technique of computing the gradient over the
-corresponding greyscale image: as it can be seen from
+corresponding grayscale image: as it can be seen from
 fig. \ref{fig:duck-gradient}, in which the gradient has been computed
 over a duck-toy image using both this and the standard algorithms,
 borders are neatly identified: this approach is thus more appropriate for
@@ -291,7 +291,7 @@ from the template will be compatible with the matching one,
 independently of illumination changes. Second, by not taking into
 account the way of the gradient, it will be valid both if the shape
 stands on a dark background, and if it stands on a clear background:
-the gradient will, in this case, mantain its module and direction and
+the gradient will, in this case, maintain its module and direction and
 only change its way, which will be discarded.
 
 Regarding normals' quantization, the same considerations can be
@@ -316,7 +316,7 @@ distances, after computing each pixel's normal vector and assigning a
 quantized value to it, a convolutionary filter is applied to the whole
 image: for each pixel, the local $5\times 5$ neighbourhood is
 considered, and to that pixel is assigned, as a final depth value, the
-sample that occours most frequently into it (nulled normal vectors are
+sample that occurs most frequently into it (nulled normal vectors are
 not considered at this step). This is useful as,
 considering the surfaces as mostly smooth over a small area (sudden
 changes in depth have been already removed by the normals' computation
@@ -351,7 +351,7 @@ normal orientation, or a custom one, is assigned to a $N$-bit value
 the value having a $1$ into one of its bits and $0$ into the other
 ones: this allows a unique representation of both single values and
 set of values. After this,
-the values are ``spreaded'' in the neighbourhood of their corresponding
+the values are ``spread'' in the neighbourhood of their corresponding
 pixel. In simple term, each binary pixel from the previous step is
 transformed into a binary pixel containing informations about which of
 the quantization levels are present into the neighbourhood of size
@@ -368,7 +368,7 @@ the adjacent pixels.
 
 Spreading pixels in this way has the advantage of introducing at no
 cost a good flexibility and robustness in terms of rigid deformation:
-in fact, it mantains locality of features, but at the same time
+in fact, it maintains locality of features, but at the same time
 permits to match features with a good margin of skew: the value of $T$
 can be reduced if the algorithm is thought to be too permissive, but
 it should never be deleted as this would cause all features to be
@@ -376,7 +376,7 @@ fixed to their pixel, which would cause obvious problems -- at least
 due to the quantization error of the camera in terms of $(u,v)$
 coordinates.
 
-When the most important features have been spreaded in their surronding
+When the most important features have been spread in their surrounding
 area, non-null pixels are left; this is the final result of the
 template creation process, and the corresponding template can be
 stored in memory for future usage. It is important to notice that a
@@ -439,7 +439,7 @@ neighbour pixels in $T$ with maximum distance $r$ is taken, and these values are
       (p,p_2) , p_2 \in P(c\dots c+r) \right\} \right) }
 \end{equation}
 
-Althought similarity functions can be customized, the main ones used
+Although similarity functions can be customized, the main ones used
 by the Line-MOD algorithm consider the difference of direction between
 corresponding pixels:
 
@@ -471,9 +471,9 @@ to which each pixel in the image will be matched, is actually really low; if,
 for example, 8 bins are used to quantize values, after spreading the
 binary representation of each pixel will be 8 bits, and thus contain
 64 possible values. It is thus perfectly feasible to do a one-shot,
-a-priori computation of the score function $S$ for each possible
-combination of input values. The spreaded image $I$ can be, in this way,
-tranformed into another serie of images $\tau_i(I), i \in 1 \dots 2^{n_0}$, resorting a lookup table, in
+a priori computation of the score function $S$ for each possible
+combination of input values. The spread image $I$ can be, in this way,
+transformed into another serie of images $\tau_i(I), i \in 1 \dots 2^{n_0}$, resorting a lookup table, in
 which each pixel corresponds to a list of values for $S$ which can be
 easily matched with each possible value into the template $T$ by only
 indexing it. Once this lookup tables has been built, the total

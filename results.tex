@@ -28,7 +28,7 @@ For camera modelling, two separate applications have been built, which
 implement the two algorithms described into
 sec.~\ref{sec:camera-calibration}. This separates the calibration
 training into two stages, one for calibrating the intrinsic parameters
-and one for the extrinsics; this separation is useful as the internal
+and one for the extrinsic; this separation is useful as the internal
 parameters of a camera can be calibrated once for its whole lifetime,
 while the  extrinsic parameters can be quickly recomputed online for
 each view, or can be given from known information (e.g. for the
@@ -38,14 +38,14 @@ program is able to fit both parameters correctly, and in a good
 way. The already shown fig.~\ref{fig:extr_alignment}, is a screenshot
 taken from the extrinsic calibration software from real-world data. A
 special care had to be taken and is useful to know in order to
-calibrate the intrinsics parameters of the depth camera: as the only
+calibrate the intrinsic parameters of the depth camera: as the only
 image source that can be used comes from the reflected speckle pattern
 caught by the infrared sensor, speckles are seen neatly by the
 infrared camera, which thus provides a very noisy image to the
 chessboard recognition algorithm; in order to fix this, it has been
 sufficient to fix a piece of very light paper in front of the infrared
 sensor while calibrating: in this way, the speckle pattern is blurred
-uniformly by the paper and a flat, greyscale image is seen by the sensor.
+uniformly by the paper and a flat, grayscale image is seen by the sensor.
 
 After calibration, two different test programs can be run to check
 for the correct execution of the latter: the first informs the user
@@ -115,7 +115,7 @@ chance that a grabbed view of a model corresponds to a known view. It
 is suggested in \cite{linemod-paper} that a good number of these
 for a working recognition system is about 2000. However, this result
 is obtained into an experiment in which the rough position of the
-object is known a-priori, having full vertical rotation range, but
+object is known a priori, having full vertical rotation range, but
 only 90° tilt rotation and half of the possible in-plane
 rotations. This is not acceptable for the solution of this problem,
 especially because of the presence of many cuboidal objects, which can
@@ -137,7 +137,7 @@ algorithm for each model is important too; two detectors have been
 implemented for the Line-MOD algorithm; the first is based on the
 original implementation found in \cite{linemod-paper}, while the
 second is a modified version of this, in which colour gradient
-features are not analyzed only onto the object's boundaries, but into
+features are not analysed only onto the object's boundaries, but into
 the whole template image. Again, this choice conditions both the
 training speed, the recognition rate and the false positive one. In
 particular, the training and recognition speeds decrease a lot when
@@ -145,7 +145,7 @@ the full analysis of the image is done, but the false positive rate is
 highly decreased. The recognition rate, for the average case, is not
 increased deeply by the use of this system, which is thus rather
 avoidable for most of the objects. The case in which the full image
-matching performs decisely better is in the recognition of weakly
+matching performs decisively better is in the recognition of weakly
 textured objects, with trivial shape factors, and poorly saturated
 colours. In such cases, the image gradient found on borders is flat,
 due to the low saturation of colours, and thus informations coming
@@ -179,18 +179,18 @@ need for the hue-based filtering used as a second step of the
 pipeline. However, this last filter is able to correctly filter out
 most of the false positives correctly, and the seldom remaining ones
 are usually dropped into the last part of the pipeline by the low
-cenvergence threshold of the ICP algorithm. The hue-based filter
+convergence threshold of the ICP algorithm. The hue-based filter
 has been however found quite critical to tune for proper operation: in
 particular, it is important to tune the two thresholds for considering
 the pixels to be white or black in order to fit well the general
 illumination conditions of the experiment.
 
 From the experiments, it has been observed that the object set can be
-divided aproximately into four classes: the first is the case in which
+divided approximately into four classes: the first is the case in which
 objects have bright colour, medium to big dimensions, and a
 non-standard shape, such as the bottle brush shown in the first part
 of fig.~\ref{fig:apc-object-sets}; the second and most populated one correspond to those
-objects which have standard cuboidal shapes, but still mantain
+objects which have standard cuboidal shapes, but still maintain
 well-saturated textures with patterns such as colour changes on the
 contour, like the board eraser of the same figure; these are mainly
 recognized correctly, but the false positive rate is increased
@@ -248,8 +248,8 @@ frameworks regarding this topic; as such, it is also the one which is
 most in beta stage. However, the obtained results look promising:
 first and foremost, the best grasping pose is correctly generated for
 every scene for which the system has been tested. In particular, the
-algorithm used for pose constraining succeds in forcing the gripper to
-an arbitrary position without making it assume innatural poses, which
+algorithm used for pose constraining succeeds in forcing the gripper to
+an arbitrary position without making it assume unnatural poses, which
 is particularly important for a small robotic arm such as the COMAU's
 Racer999 used into this project.
 After tuning the parameters used by each heuristic, it can be seen how

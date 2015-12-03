@@ -1,24 +1,24 @@
 \section{Camera modelling} \label{sec:camera_modelling}
 A central problem when working with camera-generated images and 3D models is
 correctly mapping 3D points in camera (and world) frames into 2D points on the
-acquired camera's image and viceversa. In particular, the capability to map
+acquired camera's image and vice versa. In particular, the capability to map
 points of the world to a generalized camera model in a realistic way allows all
-the algorithms, such as point cloud alignement, to work within a generalized,
+the algorithms, such as point cloud alignment, to work within a generalized,
 global coordinate system, which remains valid also if cameras are moved around
 within the scene and is camera-independent: this means that different cameras
-can be used in order to maximimize the peculiarities of each. Also, virtual
+can be used in order to maximize the peculiarities of each. Also, virtual
 renders can be done using the same model in order to correctly template-match
 the chosen data.  A \emph{pinhole} camera model can be used for this task, and
 provides the correct approximation for both RGB cameras and depth-capable ones.
 
 \subsection{Pinhole model for registered RGBD cameras}\label{sec:intrinsics}
-A camera, be it a digital camera or the human eye, can be modeled by
+A camera, be it a digital camera or the human eye, can be modelled by
 considering the path the light coming from a point will take when
 captured. By approximating the camera's objective with a single point (hole),
 light rays come onto projective plane (where the light sensor is), which is at a
 distance $f$ (called \emph{focal length}) from the hole of the camera; light
 travels with central
-simmetry with respect to the position of the point in world coordinates. By
+symmetry with respect to the position of the point in world coordinates. By
 rotating the $(u,v)$ reference frame of the image so that it has the same
 orientation as the image seen by the camera \footnote{Notice that the image
   coordinate system the $V$ axis is pointing downwards; this is coherent both
@@ -62,7 +62,7 @@ system by applying trivial similar triangles' laws:
 
 Here, $\lambda _x$ and $\lambda _y$ are camera-dependant ratios between the
 physical sensor's dimensions and its horizontal and vertical resolution, in
-order to map coordinates from meters to pixels. These can be merged into $f$ to
+order to map coordinates from metres to pixels. These can be merged into $f$ to
 get $f_x$ and $f_y$.
 
 Also, as we are assuming to work with a registered RGBD image, $z$ coordinate is
@@ -136,7 +136,7 @@ the global coordinate system.
 
 \subsection{Calibration of camera parameters} \label{sec:camera-calibration}
 Calibration is the process of extracting the intrinsic and extrinsic
-camera matrix for a camera. It is done through the analysys of a serie of RGB and depth
+camera matrix for a camera. It is done through the analysis of a serie of RGB and depth
 frames containing a single, known object with known size and features. In
 particular, a big chessboard pattern has been chosen for this work.
 
@@ -150,19 +150,19 @@ fitness function considering the relative position between these features. Care
 must be paid in order to cover the whole camera space when taking frames, thus
 minimizing the total error on the intrinsic matrix computation.
 
-In order to compute efficiently the extrinsics matrix, an original program has
+In order to compute efficiently the extrinsic matrix, an original program has
 been developed in order to exploit depth information too, which is not used at
 all by OpenCV's builtins. First, the chessboard corners are located using the RGB
 channels of the image. After this, they are sorted so that the point with the
 lower $u$ and higher $v$, i.e. the one in the bottom-left corner, is point
 number 0, and proceeding left to right. Each point is then mapped to its 3D
-camera coodinates $(x_c,y_c,z_c)$ using equation \ref{eqn:intrinsics}. 
+camera coordinates $(x_c,y_c,z_c)$ using equation \ref{eqn:intrinsics}. 
 
 Points associations between camera and global coordinates are done
 bidirectionally: point 0 is associated to global origin, and point N to global
 coordinate $(x_n, y_n, 0)$.
 
-As points' correspondances are univocal, we can use the ideas presented in
+As points' correspondences are univocal, we can use the ideas presented in
 \cite{extrinsics-algorithm}, which introduce a closed-form algorithm for finding
 the optimal transformation between the points. First, we find the two points sets' relative
 translation by computing the distance vector between the points' centroids:

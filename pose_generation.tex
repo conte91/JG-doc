@@ -21,7 +21,7 @@ for sure. In this case, both poses would be added to the grasp list, but the
 latter would be preferred if both would not make the gripper collide with the
 rest of the scene.
 
-The pose generation has been splitted into two, minor problems: indentifying a
+The pose generation has been split into two, minor problems: identifying a
 set of points onto the object which can be used for efficient grasping, and
 assigning to each point a reference frame into the gripper's model; after these
 informations have been combined, the desired gripping pose is well-defined, as the
@@ -33,12 +33,12 @@ reference frame can be solved by exploiting the geometric properties of the
 object itself, and this makes the algorithm agnostic with respect to the actual
 gripper's shape and thus more flexible and general.
 
-The point of connection between the two subproblems has been constrainted at the
+The point of connection between the two subproblems has been constrained at the
 implementation's level for simplicity's sake: all of the generated pose
 points will be associated to a vector at generation time. This vector will
 coincide with the tool's $Z$ axis at the time of pose binding. When describing
 the pose of the tools associated with a certain set of gripping poses, it will
-be sufficient to set their $Z$ axis into the operative direction (e.g. suiction
+be sufficient to set their $Z$ axis into the operative direction (e.g. suction
 direction for suckers) in order to have the generation algorithm automatically
 bind points to an actual gripper's pose.
 
@@ -54,7 +54,7 @@ failure. With this in mind, a good preference score can be obtained as the
 squared distance from the gripping point $\vec{p}$ to the centre $\vec{c}$ of the surface:
 
 \begin{equation}
-P_{g}=(\vec{p}-\vec{c})(\vec{p}-vec{c})^\tau
+P_{g}=(\vec{p}-\vec{c})(\vec{p}-\vec{c})^\tau
 \end{equation}
 
 Regarding the pose's orientation, the $Z$ axis is well-defined, as it will
@@ -147,17 +147,17 @@ pose independently when grasping. This is particularly useful in the
 case as this in which different tools have to be associated to a set
 of poses generated for a same object: for a sucker, for example, the
 in-plane rotation is totally non influential, as suckers have
-rotational simmetry; for the gripper hands, instead, grasp direction
+rotational symmetry; for the gripper hands, instead, grasp direction
 must be obviously constrained, otherwise the grasp will not be effective.
 
-When generating poses, each sets a firm contraint over the gripping
+When generating poses, each sets a firm constraint over the gripping
 tool's $Z$ axis, as described in
 sec.~\ref{sec:pose-generation-line-plane}; if the poses are generated
 on a plane, this is supposed to be big enough for the other directions
 to be considered equally important: thus, no constraints are set
 neither for the $X$ nor for the $Y$ axis. On the other hand,
 nonetheless, generating poses over a straight line segment requires
-defining a gripping plane, and will be probabily used for grasping
+defining a gripping plane, and will be probably used for grasping
 over narrow regions: thus, a vector constraining the $X$ axis is set;
 this will be both used to constrain the gripper tool and to define the
 plane to which this narrow surface belongs, which can be used in turn
@@ -170,7 +170,7 @@ matrix for the tool in object coordinates.
 The chosen default strategy for choosing among the possible tool's
 configurations is to assign to the gripper a rotational-only frame, called \emph{base
   frame}, which corresponds to the preferred pose $R_{\text{ideal}}$ of the gripper in
-global coodinates; in an ideal situation, the gripper will keep its
+global coordinates; in an ideal situation, the gripper will keep its
 preferred orientation and the tool will be aligned to the picking
 axes. If, however, this is not possible, the minimal rotation will be
 found which aligns the ideal frame with a valid one.
@@ -240,11 +240,11 @@ tool with respect to the object's coordinate system:
   R_{t,\text{ideal}} &=& R_{t,b} R_o^{-1} R_{b} \\
 \end{eqnarray}
 
-This transformation matrix is applied to the tools's $\vec{Z_t}$ axis to found
+This transformation matrix is applied to the tools' $\vec{Z_t}$ axis to found
 were it would land into an ideal situation:
 
 \begin{equation}
-  \vec{Z_{t,\text{ideal}}}  = R_{t,\text{ideal}}\begin{pmatrix}0\\0\\1
+  \vec{Z}_{t,\text{ideal}}  = R_{t,\text{ideal}}\begin{pmatrix}0\\0\\1
   \end{pmatrix}
 \end{equation}
 
@@ -254,21 +254,21 @@ both the angle and the axis of the minimum rotation between the two:
 \begin{eqnarray}
   \alpha &=& \left\{
   \begin{array}{lcr}
-    0 & \text{when} & \vec{Z_{t,\text{ideal}}} \approx
-    \vec{Z_{t,\text{real}}} ,\\
-    \pi & \text{when} & \vec{Z_{t,\text{ideal}}} \approx
-    -\vec{Z_{t,\text{real}}} ,\\
+    0 & \text{when} & \vec{Z}_{t,\text{ideal}} \approx
+    \vec{Z}_{t,\text{real}} ,\\
+    \pi & \text{when} & \vec{Z}_{t,\text{ideal}} \approx
+    -\vec{Z}_{t,\text{real}} ,\\
     \cos^{-1}\left(
-    \vec{Z_{t,\text{ideal}}}\vec{Z_{t,\text{real}}}^{\tau}  \right) &
+    \vec{Z}_{t,\text{ideal}}\vec{Z}_{t,\text{real}}^{\tau}  \right) &
     & \text{otherwise.}
   \end{array} \right. \\
   \vec{V_{\text{axis}}} &=& \left\{
   \begin{array}{lcr}
     \begin{pmatrix}
       1\\0\\0
-    \end{pmatrix} & \text{when} & \vec{Z_{t,\text{ideal}}} \approx
-    \pm \vec{Z_{t,\text{real}}}, \\
-    \vec{Z_{\text{ideal}}} \times \vec{Z_{\text{real}}} &
+    \end{pmatrix} & \text{when} & \vec{Z}_{t,\text{ideal}} \approx
+    \pm \vec{Z}_{t,\text{real}}, \\
+    \vec{Z}_{\text{ideal}} \times \vec{Z}_{\text{real}} &
     & \text{otherwise.} 
   \end{array}\right.
 \end{eqnarray}
@@ -281,21 +281,23 @@ however, the $\vec{X}$ vector as been chosen always for simplicity's sake.
 After obtaining a representation of the minimum rotation  that
 aligns the ideal tool $Z$ axis with the correct one, it can be applied
 to the whole ideal tool orientation, computed at the start of this
-process, to obtain the correct alignement of the tool in object
+process, to obtain the correct alignment of the tool in object
 coordinates.
 
 \begin{equation}
   R_t=\text{Rot}(\alpha,V_{\text{axis}}) R_{t,\text{ideal}}
 \end{equation}
 
-When a rotation matrix has been obtained with any of the methords
-decribed before, the whole tool pose, represented as an affine
+When a rotation matrix has been obtained with any of the methods
+described before, the whole tool pose, represented as an affine
 transformation, can be obtained by knowing the attach point $T_g$ of
 the grasp, as it is stored into the pose information: 
 
 \begin{equation}
   P_{\text{tool}}=\left( \begin{array}{ccc|c}
-    \multicolumn{3}{c}{R_t} & T_g \\
+    &&& \\
+    &R_t& & T_g \\
+    &&& \\
     \hline 
     0 & 0 & 0 & 1
   \end{array} \right)

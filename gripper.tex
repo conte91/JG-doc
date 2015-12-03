@@ -1,12 +1,12 @@
 \section{Gripper model}
 In this section the choice of the gripper mounted on the test robot is detailed
-and explained. The variancy within the dataset of chosen objects to grasp being
+and explained. The variance within the dataset of chosen objects to grasp being
 so large, the chosen gripper has been chosen in order to be as general as
-possible, which is the main reason between most of the projectual choices behind
+possible, which is the main reason between most of the planning choices behind
 it.
 
 The gripper consists of a mounting flange to quickly mount and
-dismount it on the robot's base, a aluminum shaft to let the gripper enter
+dismount it on the robot's base, a aluminium shaft to let the gripper enter
 easily into the objects' bin, and a serie of picking tools attached to the end
 of the shaft.
 
@@ -23,7 +23,7 @@ six mounting holes provide a solid basement for the gripper's shaft.
   Racer999's standard mounting holes and plug for air feeding. \label{fig:mounting-flange}}
 \end{figure}
 
-The shaft is composed of a simple aluminum tube, which is both resistant enough
+The shaft is composed of a simple aluminium tube, which is both resistant enough
 to hold the picking tools and picked object without damage, and slim enough to
 fit the bin from which the objects will be picked. This is necessary as the
 base of the robot, being it COMAU Racer999 as in this use case or another,
@@ -46,7 +46,7 @@ lot more options for picking poses, at the expense of worsened stability of
 the grasp, especially during object's movement, due to the weaker sucking
 strength. On the front side of the shaft, also, a picking plier is applied,
 which is needed for the smallest or thin objects, and more in general for
-every objects for which suiction can't be applied: books, for example, can't be
+every objects for which suction can't be applied: books, for example, can't be
 picked properly with sucker as opening their pages could result in damage;
 objects with irregular shape, also, wouldn't feel enough force because of air
 losses and thus need to be picked by the closing clamp.
@@ -58,12 +58,12 @@ present for supplies.
 
 The suckers and the plier are commanded electrically by onboard relays; these
 are driven by the robot's firmware. A software has been implemented using
-COMAU's propetary language, \emph{PDL2}, as one of the main processes running on the
+COMAU's proprietary language, \emph{PDL2}, as one of the main processes running on the
 robot. using PDL2's APIs, the software implements a simple TCP server, which
 listens for commands and toggles the gripper between five possible
 configurations: in the first one (reset), the gripper just remains idle and all
 the relays are shut off. This is the main state used during robot's
-movimentation. In the three next ones (close), the gripper closes all the relays
+movement. In the three next ones (close), the gripper closes all the relays
 in forward direction, making the plier close and the suckers start. The air
 compression's strength can been controlled onboard for both the suckers at the
 same time, by operating onto the air's closing valve. In the last state (open),

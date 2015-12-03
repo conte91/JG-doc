@@ -19,7 +19,7 @@ in particular, the stereoscopic (or \emph{binocular}) system -- i.e., emulating 
 of two different cameras -- has been widely studied and used, particularly into
 the robotics' field, leading to
 results such as \cite{stereo-vision-robot}; using this system, images taken
-from two cameras are first scanned for correspondant, infuential features
+from two cameras are first scanned for correspondent, influential features
 (\emph{keypoints}); pose information for each keypoint is then extracted from
 the geometrical properties of the system in what is called \emph{triangulation}
 as shown in fig. \ref{fig:stereo-triangulate}.
@@ -36,7 +36,7 @@ pose estimation of objects. Advantages of using depth sensors instead of
 stereoscopic cameras include:
 \begin{itemize}
   \item{Stereoscopic cameras can't produce an image with depth information for
-      each pixel: in fact, this system is optimized for measuring depth over a
+      each pixel: in fact, this system is optimised for measuring depth over a
       small subset of the image (the keypoints), while completely ignoring the
       rest of the pixels. This comes as a natural consequence of the fact that
       features must be matched together in order to produce a depth information,
@@ -49,14 +49,14 @@ stereoscopic cameras include:
       geometrical properties of the searched object, and must apply strong data
       filters in order not to have a high number of outliers; on the other hand,
       good depth sensors such as Occipital's Structure have an average error of
-    some fractions of millimeter;}
+    some fractions of millimetre;}
   \item{Searching for matches into images in order to obtain good precision in
       stereoscopic vision is computationally expensive; also, effectiveness of
       these algorithms suffers from common RGB vision problems such as
     illumination changes or weakly textured images.}
 \end{itemize}
 
-Obviously, depth sensors have their disadvanteges too: the most problematic one
+Obviously, depth sensors have their disadvantages too: the most problematic one
 is usually their very limited range of operation. For example, Microsoft
 Kinect's Primesense module can sense in a range going from about $80\unit{cm}$
 to about $3\unit{m}$; this makes it useless to adopt a visual depth sensor as
@@ -66,7 +66,7 @@ virtually no limit (except for focal loss) to the maximum depth it can sense;
 this is the main reason for which stereoscopic vision is preferred for
 autonomous robots, smart-cities, or search-and-rescue applications. Anyway, this
 limited range is adequate for gripping purposes, as the objects will ordinarily
-stand fixed within a range of one to two meters from the robotic arm.
+stand fixed within a range of one to two metres from the robotic arm.
 
 For this project, two different type of depth cameras have been used: the first
 is Microsoft Kinect, a common camera which can merge together both depth and RGB
@@ -96,7 +96,7 @@ information about this kind of technology.
 The idea behind structured light sensors is the use of a strong infrared projector
 which can draw a known pattern onto the scene. Being made of infrared light,
 the pattern will not disturb any RGB camera which is operating in parallel with
-it. Primesense devices's projection, in particular, consist in a coherent beam
+it. Primesense devices' projection, in particular, consist in a coherent beam
 forming a speckle pattern, as the one shown
 in fig.\ref{fig:primesense-speckle}. When the pattern is projected at a certain
 depth, it is distorted by the environment, and its reflected image is sampled
@@ -150,7 +150,7 @@ virtual one, as it doesn't match a real sensor: as the pattern image is fixed,
 it can be thought of by applying normal stereoscopic matching algorithms with
 the captured image and the orthographic drawing of the pattern. This last image
 will correspond (for any depth) to the image that would be captured by a camera
-placed in correspondance of the projector. With this in mind, stereoscopic
+placed in correspondence of the projector. With this in mind, stereoscopic
 vision can be emulated with a single camera. 
 Two advantages are there, with respect to binocular systems: first, no
 geometrical calibration is required. Calibration of the sensors' position can be
@@ -163,7 +163,7 @@ image grabbed by the IR sensor. Knowing their fixed position, triangulation is
 almost immediate too.
 
 By combining these two techniques depth can be refined accurately for each
-pixel. Most importantely, outliers can be totally filtered out as they will
+pixel. Most importantly, outliers can be totally filtered out as they will
 correspond to very different outputs coming from the first and the second
 algorithm; this is a good improvement over binocular systems.
 

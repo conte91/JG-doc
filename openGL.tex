@@ -1,19 +1,19 @@
 \section{OpenGL rendering process} \label{sec:opengl-rendering}
 In order to obtain good renderings for training and recognition purposes, it is
 important to create photo realistic, virtual snapshots of the objects in
-diffent poses. It is also important to use the same model of camera introduced in sec.
+different poses. It is also important to use the same model of camera introduced in sec.
 \ref{sec:camera_modelling} in the most uniform manner as possible.
 
 In this section, this modelling is described. First, a brief
 introduction to OpenGL (sec. \ref{sec:opengl-intro}) and to the correct usage of homogeneous coordinates (sec.
 \ref{sec:homogeneous-coordinates}) is done, followed by a description of OpenGL reference systems (sec.
 \ref{sec:opengl-reference-systems}). After this, the OpenGL rendering
-process is analyzed more in details (sec. \ref{sec:opengl-rendering-process}), and finally the
+process is analysed more in details (sec. \ref{sec:opengl-rendering-process}), and finally the
 implementation of objects' rendering for the purpose of this project is
 described keeping all of the previous into account (sec. \ref{sec:renderer3d}).
 
 \subsection{Homogeneous coordinates} \label{sec:homogeneous-coordinates}
-Homogeneous coordinates were introduced by the famous mathematician August Ferdinand Möbius in
+Homogeneous coordinates were introduced by the famous mathematician August Ferdinand M\"obius in
 \cite{homogeneous-coordinates}; they are a common way to represent points in
 \emph{projective geometry} by using an additional scale value, usually called
 $w$, in represented
@@ -39,7 +39,7 @@ multiplied by a constant value they keep representing the same point.
 The last interesting property of homogeneous coordinates for the purposes of
 this thesis is their capability to easily distinguish points from directions;
 in fact, a directional vector can be represented as a point at the infinity,
-and, differentely from cartesian coordinate systems, homogeneous coordinates
+and, differently from cartesian coordinate systems, homogeneous coordinates
 easily represent them as directional vectors by setting their $w$ coordinate to
 $0$.
 
@@ -64,7 +64,7 @@ work. During this project, homogeneous coordinates have been used extensively
 thanks to the Eigen library, in order to have a well-defined system (Affine
 transformations) to define the reference systems of interest, and in order to
 compute transformations between objects. Homogeneous coordinates are converted
-to native formats (e.g. COMAU robots' euler axis representation) only in the
+to native formats (e.g. COMAU robots' Euler axis representation) only in the
 final backend of the applications, so that data representation is unique and
 coherent in the whole scope of the project.
 
@@ -121,14 +121,14 @@ being merged with others to form the final render. In particular, geometric data
 like lines or polygons are moved into the scene, cut based on their $z$ coordinate, and
 finally mapped to 2D screen coordinates through the \emph{projection matrix}.
 Mapped points are then bound to 2D data like bitmaps and 2D points in a
-process called \emph{rasterization}; finally, every token can be modified by
+process called \emph{rasterisation}; finally, every token can be modified by
 \emph{per-fragment operations}, like texture appliances and alpha (transparency)
 computation.
 
 The first operation done by the renderer is taking the list of vertices
 which have to be drown from the global state. Vertices can be added to the
 scene by use of \emph{display list} (cached sets of 3D vertices created using
-basic drawing functions) or explicitely drown during a single rendering
+basic drawing functions) or explicitly drown during a single rendering
 iteration. Drawing primitives different from vertices, which were inserted into a
 display list via drawing functions, are numerically computed and transformed to
 vertices sets too.
@@ -168,7 +168,7 @@ matrix}. At the end of this process objects are said to be in \emph{normalized
 device coordinates \emph{NDC}}. In NDC, the (virtual) cube spawning the
 $\left(-1,1\right)$ range in each direction is projected orthographically on the
 output image buffer (considering $x$ and $y$ coordinates), with each corner
-corrisponding to an angle of the window (called \emph{Viewport}) -- top, bottom,
+corresponding to an angle of the window (called \emph{Viewport}) -- top, bottom,
 right, left-- and depth buffer
 (mapping the $(-1,1)$ $z$ coordinate to the range $\left( near , far \right)$ as described
 before).
@@ -182,7 +182,7 @@ this point and can be accessed via direct reading from raw data buffers.
 During the last phase of rendering, OpenGL's pipeline silently associate each
 pixel primitive, with its matching texture and depth information, with a single
 colour (RGB) and depth value (alpha). If only the geometric information relative
-to the center of the pixels is considered (as done by default), this will cause
+to the centre of the pixels is considered (as done by default), this will cause
 high rendering quality degradation: this is because contours of objects and
 textures will be neatly mapped on a per-pixel basis, and so their lines --
 especially if almost vertical or almost horizontal -- will appear more as a
@@ -206,7 +206,7 @@ Old versions of OpenGL provided a set of features called \emph{smoothing}, which
 emulated transparency (alpha) value on pixels on the border in order to blend
 them with neighbour pixels. Newer versions have deprecated this techniques in
 place of \emph{Multisampling}. By using multisampling, each pixel primitive --
-as the one obtained after the rasterization process -- is actually splitted in
+as the one obtained after the rasterisation process -- is actually split in
 four or more parts into a special, offscreen buffer, and the image is treated as
 it was a render with higher resolution, except for coordinate systems which will
 be left untouched -- so that the entire process is transparent to the
@@ -226,7 +226,7 @@ the software will draw onto), keeping the allocated memory area totally
 independent from the actual video memory of the rendering window. Apart from
 their physical location, they look totally equivalent to a normal rendering
 window, and just like it they have a set of buffers to which the application can
-draw, the main ones being the color and depth buffer. These can be bound 
+draw, the main ones being the colour and depth buffer. These can be bound 
 at runtime to a physical location in memory by assigning (\emph{plugging}) new buffers to the \emph{attachment point} of a
 framebuffer. A framebuffer can be drawn onto if and only if it is
 \emph{complete}, i.e. if all its main attachment points (colour and depth) have
@@ -255,7 +255,7 @@ result. However, for textures the situation is different as also another factor
 must be considered: as the object reduces
 its dimensions, texture internal data will be dropped during the mapping from 3D
 to 2D coordinate, because it actually is applied on a per-2D-pixel basis during the
-last stage of rendering (after rasterization has been done), as depicted in sec.
+last stage of rendering (after rasterisation has been done), as depicted in sec.
 \ref{sec:opengl-rendering}. This process downsamples heavily the texture -- even if
 polygon multisampling is enabled -- as no interpolation is done when scaling
 down the texture for appliance.
@@ -271,7 +271,7 @@ while more complex ones allow to refine the result at expense of a bigger
 computing time, by linearly interpolating between these two textures to produce
 a middle texture component.
 
-As said in sec. \ref{sec:opengl-intro}, OpenGL tends to be extrimely frugal in the
+As said in sec. \ref{sec:opengl-intro}, OpenGL tends to be extremely frugal in the
 number of implemented features: the only supported method for adding mipmaps to
 a texture is manually adding a series of differently sized images to the texture
 data. As it is quite easy to generate this data automatically and with good
@@ -280,7 +280,7 @@ build the set of textures of increasing size and adding them to the texture.
 A native extension for OpenGL allows to generate mipmaps when and only when
 needed, at the cost of random loss of GPU cycles into the program; this extension is,
 however, only present in newest versions of OpenGL and is not supported by some
-graphic hardwares (e.g. Intel HD4000). The programmer must explicitely check for
+graphic hardware (e.g. Intel HD4000). The programmer must explicitly check for
 its presence, and only when the extension is found by OpenGL he can safely
 assume that no manual (or semi-automatic) mipmap generation is needed.
 
@@ -312,7 +312,7 @@ standard reference systems and calibration matrices described into sec.
 transformations acting on homogeneous coordinates as in sec.
 \ref{sec:homogeneous-coordinates}. At time of objects' creation, the Assimp library
 is used to convert the mesh file, in whichever format it is, into Assimp's
-unified structure, which for simplicity's sake can be simplifiethought of as a tree of
+unified structure, which for simplicity's sake can be thought of as a tree of
 nodes, each representing a face, a texture to be applied to children, or
 an affine transformation to be applied to children. When the renderer is created
 it configures itself using GLUT to open a window and create the RGB and depth
@@ -336,8 +336,7 @@ The goal of the first set of functions of the renderer is to interface OpenGL's
 projection system with the global camera models used into the project; in
 OpenGL camera's parameters are not defined and only a single matrix is used to
 transform 3D coordinates in camera frame to 2D points onto the image. Keeping in
-mind the definitions of intrinsic parameters of the camera, as described in sec.
-\ref{sec:intrinsics}, this is accomplished into three steps.
+mind the definitions of intrinsic parameters of the camera, as described in sec.~\ref{sec:intrinsics}, this is accomplished into three steps.
 
 First, the intrinsic matrix of the camera is extracted from the
 camera's model, and from it the relevant camera parameters are read.
@@ -387,7 +386,7 @@ passed to OpenGL as the matrix which maps clip coordinates to NDC:
   M_{\texttt{proj}}=M_{\text{fit}}M_{\text{int}}
 \end{equation}
 
-Also, OpenGL is instructed to which pixels and depth ranges correponds to the
+Also, OpenGL is instructed to which pixels and depth ranges corresponds to the
 NDC by setting its \emph{viewport}, \emph{near} and \emph{far} values.
 
 At the end of this process, OpenGL will thus map automatically points in global
@@ -395,8 +394,8 @@ At the end of this process, OpenGL will thus map automatically points in global
 
 \subsection{Object movement into global space}
 Into the project's convention, each object has got its own local coordinate
-system, and the mesh is built with all its verteces into this system,with all
-its verteces into this system,  as explained into sec. \ref{sec:cad-mesh}. Every
+system, and the mesh is built with all its vertexes into this system,with all
+its vertexes into this system,  as explained into sec. \ref{sec:cad-mesh}. Every
 object is then stored into its mesh file as if it was centred into the global
 origin. Assimp library is used to read this mesh file and produce a set of faces
 together with their vertices' coordinates. From the external world, however, the global
@@ -406,7 +405,7 @@ OpenGL's one, which only knows camera (clip) coordinates. In order to move
 the object from the global system to the right position in OpenGL reference
 system the \emph{Modelview} matrix is used: this will be automatically applied
 to OpenGL when drawing each primitive, and will modify its coordinates
-accordignly. In order to take into account the difference between the global
+accordingly. In order to take into account the difference between the global
 coordinate system and OpenGL's clipping coordinates, a $\pi$ rotation along the
 $X$ axis is applied
 to the Modelview matrix \emph{before} the actual pose, which as usual is

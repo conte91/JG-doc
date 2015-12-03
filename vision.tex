@@ -34,7 +34,7 @@ rendering the object, etc.) and with the list of templates which are
 associated to the object. After reading the objects, all of their
 templates are merged together to form a single template list which
 will be used for matching: information about the nature of each
-template is mantained inside the template itself, as each item of the
+template is maintained inside the template itself, as each item of the
 list contains both the template's features and some metadata, like the
 object ID the template refers to, the pose of the object which
 corresponds to it, and additional informations which can were saved
@@ -46,8 +46,8 @@ included into the input mask are then computed, their binary
 representation and response map are generated as described in
 sec.~\ref{sec:linemod-binary}, and each template is matched upon
 this. As the most intensive part for Line-MOD is the computation of
-the reponse map for the scene's image, while template matching is
-almost istantaneous, it is very convenient to match all the possible
+the response map for the scene's image, while template matching is
+almost instantaneous, it is very convenient to match all the possible
 templates in a single pass, as this will require the scene image to be
 processed only once.
 
@@ -86,7 +86,7 @@ discarded in the following loops in order not to count them twice.
 
 \subsection{Pyramidal matching for faster match}
 As with most of the vision algorithms operating on medium-sized (VGA)
-to large-sized  images, it is often unconvenient to process the
+to large-sized  images, it is often inconvenient to process the
 whole source image each time a detection query is made from a part of
 the program. The solution used in this cases to significantly speed up
 the performance of the recognition pipeline is the usage of
@@ -151,14 +151,14 @@ searched, which brings to further performance improvement on the algorithm.
 The important thing to notice about all of this process is that,
 starting from full-scale images (when recognizing) and templates (when
 training) the whole process is \emph{totally transparent} to the user:
-this is an obvious advantage as the user probabily will not be willing
+this is an obvious advantage as the user probably will not be willing
 to further manipulate its source images when matching if not strictly needed.
 
 \subsection{False positive rejection based on hue values}
 The first step of pose matching is made by purpose to be overly tolerant in
 template matching. This is because the used objects are quite small and simple
 in shape - which can reduce the number of features to match - and at the first
-step are seen from far away ( more than 1 meter ) in order to maximize the
+step are seen from far away (more than 1 metre) in order to maximize the
 field of view without increasing the needed number of cameras. The counterpart
 for being sure to match \emph{at least} something is having a huge number of
   false positives, which must be recognized and excluded before starting the
@@ -186,7 +186,7 @@ black). When matching, these are treated as special values and two pixels are
 said to match either if their actual hue match (which
 is robust to moderate lightning changes) or if their modified hue, saturation
 and values match
-(which happes if both the model and the scene appear to be actually white or
+(which happens if both the model and the scene appear to be actually white or
 black). 
 
 After computing the new HSV values, the four resulting images (two belonging to
@@ -226,9 +226,9 @@ way, objects with small, partial occlusions can be recognized.
 
 If the threshold $t_\%$ falls below a threshold $t_{\%,\text{bad}}$
 and no valid matches have still been found to pass this check for every object, however, the
-algorithm exits anyway: exeperimental tests have, in fact, shown that
+algorithm exits anyway: experimental tests have, in fact, shown that
 when the matching threshold becomes below about $80\%$ the algorithm
-thends to recognize almost every template as matching, but it will
+tends to recognize almost every template as matching, but it will
 still fail to recognize correctly the object in its correct
 position. This will lead to a huge number of false positives (about
 $50\%$) of the total templates, and the hue matching step described in
@@ -253,7 +253,7 @@ Although this is quite a standard error, it must be combined with the minimum
 depth range of $80\unit{cm}$ for the sensor. This leads to an error of about
 $1\unit{cm}$ on the depth's values at medium ranges, as shown in \cite{kinect-evaluation}. Also, the field of view of the (fixed)
 kinect does not allow to precisely detect the object's pose, as the depth error
-increases the more the obejct is not centred with respect to the sensor. As a
+increases the more the object is not centred with respect to the sensor. As a
 higher precision is needed for good 
 object grasping, a dedicated, precision depth sensor (\emph{Structure Sensor by
 Occipital})has been mounted onto the robot's arm.
@@ -272,13 +272,13 @@ applied.
 
 First, the point cloud for the scene is obtained as explained in sec. \ref{sec:cloud-reconstruction}.
 As explained, a scene's snapshot obtained by the precision depth
-sensor used and the alignement process is done upon it. In order to
+sensor used and the alignment process is done upon it. In order to
 do this, the found match is rendered again into the position in which
-it would be as seen from the camera -- whose extrinsic caractheristics
+it would be as seen from the camera -- whose extrinsic characteristics
 are known because of the fixed locations of the bin; if this was not
 the case, it would be enough to find it again at before rendering
 using the algorithms of sec.~\ref{sec:camera-calibration}, as they
-have neglibible cost with respect to the whole recognition pipeline.
+have negligible cost with respect to the whole recognition pipeline.
 As the mask of the render has already been computed, it is exploited at this
 point and only the part of the scene corresponding to the actual
 object, increased by a low margin, is
@@ -302,7 +302,7 @@ When this is done, it will be very probable that the two clouds will
 have different point densities, especially for the process of
 information dropping coming from the recognition pipeline. This could
 harm the premises of the ICP algorithm, as different point densities
-or missing points could cause wrong correspondances between points.
+or missing points could cause wrong correspondences between points.
 
 To prevent this situation, after reconstruction and transformation,
 both the point clouds are evaluated and filtered through what is
@@ -314,7 +314,7 @@ output of a voxel grid having a scattered point cloud as an input is
 an approximation of the same point cloud made with \emph{equally
   spaced}, regular points. Using the latter instead of the first for
 the ICP algorithm results in benefits to the proper
-operation of the algorithm itself, as points' correspondance will
+operation of the algorithm itself, as points' correspondence will
 lead to zones of the clouds that actually correspond perfectly into the 3D space.
 
 After tessellating the two point clouds, whose points are set in global

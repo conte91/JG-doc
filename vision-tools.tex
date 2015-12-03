@@ -6,7 +6,7 @@ Three main libraries have been used for this purpose: OpenCV, OpenGL
 and PCL. Each of these is licensed under copyleft licenses, which has made
 it possible both to use them in the project and to expand them as
 needed (for example, the Line-MOD detection library of OpenCV has been
-modified to accomodate different use cases).
+modified to accommodate different use cases).
 
 \subsection{OpenCV principles}
 The \emph{Open Computer Vision Library (\emph{OpenCV})} is a C++
@@ -66,11 +66,11 @@ each hardware capability of the system, such as graphics card
 parallelism and SIMD CPU architectures. Also, most of the well-known
 algorithms for computer vision are implemented into the library: even
 if these algorithms could seem simple at a first glance, OpenCV
-implementations have withstanded years of testing and maturement to get
+implementations have withstood years of testing and maturement to get
 at the current state, and are thus robust to most of the possible
 bugs, including intensive check for consistent input data at runtime,
 which can be disabled in order to avoid the related performance
-penalities by defining its version of the C++'s \pre{NDEBUG} macro.
+penalties by defining its version of the C++'s \pre{NDEBUG} macro.
 
 \subsection{OpenGL graphics library} \label{sec:opengl-intro}
 OpenGL\footnote{www.opengl.org} is a free (BSD-like) software interface to graphics hardware \cite{opengl-book}. This
@@ -81,7 +81,7 @@ extremely complicated architecture and variegated set of features. Instead, a
 set of standard 3D graphics functions (\emph{API}) for the C programming
 language is exposed to the developer, and the hassle of linking these
 functions to the hardware is left to the manufacturer, who will provide its own
-optimized implementation of the library together with the hardware.
+optimised implementation of the library together with the hardware.
 
 Being industrial-level free software, this library has become very popular, and
 well-working implementations exist for most of the modern graphics hardware
@@ -134,27 +134,27 @@ languages -- most notably C++ and Python.
 \subsection{PCL libraries}
 The \emph{Point Cloud Libraries (\emph{PCL})} are a set of libraries
 designed to operate on sparse datasets, representing samples of a
-continous function, called \emph{point clouds}. A typical example of usage for this, which is the
+continuous function, called \emph{point clouds}. A typical example of usage for this, which is the
 main reason for its creation, is analysis of 3D points sampled from a
 real-world scene. From this, PCL is able to compute complex
-evaluations, the first of which is the reconstruction of the continous
+evaluations, the first of which is the reconstruction of the continuous
 surface of the object as a mesh, based on points' samples.
 
 The main advantage of the PCL library for point clouds analysis comes
 from its extremely high performance: it is, in fact, totally written
 in C++ by means of templates, which makes it possible for the compiler
-to optimize each class instance knowing the specific context in which
+to optimise each class instance knowing the specific context in which
 it will be created; doing mostly mathematical computation, it is in
 turn founded over the Eigen library, which is another C++,
 template-based library created mainly for linear algebra computation
-purposes. Both of these have, over years, heavily optimized their
+purposes. Both of these have, over years, heavily optimised their
 source code thanks to the community's contributions, and thus present
-to the user a simple API which is able to apply an enourmous set of
+to the user a simple API which is able to apply an enormous set of
 heuristics over each process in order to simplify its computation; one
 of the easiest examples from this is the distinction that both Eigen
 and PCL do for sparse or dense datasets (i.e. matrices or point
 clouds): in these cases, most of the algorithm will make use of an
-efficient data structure to analyze the incoming data, but will skip
+efficient data structure to analyse the incoming data, but will skip
 the creation of it if the dataset is marked as sparse, as creating the
 data structure would actually have an higher computational cost with
 respect to point-per-point analysis.
