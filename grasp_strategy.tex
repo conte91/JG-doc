@@ -57,7 +57,7 @@ Possible grasping poses are popped one at a time from the poses'
 list. A new compound, representing the gripper into its corresponding
 pose, is built now. Then the algorithm for shapes intersections is
 called for each object into the scene. The score function of
-sec.~\ref{grasp-score} is then computed on this result,
+sec.~\ref{sec:grasp-score} is then computed on this result,
 weighting in by means of its $\alpha$ parameter, which is used as the
 already introduced movement coefficient in order to define which
 objects can be bounced into without risk and which are hard or
@@ -95,7 +95,7 @@ object, the order in which these are executed does not influence the
 success of the algorithm. Given the list of objects which have to be
 taken, it is thus important to \emph{sort} them in a simple way, in
 order to first fulfill simplest orders, and possibly making it easier
-to fullfill the most difficult ones in the subsequent iterations.
+to fulfil the most difficult ones in the subsequent iterations.
 
 \subsection{Order list' sorting strategy} \label{sec:sort-order}
 Preference score is already used when computing single grasps as a field on which ordering of
@@ -170,7 +170,7 @@ recomputed as described in sec.~\ref{sec:best-grasp-computation}; if
 this object is the only one left into its bin, this pose is marked as good;}
 \item{Each dirty bin is marked as not being dirty anymore;}
 \item{The order list is sorted according to the strategy of
-  sec.~\ref{sort-order};}
+  sec.~\ref{sec:sort-order};}
 \item{One order is popped from the top of the sorted order list, and
   the corresponding grasp is executed: first, the robotic arm moves in
   front of the bin (to have a safe starting position); then, it moves

@@ -12,9 +12,9 @@ a tie, it will prefer the grasp with a higher preference score.
 
 The parameter used to assign to each grasp a preference score is the supposed
 easiness to grasp the object without having it dropped during the subsequent
-movement phase: for example, for the duck-toy object shown in fig.
-\ref{fig:duck-toy-grasps}, a grasp done with a sucker on the plastic covering
-should work properly enough, but, being the plastic covering not rigid, the
+movement phase: for example, for an object shaped like a milk box, a
+grasp done with a sucker on the body of the box
+should work properly enough, but, being the object heavy, the
 object is not sure to be taken without possibility of falling. Instead, a grasp
 done with clamps on the rigid, cardboard top of the envelope would work almost
 for sure. In this case, both poses would be added to the grasp list, but the
@@ -44,14 +44,14 @@ bind points to an actual gripper's pose.
 
 \subsection{Pose generations on a line and on a plane's surface} \label{sec:pose-generation-line-plane}
 If a set of poses on a plane surface must be generated, a good method is simply
-to sample the plane onto equally distanced points. Starting from the center of
+to sample the plane onto equally distanced points. Starting from the centre of
 the plane, which would be the preferred point for the gripper to land onto,
 samples can be taken at increasing distances until the border of the surface is
 reached. when doing this, it assumed that the algorithm requiring pose
 generation will already have taken into account a good margin from the gripper
 to operate, and so none of the poses will actually result into a gripping
 failure. With this in mind, a good preference score can be obtained as the
-squared distance from the gripping point $\vec{p}$ to the center $\vec{c}$ of the surface:
+squared distance from the gripping point $\vec{p}$ to the centre $\vec{c}$ of the surface:
 
 \begin{equation}
 P_{g}=(\vec{p}-\vec{c})(\vec{p}-vec{c})^\tau
@@ -68,7 +68,7 @@ direction is the direction of their product:
 \end{equation}
 
 On the other hand, it is helpful sometimes to describe the plane by its
-perpendicular direction and center point: in this case, the $Z$ axis will just
+perpendicular direction and central point: in this case, the $Z$ axis will just
 be the same as the perpendicular vector.
 
 In the case that the path on which the gripper can land is a straight
@@ -107,8 +107,7 @@ the commonly used shapes can be described. In particular, planes are
 useful to describe grasping points on cuboidal shapes, while lines are
 used in the same context, but in the case in which the grasping
 direction must be more constrained and the surface the line refers to
-is particularly narrow (e.g. in the case of a grasp on the cardboard
-top for the toy duck of fig.~\ref{fig:duck-toy-grasps}).
+is particularly narrow (e.g. in the case of an object shaped like a pencil).
 
 An easy possibility to extend this last generation algorithm, instead
 of having it generate points on a straight line, is the use of

@@ -192,7 +192,7 @@ all the three projections belong to the projection of the cube:
 
 \paragraph{A \emph{sphere}} is a shape representing a sphere of fixed radius,
 which is the only one of its dimensions. The reference system of the sphere, 
-which its transformation refers to, is fixed into the sphere's center. Having
+which its transformation refers to, is fixed into the sphere's centre. Having
 central simmetry, the rotation part of the sphere's transformation will actually
 be ignored.
 
@@ -208,7 +208,7 @@ than $R$.
 
 \paragraph{A \emph{cylinder}} is a shape representing a rect, circular cylinder.
 Its two dimensional values represent the base's radius and the height of the
-cylinder. Its coordinate system is fixed at the center of the circle, at the
+cylinder. Its coordinate system is fixed at the centre of the circle, at the
 base of the cylinder, with the
 Z axis pointing upwards on the length direction.
 
@@ -274,8 +274,8 @@ known to not intersect at all).
 \subsection{Point approximation of shapes on different levels of precision}
 The basic algorithm is based on splitting one of the two shapes to intersect into a serie of cubes of
 fixed dimension.
-Cubes are then represented with their center only, and only this information is
-used to compute the shapes' intersections' volume: for each cube, if the center
+Cubes are then represented with their centre only, and only this information is
+used to compute the shapes' intersections' volume: for each cube, if the centre
 of the cube belongs to the other shape, the whole cube is considered to belong
 to the latter. The final intersection volume is brought by the sum of the
 volumes, actually approximating via Riemann's series the real value of the
@@ -286,7 +286,7 @@ representations are returned by the shape as a serie of points, or \emph{point
 cloud}, which is the same representation used for visualization
 purposes in many of the test examples and most of the figures regarding this chapter. While the surface's points
 represent real points onto the surface of the 
-object, the volume's points are the center of the approximating cubes described
+object, the volume's points are the centre of the approximating cubes described
 before. Each shape also knows how to analitically compute its total surface and
 volume, which is a trivial geometric task for each primitive.
 
@@ -348,7 +348,7 @@ Some levels of approximation of different surfaces can be seen in fig. \ref{fig:
     \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/cube_surf}}&
     \adjustbox{valign=m}{\includegraphics[width=2in]{./Results/compound_surf}}
   \end{tabular}
-  \caption{Surface (top) and volume (bottom) approximation of a cube (left), a sphere (center) and a compound
+  \caption{Surface (top) and volume (bottom) approximation of a cube (left), a sphere (centre) and a compound
   (right) for different values of $l$, depicted in red, green, and blue. \label{fig:approximate_shapes}}
 \end{figure}
 

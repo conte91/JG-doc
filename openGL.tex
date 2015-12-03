@@ -152,7 +152,7 @@ must be chosen in the most restrictive way as possible: this is because $z$
 coordinate is mapped to its output buffer (depth buffer) with a low-range
 (usually, $12\unit{b}$) value, taking the values of $near$ and $far$ as a
 reference for minimum and maximum value. So, having a too wide range in near and
-far planes results in heavy loss of depth information due to discretization of
+far planes results in heavy loss of depth information due to quantization of
 depth values.
 
 \begin{figure}[htbp]
@@ -397,7 +397,7 @@ At the end of this process, OpenGL will thus map automatically points in global
 Into the project's convention, each object has got its own local coordinate
 system, and the mesh is built with all its verteces into this system,with all
 its verteces into this system,  as explained into sec. \ref{sec:cad-mesh}. Every
-object is then stored into its mesh file as if it was centered into the global
+object is then stored into its mesh file as if it was centred into the global
 origin. Assimp library is used to read this mesh file and produce a set of faces
 together with their vertices' coordinates. From the external world, however, the global
 renderer can display a mesh into a specified pose in the global coordinate

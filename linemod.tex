@@ -1,4 +1,4 @@
-\section{Linemod template matching} \label{sec:linemod}
+\section{Line-MOD template matching} \label{sec:linemod}
 Template matching has always been an attractive approach to computer vision,
 especially for real-time applications; some of the main reasons for this
 include ease of generalization of
@@ -140,7 +140,7 @@ One of the most important features which can be extracted from a 3D
 image is points' normals. These, just like an image's gradient, form a
 vector field inside the image, representing the approximated normals
 to the surface for which the RGBD picture has been taken, sampled in
-correspondance of the image's pixel centers.
+correspondance of the image's pixel centres.
 
 Of course, starting with sampled (and noisy) data from the image
 implies that the normals which are computed are only a supposition:
@@ -239,7 +239,7 @@ cost of a high number of false positives, which will have to be filtered.
 The Line algorithm of \cite{linemod-origins} only considered colour gradient; however, Line-MOD
 generalized this algorithm to be capable to match different set of
 features, each represented by a \emph{modality} comprehensive of a
-feature-computation algorithm, a discretization one, and a match score
+feature-computation algorithm, a quantization one, and a match score
 computation. In this way, the binary encoding and matching algorithms
 can be applied to whatever feature set is more appropriate for the
 template, and thus the whole algorithm can be easily extended and find
@@ -249,13 +249,13 @@ sec.~\ref{sec:linemod-gradient} and depth normals as in
 sec.~\ref{sec:linemod-depth}, for which good computation algorithms have
 been already stated.
 
-Before discretization, every feature is discarded if it is not strong
+Before quantization, every feature is discarded if it is not strong
 enough, i.e. if its corresponding vector's magnitue is less that a
 threshold $t_{filter}$. This helps too keep only the most important
 features into the image, which is important as the feature's magnitude
 will be flattened in the following steps.
 
-For the image colour gradient, discretization of the gradient's direction is
+For the image colour gradient, quantization of the gradient's direction is
 considered; this is represented by the angle $\alpha$ from the
 base of the positive $X$ axis to the gradient's direction line. Given
 the number $N$ of samples, the orientation angle is approximated to
@@ -280,7 +280,7 @@ part of the angles' space.
 \centering
 \includegraphics[height=2.5in]{./Graphics/duck-gradient}
 \caption{Approximation of the gradient for the image of a duck toy:
-  the discretization algorithm used by Line-MOD (right) provides a
+  the quantization algorithm used by Line-MOD (right) provides a
   much better edge recognition performance with respect to standard
   algorithms (left). Image courtesy of Stefan Hinterstoi\ss er. \label{fig:duck-gradient}}.
 \end{figure}
@@ -294,13 +294,13 @@ stands on a dark background, and if it stands on a clear background:
 the gradient will, in this case, mantain its module and direction and
 only change its way, which will be discarded.
 
-Regarding normals' discretization, the same considerations can be
+Regarding normals' quantization, the same considerations can be
 applied. Dropping the normal vector's magnitude comes naturally, as
 it will be $1$ by definition. Thus, again only the direction of the vector is
 considered. Being a 3D vector, opposed to the 2D vector which is the
-image's gradient, it is more difficult to find a good discretization
-for the possible value. The solution of \cite{linemod-paper} is to
-discretize the normals' direction with respect to a set of possible
+image's gradient, it is more difficult to find a good quantization function
+for the possible values. The solution of \cite{linemod-paper} is to
+quantize the normals' direction with respect to a set of possible
 directions over the edges of a right, circular cone pointing towards
 the camera. Each vector is then first flattened to the edge of the
 cone, then to the nearest sample: in this way, the obtained value
@@ -334,7 +334,7 @@ the same time subdivide smooth areas between each other.
 \begin{figure}[htbp]
 \centering
 \includegraphics[height=2.5in]{./Graphics/depth-man}
-\caption{Discretization of the possible values for a surface's normal
+\caption{Quantization of the possible values for a surface's normal
   vector to the surface of a circular cone (top-left). If applied to a
   real image (top-right), the input depth map (bottom-left) produces a
   normal map (bottom-right) which is already aware of difference
@@ -390,7 +390,7 @@ can be described. Line-MOD is a subset of Line
 (\cite{linemod-origins}), which takes the same processing steps of
 Line and applies it to match multiple features, computed from
 different modalities, in parallel (hence the name, for
-\emph{multiple-MODalities Line}). After computing and discretizing
+\emph{multiple-MODalities Line}). After computing and quantizing
 set of modalities, seen by the algorithm through a simple abstraction
 layer given by these three operations (the process at the upper level
 is thus, indeed, completely modality-agnostic), this algorithm
@@ -427,9 +427,9 @@ building to template matching, and the task to perform, for each
 template $T$ which is put into a template list to be matched, is to
 find a similarity measure $\epsilon_m (T,I)$ between the template itself
 and a portion $P(I,c)$ of
-the input image $I$, centered on $c$, on which the template has to be matched. Given a
+the input image $I$, centred on $c$, on which the template has to be matched. Given a
 similarity function $S_m(p_1, p_2)$ between two points $p_1$ and $p_2$
-with respect to their discretized value with modality $m$ -- the ones
+with respect to their quantized value with modality $m$ -- the ones
 of which the templates' images are built -- the maximum similarity
 score for each point in $P$ with respect to the corresponding
 neighbour pixels in $T$ with maximum distance $r$ is taken, and these values are summed up:

@@ -174,7 +174,7 @@ some points below $100\%$ (in these experiments, we used $97\%$ as a
 starting threshold, which can be lowered if needed by the pipeline as
 explained in sec.~\ref{sec:linemod-pipeline}); in this case, many
 false positives arise, which is a problem already observed for the
-Line-MOD algorithm in \ref{linemod-pipeline}, and thus justifies the
+Line-MOD algorithm in \cite{linemod-pipeline}, and thus justifies the
 need for the hue-based filtering used as a second step of the
 pipeline. However, this last filter is able to correctly filter out
 most of the false positives correctly, and the seldom remaining ones
@@ -224,6 +224,16 @@ appropriate to exploit the modularity features of the created
 framework to use another, more specific algorithm, for example by
 searching the image for low-saturation areas and fitting a cubical
 shape onto them with a variation of the RANSAC algorithm of \cite{ransac}.
+
+\begin{figure}[htbp] 
+\centering
+\includegraphics[width=2.5in]{./Graphics/apc-object-sets}
+\caption{From the top-left, as rendered by the framework: an object
+  with good, smooth shape and good, brilliant colours; an object with
+  trivial shape but high-contrast colours, and object with weakly
+  saturated colours but high-contrast internal details, an object
+  with weakly saturated colours and low-contrast internal details.\label{fig:apc-object-sets}}
+\end{figure}
 
 However, the bigger part of the common, daily usage items belong to
 one of the first three categories: this makes the Line-MOD based

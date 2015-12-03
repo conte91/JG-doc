@@ -66,7 +66,7 @@ scene's section $I$ with itself:
 In order to avoid considering matches which bring too little
 information due to the extremely low matching area, a filter is put on
 all the matches that come out from this cycle, checking both the
-matching percentage defined in eqn.~\ref{match-percentage} to be over
+matching percentage defined in eqn.~\ref{eqn:match-percentage} to be over
 a threshold $t_\%$ and the total area (in pixels) of the template
 which matched to be over a threshold $t_{\text{area}}$. All the
 matches that pass this check are kept as valid and stored into a
@@ -115,7 +115,7 @@ images' building process is seen in fig.~\ref{fig:pyramidal-images}.
 \caption{Building an image pyramid from an image: at each iteration,
   the top level of the pyramid (i.e. the image with the smallest
   scale) is blurred and downsampled to produce the next pyramidal
-  level. Image source: Cmglee (own work) (Cc-BY-SA 3.0)
+  level. Image source: Cmglee (own work) (CC-BY-SA 3.0)
   \label{fig:pyramidal-images}}
 \end{figure}
 
@@ -253,7 +253,7 @@ Although this is quite a standard error, it must be combined with the minimum
 depth range of $80\unit{cm}$ for the sensor. This leads to an error of about
 $1\unit{cm}$ on the depth's values at medium ranges, as shown in \cite{kinect-evaluation}. Also, the field of view of the (fixed)
 kinect does not allow to precisely detect the object's pose, as the depth error
-increases the more the obejct is not centered with respect to the sensor. As a
+increases the more the obejct is not centred with respect to the sensor. As a
 higher precision is needed for good 
 object grasping, a dedicated, precision depth sensor (\emph{Structure Sensor by
 Occipital})has been mounted onto the robot's arm.
@@ -277,7 +277,7 @@ do this, the found match is rendered again into the position in which
 it would be as seen from the camera -- whose extrinsic caractheristics
 are known because of the fixed locations of the bin; if this was not
 the case, it would be enough to find it again at before rendering
-using the algorithms of sec.~\ref{sec:camera_calibration}, as they
+using the algorithms of sec.~\ref{sec:camera-calibration}, as they
 have neglibible cost with respect to the whole recognition pipeline.
 As the mask of the render has already been computed, it is exploited at this
 point and only the part of the scene corresponding to the actual
