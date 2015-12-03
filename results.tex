@@ -231,6 +231,45 @@ algorithm a good choice both for the purposes of the Amazon Picking
 Challenge and for usage as the default recognition pipeline of the
 framework.
 
+\section{Comments on the gripping's module}
+The gripping module is the only one which has been built essentially from scratch;
+this has been due to the extreme fragmentation in libraries and
+frameworks regarding this topic; as such, it is also the one which is
+most in beta stage. However, the obtained results look promising:
+first and foremost, the best grasping pose is correctly generated for
+every scene for which the system has been tested. In particular, the
+algorithm used for pose constraining succeds in forcing the gripper to
+an arbitrary position without making it assume innatural poses, which
+is particularly important for a small robotic arm such as the COMAU's
+Racer999 used into this project.
+After tuning the parameters used by each heuristic, it can be seen how
+the computational performance of the algorithm is acceptable for the
+specifications of the problem, running in the range of few tenth of
+precise intersection computations per second on compound
+scenes. Whether not optimal, this can, and likely will, be easily
+improved by adding further heuristic to each shape: in particular,
+some trivial heuristics such as cuboid intersection's skipping have
+still not been implemented, and are easy to. This will for sure
+improve the performance, and especially it will flatten the currently
+high variance in computation cost, which, for example, currently is
+$O(1)$ for any sphere-to-sphere intersection and $O(l^2)$ in the
+average cuboid-to-cuboid intersection.
 
+Another essential optimization which can easily improve the
+performance of this algorithm is the used of multithreading in
+computation, as they are mostly independent from each other into the
+intersection module. This has been made trivial to do due to the
+recent support of every modern system to the C++11 specification,
+which provides the \pre{std::async} abstraction for asynchronous computations.
 
+Some tests driven by trial-and-error have shown that it is easy for a
+non-skilled operator to correctly implement model files describing the
+desired training for picking poses, due to the easy-to-use pose
+generation and constraining APIs described in
+sec.~\ref{sec:pose-generation}. This is an obvious advantage, and
+hopefully will help any future user of the system to approach it
+without difficulty, leaving anyway to him the faculty of digging and
+modifying the framework's behaviour at any abstraction level without
+the need of modifying the codebase of the framework itself.
 
+\section{Conclusions}
