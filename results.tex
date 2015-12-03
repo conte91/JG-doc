@@ -231,7 +231,7 @@ algorithm a good choice both for the purposes of the Amazon Picking
 Challenge and for usage as the default recognition pipeline of the
 framework.
 
-\section{Comments on the gripping's module}
+\section{Comments on the gripping module}
 The gripping module is the only one which has been built essentially from scratch;
 this has been due to the extreme fragmentation in libraries and
 frameworks regarding this topic; as such, it is also the one which is
@@ -256,8 +256,8 @@ $O(1)$ for any sphere-to-sphere intersection and $O(l^2)$ in the
 average cuboid-to-cuboid intersection.
 
 Another essential optimization which can easily improve the
-performance of this algorithm is the used of multithreading in
-computation, as they are mostly independent from each other into the
+performance of this algorithm is the use of multithreading for
+computations, as they are mostly independent from each other into the
 intersection module. This has been made trivial to do due to the
 recent support of every modern system to the C++11 specification,
 which provides the \pre{std::async} abstraction for asynchronous computations.
@@ -273,3 +273,32 @@ modifying the framework's behaviour at any abstraction level without
 the need of modifying the codebase of the framework itself.
 
 \section{Conclusions}
+The completed project manages to provide both a complete vision and
+grasping solution, and more importantly a base over which new gripping
+systems can be implemented easily. Although into its initial
+development stages with respect to the breadth of the topic which it
+tries to fit into, and although improvable for sure, it has an overall
+discrete performance if compared to 
+state-of-the-art projects that cover the same topics, mainly due to the usage of
+many of them in form of software libraries. However, differently from
+them, the main improvement that this project brings to the robotics
+field is the capability to bring all of these different libraries to
+share an overall coherent structure, to completely inhibit fragmentation between
+different modules, and more in general to let a future developer
+structure in a more efficient and safe way its projects. The total
+portability of the system to different software and hardware
+platforms, mainly due to the use of free and open source software, and
+to the total absence of variation over well-established standards,
+combined with the full modularity of the system, will
+make the framework easy to maintain, to expand, and to use. A good
+starting point for the future improvement of the system would be its
+integration with the \emph{Robot Operating System (\emph{ROS})}, which
+has become a de-facto standard in recent years, which excellent
+support for complex robotics applications; this would help it improve
+its internal coherence between its software stacks, which is one of
+the fields ROS currently misses the most.
+
+Hopefully, these factors will let future versions of this software play an
+important role into the next iterations of the Amazon Picking
+Challenge and into the robotics research world in general, in order to help
+automated robotic systems find a bigger space into everyday life's applications.

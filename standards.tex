@@ -1,0 +1,64 @@
+\section{Project-defined conventions}
+If as a complete software solution the goal of this project is to
+fulfill the requirements of the Amazon Picking Challenge, the
+principal goal of the same as a software framework is to provide a
+well-defined, expandable and easy-to-use base structure which can
+compensate the fragmentation and lack of interoperability found in
+most of the mainstream software libraries currently used in
+research. The first important step towards providing the user with a
+single, well-defined software interface to use for every task is the
+definition of some standard practices, which have been used through
+all of the code stack and are hereby presented:
+
+\begin{itemize}
+\item{Every module of the system uses the same unit system, which is
+  composed of all the international system's measurement base units,
+  without usage of multiples or submultiples; this is a strong
+  requirement for a user, but is actually easy to implement without
+  effort due to floating-point notations common to most programming
+  languages, which permit at least the usage of scientific notation
+  for floating-points values. External libraries, such as OpenNI RGBD
+  camera libraries, which use different units are accessed by means of
+  wrappers, which provide transparent interfaces to the user;}
+\item{All the reference systems are right-handed, and every physical
+  object or movable part is linked to a reference system; relative poses
+  between objects into physical world are represented by means of
+  relative transformations between their reference systems, and these in turn are represented by means
+  of affine transformations, i.e. $4 \times 4$ transformation matrices
+  formed by a linear (rotational) $3 \times 3$ part, a translation
+  part, and a scaling factor;}
+\item{All the matrices used into the project, including affine transformations, are represented 
+  by each module using Eigen's matricial datatypes; Eigen's matrices
+  provide a lot of simple ways to instantiate themselves starting from
+  the most different datatypes (e.g. OpenCV's matrices, raw C
+  pointers), which makes this choice good as a standard as it makes it
+  extremely easy to build wrapper functions for every existing
+  algorithm which doesn't follow this convention;}
+\item{All the images are represented through the use of OpenCV
+  matrices, and their pixels are represented by their $(u,v)$
+  coordinates, having the $0,0$ coordinate into their top-left corners
+  -- this means that, in practice, an image is treated as a matrix
+  indexed by its row and column indices;}
+\item{Data representation is done by means of YAML files (an example
+  of which can be found in app.~\ref{app:yml}) using the OpenCV's
+  APIs. These APIs make it easy to serialize and deserialize every
+  object, in order to configure the initial status of a system or save
+  it between different sessions, and are easily expandable in an
+  object-oriented way: it is sufficient, for a new datatype which
+  wants to be serialized or deserialized, to declare its own
+  \pre{read} and \pre{write} functions which can write transparently
+  YAML using C++'s standard \pre{ostream} syntax;}
+\item{Inter-system portability of the project is guaranteed by the use
+  of standard tools and languages; in particular, the C++11 language is
+  the preferred one for system expansion, and no nonstandard extensions
+  have been used. Using C++ as a core language makes it easy to write
+  bidirectional bindings through the framework and other software: thus,
+  additional modules can be written easily using a completely different
+  language, but they shall come with C++ bindings at last in order to
+  use them from every other module.
+\end{itemize}
+
+This small set of requirements has been found to be extremely
+convenient to work onto, as it is easy to use, fits well the overall
+structure of the code, and does not require significant effort from
+the software developer.
