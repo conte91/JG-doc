@@ -15,13 +15,13 @@ programs which have been created for the project.
 First, I/O serialization methods have been created for each module;
 these are capable of creating and reading text files containing their
 own data structures, specified with the YAML format introduced into
-sec.~\ref{TODO}. Serialization is done in a recursive way, i.e. being
+sec.~\ref{sec:standards}. Serialization is done in a recursive way, i.e. being
 each module capable of reading its own structure, to read the
 corresponding data members it is sufficient to use the standard OpenCV
 functions, which will in turn call the correct methods of each
 member's type. An example of the YAML data produced by
 the \pre{Camera} class when saving camera calibration data is given in
-app.~\ref{TODO}, containing the stored parameters for the Kinect
+app.~\ref{app:yml}, containing the stored parameters for the Kinect
 camera used during the tests. 
 
 For camera modelling, two separate applications have been built, which
@@ -88,7 +88,7 @@ the proposed solution, by emulating inputs from the lower-level
 modules and performing a simulation of the order in which the objects
 are taken.
 
-\section{Performance analysis of the implemented solution}
+\section{Performance analysis of the implemented solution} \label{sec:result-tests}
 Here follows a qualitative analysis of the behaviour of the main parts
 of the solution which are found at the upper level of abstraction,
 with focus of the training process, recognition pipeline, and pose

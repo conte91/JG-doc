@@ -179,7 +179,6 @@ this point and can be accessed via direct reading from raw data buffers.
 
 \subsection{Antialiasing of polygons and textures} \label{sec:antialiasing}
 \label{sec:FBO}
-%TODO antialiasing of textures
 During the last phase of rendering, OpenGL's pipeline silently associate each
 pixel primitive, with its matching texture and depth information, with a single
 colour (RGB) and depth value (alpha). If only the geometric information relative
@@ -461,8 +460,7 @@ from the mesh's root node:
     original caller of the drawing algorithm.}
 \end{itemize}
 
-When the algorithm exits, thus, the mesh will be drown on OpenGL's FBO %TODO
-%capitoletto su FBO 
+When the algorithm exits, thus, the mesh will be drown on OpenGL's FBO
 with both colour and depth informations and the render is ready to be read from the
 caller's process. Also, the final state of OpenGL's render is equal to the
 starting one, which allows to draw more than one mesh singularly without

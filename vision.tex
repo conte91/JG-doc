@@ -248,10 +248,10 @@ information is used.
 The Microsoft Kinect RGBD camera provides good depth informations for the template-matching
 requirements, but it is not suitable for precisely find the pose of an object
 for grasping. This is due mainly to the limitations of its depth sensor, having
-a nonlinear depth error of about $1\%$\footnote{TODO:link at MS device page}.
+a nonlinear depth error of about $1\%$.
 Although this is quite a standard error, it must be combined with the minimum
 depth range of $80\unit{cm}$ for the sensor. This leads to an error of about
-$1\unit{cm}$ on the depth's values. Also, the field of view of the (fixed)
+$1\unit{cm}$ on the depth's values at medium ranges, as shown in \cite{kinect-evaluation}. Also, the field of view of the (fixed)
 kinect does not allow to precisely detect the object's pose, as the depth error
 increases the more the obejct is not centered with respect to the sensor. As a
 higher precision is needed for good 

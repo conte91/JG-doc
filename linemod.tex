@@ -400,7 +400,9 @@ through a certain logic, given by the feature itself: for example,
 considering the case of untextured objects, colour gradients can be
 found mostly onto the external edges of the objects: thus, only these
 are extracted after gradient computation, as this will improve a lot
-the algorithm's performance without impacting the recognition process. %TODO esperimentino
+the algorithm's performance without impacting the recognition
+process. As explained in sec.~\ref{sec:result-tests}, this has been
+found to work for most cases with an actual good performance improvement.
 On the other hand, considering normals on the edges would for sure
 worsen the performance in terms of recognition accuracy, as normals
 are not well-defined in proximity of the borders. Thus, normals are
