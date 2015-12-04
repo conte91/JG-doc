@@ -10,8 +10,7 @@ so-called \emph{depth sensors}; these particular kinds of sensors can provide
 the user with an image which is built of floating-point, or integer, values,
 each representing the distance from the sensor itself to the nearest obstacle
 within line-of-sight, along the sensor's axis. If combined with the commonly
-used geometric model for a camera, described in detail in sec.
-\ref{sec:camera_modelling}, this measurement can lead to having not only a $z$
+used geometric model for a camera, described in detail in sec.~\ref{sec:camera_modelling}, this measurement can lead to having not only a $z$
 coordinate for each sampled point, but a complete 3D point $P=(x,y,z)$.
 
 Other known approaches have been used in the past to obtain 3D vision systems:
@@ -22,7 +21,7 @@ results such as \cite{stereo-vision-robot}; using this system, images taken
 from two cameras are first scanned for correspondent, influential features
 (\emph{keypoints}); pose information for each keypoint is then extracted from
 the geometrical properties of the system in what is called \emph{triangulation}
-as shown in fig. \ref{fig:stereo-triangulate}.
+as shown in fig.~\ref{fig:stereo-triangulate}.
 
 \begin{figure}[htbp]
 \centering
@@ -71,7 +70,7 @@ stand fixed within a range of one to two metres from the robotic arm.
 For this project, two different type of depth cameras have been used: the first
 is Microsoft Kinect, a common camera which can merge together both depth and RGB
 informations, widely used in both consumer and research environment,
-the layout of which is shown in fig. \ref{fig:kinect}; the second is Occipital's
+the layout of which is shown in fig.~\ref{fig:kinect}; the second is Occipital's
 Structure sensor, which is a depth-only camera with optimal minimum range
 ($40\unit{cm}$) and precision capabilities (about $1\unit{mm}$ of maximum error,
 with very reduced noise).
@@ -98,7 +97,7 @@ which can draw a known pattern onto the scene. Being made of infrared light,
 the pattern will not disturb any RGB camera which is operating in parallel with
 it. Primesense devices' projection, in particular, consist in a coherent beam
 forming a speckle pattern, as the one shown
-in fig.\ref{fig:primesense-speckle}. When the pattern is projected at a certain
+in fig.~\ref{fig:primesense-speckle}. When the pattern is projected at a certain
 depth, it is distorted by the environment, and its reflected image is sampled
 by an infrared sensor (acting like a normal camera), put behind an infrared
 filter operating with a narrow frequency range in order to remove noise. All of
@@ -128,8 +127,7 @@ composing the pattern: first, as the pattern is both projected
 and recaptured using fixed-focus lenses, it will become blurrier the more
 distant the reflection point is. Also, lenses used by the capturing device (the
 IR sensor) are built in order to have very different focal lengths $f_x$ and
-$f_y$ (this concept is explained, together with camera modelling, in sec.
-\ref{sec:intrinsics}): they are \emph{astigmatic} lenses. Also, its axes are not
+$f_y$ (this concept is explained, together with camera modelling, in sec.~\ref{sec:intrinsics}): they are \emph{astigmatic} lenses. Also, its axes are not
 perfectly aligned to the pattern's reference system; in practice, deformation in
 the image is introduced by purpose. Usage of astigmatic lenses means that, given
 a certain point at a certain depth $d$, it will be more in focus on one principal
@@ -139,8 +137,7 @@ blurring on both its directions. The main ellipse's axis angles will vary in fun
 of $d$.
 
 The second technique used for depth reconstruction is based on the same
-principle of stereoscopic vision: as it can be seen in fig.
-\ref{fig:kinect}, the projector and the IR sensor are by purpose mounted
+principle of stereoscopic vision: as it can be seen in fig.~\ref{fig:kinect}, the projector and the IR sensor are by purpose mounted
 at a quite high distance. The result is that each pattern's point is shifted on
 one side of the captured image depending on its reflecting distance (i.e. depth
 value). Measurement of this shift can improve the results obtained with the
@@ -167,8 +164,7 @@ pixel. Most importantly, outliers can be totally filtered out as they will
 correspond to very different outputs coming from the first and the second
 algorithm; this is a good improvement over binocular systems.
 
-After getting a good point map, the camera model of sec.
-\ref{sec:camera_modelling} is used by the camera's hardware to associate to each
+After getting a good point map, the camera model of sec.~\ref{sec:camera_modelling} is used by the camera's hardware to associate to each
 obtained spatial location a point into the RGB image taken by the colour sensor.
 Again, this procedure is highly simplified by the fact that the relative
 position between the two sensors is known a priori. The result of this operation

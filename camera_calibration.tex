@@ -39,7 +39,7 @@ prospective. This transformation is called \emph{perspective projection}.
 \caption{Geometric projection of a general point into the camera's projective
 plane. \label{fig:intrinsics}}
 \end{figure}
-Examining the geometric properties of this system from fig. \ref{fig:intrinsics}, we can easily extract the
+Examining the geometric properties of this system from fig.~\ref{fig:intrinsics}, we can easily extract the
 transformation from a point $P_c(x_c,y_c,z_c)$ in the local coordinate system
 $X_cY_cZ_c$ to the corresponding point $P_p(u,v)$ in the image's coordinate
 system by applying trivial similar triangles' laws:
@@ -69,8 +69,7 @@ Also, as we are assuming to work with a registered RGBD image, $z$ coordinate is
 directly measured from the depth sensor and is reported on a per-pixel basis
 without the need of further processing.
 
-If we use \emph{homogeneous coordinates} as described in sec.
-\ref{sec:homogeneous-coordinates}
+If we use \emph{homogeneous coordinates} as described in sec.~\ref{sec:homogeneous-coordinates}
 to describe both 3D and 2D points, we get
 
 \begin{equation} \label{eqn:intrinsics}
@@ -124,7 +123,7 @@ The matrix $E$ is called \emph{Extrinsic camera matrix}.
 
 \subsection{3D cloud reconstruction from RGBD image}
 \label{sec:cloud-reconstruction}
-By inverting eqns. \ref{eqn:intrinsics} and \ref{eqn:extrinsics} we can pass from homogeneous
+By inverting eqns.~\ref{eqn:intrinsics} and \ref{eqn:extrinsics} we can pass from homogeneous
 $(u,v,z_c)$ coordinates to homogeneous $(x,y,z)$ coordinates. In practice, this
 means passing from points into a camera-generated image to a cloud of points in
 the global coordinate system.
@@ -180,7 +179,7 @@ Decomposition to find the optimal rotation:
 
 Finally, the error can be computed and tested to be low enough. If the result is
 good, the theoretical and captured chessboard are correctly aligned as shown in
-fig. \ref{fig:extr_alignment}.
+fig.~\ref{fig:extr_alignment}.
 
 Both intrinsic and extrinsic matrices are saved to a camera model file by the
 calibration programs.

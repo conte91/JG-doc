@@ -76,7 +76,7 @@ point within $C$. Using the same definition, the closest point $\vec{p_c}$ to
 $\vec{p}$ is the point satisfying the equation $E(\vec{p},
 \vec{p_c})=d(\vec{p}, C)$. Finding this point is an operation which can be done
 with an average cost of $O\left(\text{log}\left(N_c\right)\right)$ using a K-D
-tree as explained in sec. \ref{kdtree}, and with a worst-case computational cost of
+tree as explained in sec.~\ref{kdtree}, and with a worst-case computational cost of
 $O\left( N_c \right)$; thus, finding the complete set of closest points to
 every point in the reference, i.e. finding the set $P_{c} = \left\{ p_c :
 E(\vec{p},\vec{p_c}) = d(\vec{p},C) , p \in C \right\}$, has an average
@@ -204,8 +204,7 @@ The whole algorithm can be then summed up in this way:
 \item{Transform each point $p \in D$ using the current transformation $T$;}
 \item{For each point, search for the nearest neighbour $p_c \in R$ and create
   the set of associations $A=\left\{(p,p_c) : p \in D \right\}$;}
-\item{Find the best transformation from $D$ to $A$ as explained in sec.
-  \ref{sec:icp-best-transformation}, and save it into $T$;}
+\item{Find the best transformation from $D$ to $A$ as explained in sec.~\ref{sec:icp-best-transformation}, and save it into $T$;}
 \item{Stack the current transformations together into $P$: $P=TP$;}
 \item{If $d(D,R)<t_{\text{good}}$ or $\Delta d(D,R)<t_{\text{stop}}$, exit;}
 \item{Go to step 2.}
@@ -296,7 +295,7 @@ as follows:
       \not \exists \vec{x} \in T_2 : \lVert \vec{x}-\vec{P} \rVert < d
       \Leftrightarrow \lvert c_i-p_i \rvert < d
     \end{equation}
-    if this property, which is shown in fig. \ref{fig:kdtree-hypersphere}, does not apply, search recursively into the other branch
+    if this property, which is shown in fig.~\ref{fig:kdtree-hypersphere}, does not apply, search recursively into the other branch
   $T_2$ as well.}
 \end{enumerate}
 

@@ -31,18 +31,14 @@ two problems of template matching approaches. It is based on a previous work by
 the same authors, \cite{linemod-origins}, in which the LINE algorithm was
 descript, which solved both the problem of template matching velocity and
 texture-less detection, modified to give increased robustness and detection
-rates. Another, following work is described in details in sec.
-\ref{sec:linemod-pipeline}, and focuses on a practical application of these
+rates. Another, following work is described in details in sec.~\ref{sec:linemod-pipeline}, and focuses on a practical application of these
 algorithms, which is the one to which the system proposed into this project has
 inspired.
 
 In this section, this algorithm is explained in detail. Its key concepts are
-introduced first, such the concept of image gradient (sec.
-\ref{sec:linemod-gradient}) and depth normal computation (sec.
-\ref{sec:linemod-depth}). Then, the modality of data representation, which is
-the main reason for this algorithm's good performance, is shown in sec.
-\ref{sec:linemod-binary}, and finally the algorithm's operating principle is
-detailed in sec. \ref{sec:linemod-usage}.
+introduced first, such the concept of image gradient (sec.~\ref{sec:linemod-gradient}) and depth normal computation (sec.~\ref{sec:linemod-depth}). Then, the modality of data representation, which is
+the main reason for this algorithm's good performance, is shown in sec.~\ref{sec:linemod-binary}, and finally the algorithm's operating principle is
+detailed in sec.~\ref{sec:linemod-usage}.
 
 \subsection{Gradient orientation of images} \label{sec:linemod-gradient}
 In order to efficiently detect matches into a non-textured image, which is one
@@ -120,7 +116,7 @@ example, the result of the application of Sobel operator $G$ on a reference
 image\footnote{Image taken from the USC SIPI database
   ( http://sipi.usc.edu/database/ ), one of the most common computer vision reference
 databases. Original source is unknown.}
- is shown in fig.\ref{fig:scimmia}.
+ is shown in fig.~\ref{fig:scimmia}.
 
 \begin{figure}[htbp]
 \centering
@@ -211,7 +207,7 @@ performance. In this case, the latter is much more important as
 precision in normal computation will be not very relevant, as the
 algorithm will highly cut down the resolution of this computation to
 better stand small transformations as explained in
-sec. \ref{sec:linemod-quantization}. On the other hand, computational speed
+sec.~\ref{sec:linemod-quantization}. On the other hand, computational speed
 is important as Line-MOD wants to be able to have future real-time applications.
 
 \subsection{Gradient and depth quantization} \label{sec:linemod-quantization}
@@ -267,7 +263,7 @@ magnitude is kept. The result of this last step is a gradient which is
 much more descriptive of the actual image, with respect to the
 standardized technique of computing the gradient over the
 corresponding grayscale image: as it can be seen from
-fig. \ref{fig:duck-gradient}, in which the gradient has been computed
+fig.~\ref{fig:duck-gradient}, in which the gradient has been computed
 over a duck-toy image using both this and the standard algorithms,
 borders are neatly identified: this approach is thus more appropriate for
 template creation and detection. In this case the red arrow,

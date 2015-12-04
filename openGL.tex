@@ -1,16 +1,13 @@
 \section{OpenGL rendering process} \label{sec:opengl-rendering}
 In order to obtain good renderings for training and recognition purposes, it is
 important to create photo realistic, virtual snapshots of the objects in
-different poses. It is also important to use the same model of camera introduced in sec.
-\ref{sec:camera_modelling} in the most uniform manner as possible.
+different poses. It is also important to use the same model of camera introduced in sec.~\ref{sec:camera_modelling} in the most uniform manner as possible.
 
 In this section, this modelling is described. First, a brief
-introduction to OpenGL (sec. \ref{sec:opengl-intro}) and to the correct usage of homogeneous coordinates (sec.
-\ref{sec:homogeneous-coordinates}) is done, followed by a description of OpenGL reference systems (sec.
-\ref{sec:opengl-reference-systems}). After this, the OpenGL rendering
-process is analysed more in details (sec. \ref{sec:opengl-rendering-process}), and finally the
+introduction to OpenGL (sec.~\ref{sec:opengl-intro}) and to the correct usage of homogeneous coordinates (sec.~\ref{sec:homogeneous-coordinates}) is done, followed by a description of OpenGL reference systems (sec.~\ref{sec:opengl-reference-systems}). After this, the OpenGL rendering
+process is analysed more in details (sec.~\ref{sec:opengl-rendering-process}), and finally the
 implementation of objects' rendering for the purpose of this project is
-described keeping all of the previous into account (sec. \ref{sec:renderer3d}).
+described keeping all of the previous into account (sec.~\ref{sec:renderer3d}).
 
 \subsection{Homogeneous coordinates} \label{sec:homogeneous-coordinates}
 Homogeneous coordinates were introduced by the famous mathematician August Ferdinand M\"obius in
@@ -138,14 +135,14 @@ data, like surfaces, edges, texture coordinates.
 Each primitive is then moved into the scene through an affine transformation
 described by the \emph{Modelview matrix}. This $4 \times 4$ matrix multiplies
 each primitive on the left to produce its coordinate in the first of two
-coordinate systems described in sec. \ref{sec:opengl-reference-systems}, called
+coordinate systems described in sec.~\ref{sec:opengl-reference-systems}, called
 \emph{clip coordinates}. This is the global, 3D reference system and is the one in
 which the actual 3D drawing is done: first, $z$ coordinate is used to determine
 which parts of which object will actually be visible. Points are not considered
 if their $z$ coordinate makes them covered by another object. At this point the
 whole scene is clipped (hence the name), using two planes, \emph{near} and
 \emph{far} clipping planes. Objects are kept if they lie in between this planes,
-i.e. if and only if $near<z<far$ as shown in fig. \ref{fig:clipping-planes}.
+i.e. if and only if $near<z<far$ as shown in fig.~\ref{fig:clipping-planes}.
 This is to minimize the number of objects to process, by removing objects that
 are actually too far away or too near to be rendered accurately. These values
 must be chosen in the most restrictive way as possible: this is because $z$
@@ -186,8 +183,7 @@ to the centre of the pixels is considered (as done by default), this will cause
 high rendering quality degradation: this is because contours of objects and
 textures will be neatly mapped on a per-pixel basis, and so their lines --
 especially if almost vertical or almost horizontal -- will appear more as a
-polyline than a single, straight line. This effect is shown in fig.
-\ref{fig:polyline}. To solve this issue, a set of techniques for what is called
+polyline than a single, straight line. This effect is shown in fig.~\ref{fig:polyline}. To solve this issue, a set of techniques for what is called
 \emph{antialiasing} are implemented. If implemented correctly, antialiasing of
 polygons' edges and texture data can improve image quality by blending the
 boundaries between adjacent polygons, thus providing a more photorealistic
@@ -255,8 +251,7 @@ result. However, for textures the situation is different as also another factor
 must be considered: as the object reduces
 its dimensions, texture internal data will be dropped during the mapping from 3D
 to 2D coordinate, because it actually is applied on a per-2D-pixel basis during the
-last stage of rendering (after rasterisation has been done), as depicted in sec.
-\ref{sec:opengl-rendering}. This process downsamples heavily the texture -- even if
+last stage of rendering (after rasterisation has been done), as depicted in sec.~\ref{sec:opengl-rendering}. This process downsamples heavily the texture -- even if
 polygon multisampling is enabled -- as no interpolation is done when scaling
 down the texture for appliance.
 
@@ -271,7 +266,7 @@ while more complex ones allow to refine the result at expense of a bigger
 computing time, by linearly interpolating between these two textures to produce
 a middle texture component.
 
-As said in sec. \ref{sec:opengl-intro}, OpenGL tends to be extremely frugal in the
+As said in sec.~\ref{sec:opengl-intro}, OpenGL tends to be extremely frugal in the
 number of implemented features: the only supported method for adding mipmaps to
 a texture is manually adding a series of differently sized images to the texture
 data. As it is quite easy to generate this data automatically and with good
@@ -290,7 +285,7 @@ produce high-quality, low-sized images when initializing the system (i.e. when
 the program can afford to lose time to produce this data using complex filters
 such as cubic interpolation). The visual result of texture mipmapping is
 qualitative relevant and can be observed, together with the effect of
-multisample on geometry, in fig. \ref{fig:multisampling-on}
+multisample on geometry, in fig.~\ref{fig:multisampling-on}
 
 \begin{figure}[htbp]
   \centering
@@ -301,16 +296,14 @@ turned off (right). \label{fig:multisampling-on}.}
 \end{figure}
 
 \section{Implementation of objects' rendering} \label{sec:renderer3d}
-With the details explained in sec. \ref{sec:opengl-rendering} in mind, a mesh renderer has been implemented, capable of
+With the details explained in sec.~\ref{sec:opengl-rendering} in mind, a mesh renderer has been implemented, capable of
 reading objects' meshes from files as needed; together with meshes, it reads the full model of
 camera with which training has to be done, and renders them in the required
 pose, also extrapolating useful informations from the render which can be used
 for training. All the interface of the renderer with the external world is done
 using the conventions of the whole project: cameras are modelled using OpenCV's
-standard reference systems and calibration matrices described into sec.
-\ref{sec:camera_modelling}, while object poses are described as affine
-transformations acting on homogeneous coordinates as in sec.
-\ref{sec:homogeneous-coordinates}. At time of objects' creation, the Assimp library
+standard reference systems and calibration matrices described into sec.~\ref{sec:camera_modelling}, while object poses are described as affine
+transformations acting on homogeneous coordinates as in sec.~\ref{sec:homogeneous-coordinates}. At time of objects' creation, the Assimp library
 is used to convert the mesh file, in whichever format it is, into Assimp's
 unified structure, which for simplicity's sake can be thought of as a tree of
 nodes, each representing a face, a texture to be applied to children, or
@@ -319,7 +312,7 @@ it configures itself using GLUT to open a window and create the RGB and depth
 framebuffers in which to render. Renderer's initialization is a one-time
 operation, and is performed statically by the first object using GLUT. During
 this phase, renderer also initializes the needed parameters for multisampling as
-described in sec. \ref{sec:antialiasing}.
+described in sec.~\ref{sec:antialiasing}.
 
 Three main features have been implemented, which can be used as an access point
 to the renderer: the first one can set the
@@ -328,8 +321,7 @@ one can set the reference position of objects into camera's space (in this proje
 conventions, i.e. in OpenCV not in OpenGL one); the third function can render a
 mesh and extract RGB and depth buffers to OpenCV matrices for later use. This
 last feature also extracts object's bounding box information and rendering mask,
-which will be used for training and recognition filtering in sec.
-\ref{sec:vision}.
+which will be used for training and recognition filtering in sec.~\ref{sec:vision}.
 
 \subsection{OpenGL camera modelling}
 The goal of the first set of functions of the renderer is to interface OpenGL's
@@ -395,7 +387,7 @@ At the end of this process, OpenGL will thus map automatically points in global
 \subsection{Object movement into global space}
 Into the project's convention, each object has got its own local coordinate
 system, and the mesh is built with all its vertexes into this system,with all
-its vertexes into this system,  as explained into sec. \ref{sec:cad-mesh}. Every
+its vertexes into this system,  as explained into sec.~\ref{sec:cad-mesh}. Every
 object is then stored into its mesh file as if it was centred into the global
 origin. Assimp library is used to read this mesh file and produce a set of faces
 together with their vertices' coordinates. From the external world, however, the global
@@ -424,7 +416,7 @@ already represented as a $4 \times 4$ affine transformation matrix:
 Another convenience function is presented to the user, which can emulate
 camera's movement around the object: in this case, the object's pose is first
 computed as the inverse of camera pose ($M_{pose}=M_{cam}^{-1}$), and it is
-finally applied as in eqn. \ref{eqn:modelview}.
+finally applied as in eqn.~\ref{eqn:modelview}.
 
 \subsection{Object rendering and image processing} \label{sec:meshdraw}
 When all the rendering parameters has been set accordingly to the desired scene
@@ -467,7 +459,7 @@ setting the parameters for each.
 
 \subsection{Framebuffer's data acquisition}
 As all data has to be rendered off-window, OpenGL's \emph{framebuffer objects
-(\emph{FBO})} have been used as explained in sec. \ref{sec:FBO}. Two main FBOs
+(\emph{FBO})} have been used as explained in sec.~\ref{sec:FBO}. Two main FBOs
 are generated and replaced each time the camera model changes its dimensions:
 
 \begin{itemize}
@@ -491,7 +483,7 @@ are generated and replaced each time the camera model changes its dimensions:
 
 When an application wants to drive something into the rendering, it first binds
 the drawing buffer to the multisampled FBO, then calls its drawing algorithm as
-explained in sec. \ref{sec:meshdraw}. Finally, it resolves the FBO as above and
+explained in sec.~\ref{sec:meshdraw}. Finally, it resolves the FBO as above and
 reads the pixels' data from it. In order to comply with the global, internal
 specifications of the project, this data is transformed into a \texttt{cv::Mat}
 object; no data copying is needed because OpenCV's matrices' internal format is

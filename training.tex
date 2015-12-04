@@ -59,8 +59,7 @@ object with the CAD capabilities of FreeCAD, the corresponding mesh has been
 exported using a common file interchange format (\texttt{.obj}) and has been
 textured in blender by using photos of the object taken with a digital camera,
 exploiting Blender's advanced UV unwrapping and mapping capabilities. The result
-is a realistic model of the object like the one shown in fig.
-\ref{fig:realistic_rendering}, correctly textured to mimic the real one.
+is a realistic model of the object like the one shown in fig.~\ref{fig:realistic_rendering}, correctly textured to mimic the real one.
 
 \begin{figure}[htbp]
 \centering
@@ -76,8 +75,7 @@ The problem of covering the whole viewpoints' set for a particular object
 implies a tight compromise between training speed, execution speed and
 reliability. In fact, the number of templates needed for a particular object increases
 both training time and recognition time. However, as the training procedure is
-fully automated and not very long (about 15 minutes per object, as depicted in sec.
-\ref{sec:result-tests}),
+fully automated and not very long (about 15 minutes per object, as depicted in sec.~\ref{sec:result-tests}),
 the running time of the recognition algorithm is the main problem if too much
 templates are generated. On the other side, if the object is not trained enough
 at different positions and values, it could be not recognized correctly and the
@@ -96,7 +94,7 @@ used by mainstream 3D graphics tools for mesh generation: U-V coordinates (i.e.
 increasing latitudes and longitudes), and icosahedron cutting (the result of
 which is called \emph{icosphere}). 
 
-As depicted in fig. \ref{fig:uvsphere_vs_icosphere}, generating a sphere by changing latitude and longitudes of points has the 
+As depicted in fig.~\ref{fig:uvsphere_vs_icosphere}, generating a sphere by changing latitude and longitudes of points has the 
 disadvantage of having different points' densities between the poles and at the
 equator, as changing longitudes results in a smaller movement if latitude is
 near poles. 
@@ -169,6 +167,6 @@ relative to the camera, as it is in the coordinate system of the latter that the
 object's pose will be estimated.
 
 The object is then rendered on RGBD images into its position using the OpenGL renderer
-described in sec. \ref{sec:opengl-rendering}. The rendered RGBD image, together
+described in sec.~\ref{sec:opengl-rendering}. The rendered RGBD image, together
 with the object's mask generated from rendering, is finally passed to the chosen
 detector in order to extract a template. 

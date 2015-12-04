@@ -5,7 +5,7 @@ in which to travel in order to correctly grasp it. In this project, this task
 is accomplished by simulating a set of predefined poses over each object before
 gripping. As the goal of the project is grasping a \emph{set} of objects, a
 good grasping strategy must be implemented too; this strategy is described in
-detail in sec. \ref{sec:order-list}. However, this means that, independently from the
+detail in sec.~\ref{sec:order-list}. However, this means that, independently from the
 chosen global strategy, grasping pose computation has to assign to each
 possible set of movements (which we will refer to as a \emph{grasp} from now on)
 a \emph{score} representing the difficulty of picking
@@ -13,11 +13,9 @@ for that particular grasp. The chosen algorithm assigns to each grasp a
 probabilistic score, based on the intersection volume between an emulated
 gripper and the scene, from which the object to grasp has been removed.
 
-In this section, first it is described the score concept (sec.
-\ref{sec:grasp_score}), then the chosen way of modelling the gripper (and robot) and
-the scene (sec. \ref{sec:shapes}). Finally, a flexible way to compute the score for a set of possible
-grasps is presented, together with details for particular cases (sec.
-\ref{sec:grasp_computing}).
+In this section, first it is described the score concept (sec.~\ref{sec:grasp_score}), then the chosen way of modelling the gripper (and robot) and
+the scene (sec.~\ref{sec:shapes}). Finally, a flexible way to compute the score for a set of possible
+grasps is presented, together with details for particular cases (sec.~\ref{sec:grasp_computing}).
 
 \subsection{Probabilistic grasping score} \label{sec:grasp_score}
 For the implementation of any high-level grasping strategy for multiple
@@ -98,10 +96,10 @@ The chosen function, which satisfies all of the above properties, is
   \right.
 \end{equation}
 
-It is shown in appendix \ref{sec:demonstrate-score} that $s(V_{int})$ satisfies all
+It is shown in appendix~\ref{sec:demonstrate-score} that $s(V_{int})$ satisfies all
 of the above properties for any $K\geq \frac{V_{\text{max}}-V_{\text{easy}}}{V_{\text{easy}}}$, and is thus suitable as a score
 function. Some examples of this function varying the two parameters $\alpha$ and
-$K$ are shown in fig. \ref{fig:score_function}.
+$K$ are shown in fig.~\ref{fig:score_function}.
 
 \begin{figure}[htbp]
   \centering
@@ -137,8 +135,7 @@ multiple-nodes meshes. This approach has a serie of advantages:
   \item{using an approach similar to what is supported by CAD
       applications results in the possibility of scripting the latter in order
       to automatically produce an exact representation of the object starting
-      from a CAD model, which could be the same used for training in sec.
-    \ref{sec:cad-mesh};}
+      from a CAD model, which could be the same used for training in sec.~\ref{sec:cad-mesh};}
   \item{the approach is very flexible because of the relative independency
       between the object's model and the rest of the algorithms: new use-case of
       the algorithm (e.g. for moving or nonrigid objects) could leave this part intact, and
@@ -251,8 +248,7 @@ A point, or any other primitive, $P$ belongs to a compound $C$ with children $c_
 
 Using this four composing blocks, it is easy to form every object. Also, every
 object can be evaluated for intersection with at least a point, which is the
-base for the volumes' evaluation system described into sec.
-\ref{sec:grasp_computing}; some objects can also be intersected more efficiently by
+base for the volumes' evaluation system described into sec.~\ref{sec:grasp_computing}; some objects can also be intersected more efficiently by
 exploiting other special case features as line evaluation. Also, it has been
 shown how the easy structure of each primitive, together with the use of
 compounds, makes it easy to add further extensions to this system and immediately
@@ -336,7 +332,7 @@ constraints are needed for the algorithm to work properly:
   }
 \end{itemize}
 
-Some levels of approximation of different surfaces can be seen in fig. \ref{fig:approximate_shapes}.
+Some levels of approximation of different surfaces can be seen in fig.~\ref{fig:approximate_shapes}.
 
 \begin{figure}[htbp]
   \centering
@@ -360,8 +356,7 @@ points which it contain, and then assume that each point corresponds to the same
 fraction of the shape's volume: $V_{\text{cube}}=\frac{V_{\text{shape}}}{N_p}$.
 This assumption will be valid for sure, i.e. the computed sum will converge to
 the actual intersection value if $l$ is high enough, thanks to the third
-property of the approximation function stated in eqn.
-\ref{eqn:points_with_constant_density}.
+property of the approximation function stated in eqn.~\ref{eqn:points_with_constant_density}.
 
 The total intersection volume $V_{\text{int}}$ computed with approximation level
 $l$ will then be
@@ -370,11 +365,11 @@ $l$ will then be
 \end{equation}
 
 \subsection{Optimised volume computations for particular cases}
-The method presented in sec. \ref{volume-via-points} is universally valid,
+The method presented in sec.~\ref{volume-via-points} is universally valid,
 being able to be applied for every combination of shapes. However, this is
 clearly not efficient if applied to large datasets; also, the computational
 complexity increases cubically with the level of approximation as stated in
-eqn. \ref{volume-l-3}. Thus, when performing intersections for shapes for which
+eqn.~\ref{volume-l-3}. Thus, when performing intersections for shapes for which
 a closed form solution is known, this is preferred. In this project the case of
 sphere-sphere intersection has been implemented as an example, but other cases
 can be easily added due to the polymorphic structure of the algorithm.
@@ -434,12 +429,12 @@ second are contained into the first:
 A lot of special cases exists for these situations too, that can improve the
 execution speed (although this is asymptotically negligible, as the average
 execution time will already be $O(l^3)$); for example, for cube-to-sphere
-intersection, eqn. \ref{eqn:surface-in-volume} can be reduced to constant time by
+intersection, eqn.~\ref{eqn:surface-in-volume} can be reduced to constant time by
 noticing that it is sufficient for all the vertices $V$ of the cube to be
 contained into the sphere in order for its whole surface to be contained too;
 more in general, for polygonal, convex, meshes-like shapes, only the edges must
 be checked to be contained one into the volume of the other. Also, if the shapes
-are \emph{simply connected}, the second part of eqn. \ref{eqn:surface-in-volume}
+are \emph{simply connected}, the second part of eqn.~\ref{eqn:surface-in-volume}
 can be omitted as it is implicitly true if the first part is. The number of
 points to check is thus halved or reduced to a constant number in these cases --
 which actually represent the majority of cases.
