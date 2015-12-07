@@ -18,5 +18,6 @@
 !Slides/*.sh
 !*.xmpdata
 !*.lst
+!LICENSE.txt
 *-converted-to.pdf
 *.fcstd1

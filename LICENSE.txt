@@ -1,0 +1,27 @@
+This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+Some of the files included into this work are NOT of property of the author,
+have been specifically licensed to the author, and thus
+do not fall under this license, neither are they compatible:
+
+* Code snippets are licensed under the Mozilla Public License, v2.0
+* All the material which has been flagged as "Courtesy of" into the project is
+  property of its owner, and may have different licensing terms;
+* Politecnico di Torino's logo is property of Politecnico di Torino, and has
+  been substituted into the work;
+* COMAU logo is property of COMAU S.p.A.;
+* Isaac Team's logo is property of Isaac Team, Politecnico di Torino;
+* Pisa/IIT softhand image is property of Manuel Giuseppe Catalano and Giorgio
+  Grioli;
+* Versaball's image and Versaball trademarks are property of Empire Robotics,
+  Inc.;
+* OpenGL, OpenCV, Eigen, Kinect, OpenNI, Python are properties of their
+  respective counterparts with different licenses;
+* Xkcd's drawing is property of RM (xkcd.com), and is licensed under the
+  Creative Commons Attribution-NonCommercial 2.5 License. 
+
+Notice that these different licensing terms may imply that you may NOT redistribute the
+whole presentation or material in binary form: if you need to redistribute it
+according to this license, you will need to either ask for specifical licensing
+to these authors, or change the logos/graphics in order to use available ones.
+
