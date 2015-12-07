@@ -7,8 +7,16 @@
 !Makefile
 !Graphics
 !Results
+!Slides
 !Graphics/*
 !Results/*
+!Slides/*.png
+!Slides/*.svg
+!Slides/*.tex
+!Slides/*.sty
+!Slides/*.eps
+!Slides/*.sh
+!*.xmpdata
 !*.lst
 *-converted-to.pdf
 *.fcstd1
